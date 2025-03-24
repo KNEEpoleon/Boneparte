@@ -1,0 +1,5 @@
+/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl:msg/LBRCommand.idl
+/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl:msg/LBRJointPositionCommand.idl
+/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl:msg/LBRState.idl
+/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl:msg/LBRTorqueCommand.idl
+/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl:msg/LBRWrenchCommand.idl

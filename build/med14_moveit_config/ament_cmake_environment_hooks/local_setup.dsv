@@ -1,0 +1,2 @@
+source;share/med14_moveit_config/environment/ament_prefix_path.sh
+source;share/med14_moveit_config/environment/path.sh

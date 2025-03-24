@@ -1,0 +1,4 @@
+Invoking command in '/home/genisis/Boneparte/build/fri_client_sdk': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/genisis/Boneparte/build/fri_client_sdk -- -j8 -l8
+Invoked command in '/home/genisis/Boneparte/build/fri_client_sdk' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/genisis/Boneparte/build/fri_client_sdk -- -j8 -l8
+Invoking command in '/home/genisis/Boneparte/build/fri_client_sdk': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/genisis/Boneparte/build/fri_client_sdk
+Invoked command in '/home/genisis/Boneparte/build/fri_client_sdk' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/genisis/Boneparte/build/fri_client_sdk

@@ -1,0 +1,22 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from lbr_fri_idl/msg/LBRTorqueCommand.msg
+// generated code does not contain a copyright notice
+
+
+module lbr_fri_idl {
+  module msg {
+    typedef double double__7[7];
+    @verbatim (language="comment", text=
+      "Torque command for the Fast Robot Interface (FRI)." "\n"
+      "Requires joint position and torque overlay." "\n"
+      "Refer to KUKA::FRI::LBRCommand in friLBRCommand.h for documentation." "\n"
+      "" "\n"
+      " * joint_position [rad]" "\n"
+      " * torque [Nm]")
+    struct LBRTorqueCommand {
+      double__7 joint_position;
+
+      double__7 torque;
+    };
+  };
+};

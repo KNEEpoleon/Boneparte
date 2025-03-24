@@ -1,0 +1,72 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from lbr_fri_idl/msg/LBRState.msg
+// generated code does not contain a copyright notice
+
+
+module lbr_fri_idl {
+  module msg {
+    typedef double double__7[7];
+    @verbatim (language="comment", text=
+      "Message that holds states that are exposed through the" "\n"
+      "Fast Robot Interface (FRI)." "\n"
+      "Following states are exposed (refer to KUKA::FRI::LBRState in friLBRState.h for documentation):" "\n"
+      "" "\n"
+      " * sample_time [s]" "\n"
+      " * session_state [#]" "\n"
+      " * connection_quality [#]" "\n"
+      " * safety_state [#]" "\n"
+      " * operation_mode [#]" "\n"
+      " * drive_state [#]: " "\n"
+      " * client_command_mode [#]" "\n"
+      " * overlay_type [#]" "\n"
+      " * control_mode [#]" "\n"
+      "" "\n"
+      " * time_stamp_sec [s]" "\n"
+      " * time_stamp_nano_sec [ns]" "\n"
+      "" "\n"
+      " * measured_joint_position [rad]" "\n"
+      " * commanded_joint_position [rad]" "\n"
+      " * measured_torque [Nm]" "\n"
+      " * commanded_torque [Nm]" "\n"
+      " * external_torque [Nm]" "\n"
+      " * ipo_joint_position [rad]" "\n"
+      " * tracking_performance [a.u.]")
+    struct LBRState {
+      double sample_time;
+
+      int8 session_state;
+
+      int8 connection_quality;
+
+      int8 safety_state;
+
+      int8 operation_mode;
+
+      int8 drive_state;
+
+      int8 client_command_mode;
+
+      int8 overlay_type;
+
+      int8 control_mode;
+
+      uint32 time_stamp_sec;
+
+      uint32 time_stamp_nano_sec;
+
+      double__7 measured_joint_position;
+
+      double__7 commanded_joint_position;
+
+      double__7 measured_torque;
+
+      double__7 commanded_torque;
+
+      double__7 external_torque;
+
+      double__7 ipo_joint_position;
+
+      double tracking_performance;
+    };
+  };
+};

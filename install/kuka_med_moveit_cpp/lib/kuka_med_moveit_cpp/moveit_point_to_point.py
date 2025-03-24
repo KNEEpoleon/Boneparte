@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/src/manipulation/kuka_med_moveit_cpp/scripts/moveit_point_to_point.py

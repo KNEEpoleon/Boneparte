@@ -1,0 +1,80 @@
+[0.014s] Invoking command in '/home/genisis/Boneparte/build/lbr_bringup': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_ros2_control/lib:/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_bringup -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_bringup
+[0.068s] -- The C compiler identification is GNU 11.4.0
+[0.124s] -- The CXX compiler identification is GNU 11.4.0
+[0.133s] -- Detecting C compiler ABI info
+[0.198s] -- Detecting C compiler ABI info - done
+[0.208s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.208s] -- Detecting C compile features
+[0.209s] -- Detecting C compile features - done
+[0.212s] -- Detecting CXX compiler ABI info
+[0.294s] -- Detecting CXX compiler ABI info - done
+[0.304s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.304s] -- Detecting CXX compile features
+[0.305s] -- Detecting CXX compile features - done
+[0.308s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.445s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.502s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.665s] -- Configuring done
+[0.668s] -- Generating done
+[0.670s] -- Build files have been written to: /home/genisis/Boneparte/build/lbr_bringup
+[0.675s] Invoked command in '/home/genisis/Boneparte/build/lbr_bringup' returned '0': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_ros2_control/lib:/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_bringup -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_bringup
+[0.676s] Invoking command in '/home/genisis/Boneparte/build/lbr_bringup': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_ros2_control/lib:/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_bringup -- -j8 -l8
+[0.726s] Built target ament_cmake_python_symlink_lbr_bringup
+[0.970s] running egg_info
+[0.970s] creating lbr_bringup.egg-info
+[0.971s] writing lbr_bringup.egg-info/PKG-INFO
+[0.971s] writing dependency_links to lbr_bringup.egg-info/dependency_links.txt
+[0.971s] writing top-level names to lbr_bringup.egg-info/top_level.txt
+[0.971s] writing manifest file 'lbr_bringup.egg-info/SOURCES.txt'
+[0.973s] reading manifest file 'lbr_bringup.egg-info/SOURCES.txt'
+[0.973s] writing manifest file 'lbr_bringup.egg-info/SOURCES.txt'
+[0.997s] Built target ament_cmake_python_build_lbr_bringup_egg
+[1.007s] Invoked command in '/home/genisis/Boneparte/build/lbr_bringup' returned '0': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_ros2_control/lib:/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_bringup -- -j8 -l8
+[1.009s] Invoking command in '/home/genisis/Boneparte/build/lbr_bringup': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_ros2_control/lib:/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_bringup
+[1.015s] -- Install configuration: ""
+[1.016s] -- Execute custom install script
+[1.017s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/gazebo.rviz
+[1.025s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/hardware.rviz
+[1.033s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/mock.rviz
+[1.041s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/moveit_servo.yaml
+[1.050s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/gazebo.launch.py
+[1.058s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/hardware.launch.py
+[1.066s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/mock.launch.py
+[1.074s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/move_group.launch.py
+[1.083s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/moveit_servo.launch.py
+[1.091s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/rviz.launch.py
+[1.099s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/pythonpath.sh
+[1.107s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/pythonpath.dsv
+[1.115s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/PKG-INFO
+[1.123s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/SOURCES.txt
+[1.131s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/dependency_links.txt
+[1.139s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/top_level.txt
+[1.148s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/__init__.py
+[1.156s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/description.py
+[1.164s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/gazebo.py
+[1.172s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/moveit.py
+[1.180s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/ros2_control.py
+[1.188s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/rviz.py
+[1.197s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/ament_index/resource_index/package_run_dependencies/lbr_bringup
+[1.205s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/ament_index/resource_index/parent_prefix_path/lbr_bringup
+[1.214s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/ament_prefix_path.sh
+[1.222s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/ament_prefix_path.dsv
+[1.230s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/path.sh
+[1.239s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/path.dsv
+[1.247s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.bash
+[1.255s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.sh
+[1.264s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.zsh
+[1.272s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.dsv
+[1.280s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/package.dsv
+[1.288s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/ament_index/resource_index/packages/lbr_bringup
+[1.296s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/cmake/lbr_bringupConfig.cmake
+[1.304s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/cmake/lbr_bringupConfig-version.cmake
+[1.313s] -- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/package.xml
+[1.353s] Listing '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup'...
+[1.353s] Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/__init__.py'...
+[1.353s] Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/description.py'...
+[1.353s] Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/gazebo.py'...
+[1.353s] Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/moveit.py'...
+[1.354s] Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/ros2_control.py'...
+[1.354s] Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/rviz.py'...
+[1.360s] Invoked command in '/home/genisis/Boneparte/build/lbr_bringup' returned '0': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_ros2_control:/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_ros2_control/lib:/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_bringup

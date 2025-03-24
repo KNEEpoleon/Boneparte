@@ -1,0 +1,6 @@
+Invoking command in '/home/genisis/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_description
+Invoked command in '/home/genisis/Boneparte/build/lbr_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_description
+Invoking command in '/home/genisis/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_description -- -j8 -l8
+Invoked command in '/home/genisis/Boneparte/build/lbr_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_description -- -j8 -l8
+Invoking command in '/home/genisis/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_description
+Invoked command in '/home/genisis/Boneparte/build/lbr_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_description

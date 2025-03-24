@@ -1,0 +1,4 @@
+source;share/lbr_ros2_control/local_setup.bash
+source;share/lbr_ros2_control/local_setup.dsv
+source;share/lbr_ros2_control/local_setup.sh
+source;share/lbr_ros2_control/local_setup.zsh

@@ -1,0 +1,115 @@
+[0.011s] Invoking command in '/home/genisis/Boneparte/build/lbr_ros2_control': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_ros2_control -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_ros2_control
+[0.059s] -- The C compiler identification is GNU 11.4.0
+[0.109s] -- The CXX compiler identification is GNU 11.4.0
+[0.115s] -- Detecting C compiler ABI info
+[0.205s] -- Detecting C compiler ABI info - done
+[0.212s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.212s] -- Detecting C compile features
+[0.212s] -- Detecting C compile features - done
+[0.215s] -- Detecting CXX compiler ABI info
+[0.290s] -- Detecting CXX compiler ABI info - done
+[0.297s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.297s] -- Detecting CXX compile features
+[0.297s] -- Detecting CXX compile features - done
+[0.300s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.435s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.491s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.521s] -- Found controller_interface: 2.48.0 (/opt/ros/humble/share/controller_interface/cmake)
+[0.564s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.569s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.578s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.590s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.606s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.815s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.818s] -- Found rmw_cyclonedds_cpp: 1.3.4 (/opt/ros/humble/share/rmw_cyclonedds_cpp/cmake)
+[0.841s] -- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+[0.850s] -- Looking for pthread.h
+[0.915s] -- Looking for pthread.h - found
+[0.915s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[0.984s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[0.985s] -- Found Threads: TRUE  
+[1.043s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/humble/share/eigen3_cmake_module/cmake)
+[1.050s] -- Found Eigen3: TRUE (found version "3.4.0") 
+[1.052s] -- Found kinematics_interface: 0.3.0 (/opt/ros/humble/share/kinematics_interface/cmake)
+[1.054s] -- Found lbr_fri_idl: 1.5.0 (/home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake)
+[1.065s] -- Found lbr_fri_ros2: 2.2.0 (/home/genisis/Boneparte/install/lbr_fri_ros2/share/lbr_fri_ros2/cmake)
+[1.076s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[1.168s] -- Configuring done
+[1.203s] -- Generating done
+[1.207s] -- Build files have been written to: /home/genisis/Boneparte/build/lbr_ros2_control
+[1.215s] Invoked command in '/home/genisis/Boneparte/build/lbr_ros2_control' returned '0': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_ros2_control -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_ros2_control
+[1.217s] Invoking command in '/home/genisis/Boneparte/build/lbr_ros2_control': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_ros2_control -- -j8 -l8
+[1.269s] [ 37%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/controllers/lbr_torque_command_controller.cpp.o[0m
+[1.269s] [ 37%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/controllers/admittance_controller.cpp.o[0m
+[1.269s] [ 37%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/controllers/lbr_joint_position_command_controller.cpp.o[0m
+[1.269s] [ 62%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/controllers/lbr_wrench_command_controller.cpp.o[0m
+[1.269s] [ 62%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/controllers/lbr_state_broadcaster.cpp.o[0m
+[1.269s] [ 75%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/controllers/twist_controller.cpp.o[0m
+[1.269s] [ 87%] [32mBuilding CXX object CMakeFiles/lbr_ros2_control.dir/src/system_interface.cpp.o[0m
+[5.313s] In file included from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_torque_command_controller.hpp:15[m[K,
+[5.314s]                  from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/src/controllers/lbr_torque_command_controller.cpp:1[m[K:
+[5.314s] [01m[K/opt/ros/humble/include/realtime_tools/realtime_tools/realtime_buffer.h:22:100:[m[K [01;36m[Knote: [m[K‘[01m[K#pragma message: This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header.[m[K’
+[5.314s]    22 |   "This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header."[01;36m[K)[m[K  //NOLINT
+[5.314s]       |                                                                                                    [01;36m[K^[m[K
+[5.326s] In file included from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_joint_position_command_controller.hpp:13[m[K,
+[5.326s]                  from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/src/controllers/lbr_joint_position_command_controller.cpp:1[m[K:
+[5.326s] [01m[K/opt/ros/humble/include/realtime_tools/realtime_tools/realtime_buffer.h:22:100:[m[K [01;36m[Knote: [m[K‘[01m[K#pragma message: This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header.[m[K’
+[5.326s]    22 |   "This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header."[01;36m[K)[m[K  //NOLINT
+[5.326s]       |                                                                                                    [01;36m[K^[m[K
+[5.359s] In file included from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_state_broadcaster.hpp:15[m[K,
+[5.359s]                  from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/src/controllers/lbr_state_broadcaster.cpp:1[m[K:
+[5.359s] [01m[K/opt/ros/humble/include/realtime_tools/realtime_tools/realtime_publisher.h:22:103:[m[K [01;36m[Knote: [m[K‘[01m[K#pragma message: This header include is deprecated. Please update your code to use 'realtime_publisher.hpp' header.[m[K’
+[5.359s]    22 |   "This header include is deprecated. Please update your code to use 'realtime_publisher.hpp' header."[01;36m[K)[m[K  //NOLINT
+[5.359s]       |                                                                                                       [01;36m[K^[m[K
+[5.435s] In file included from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_wrench_command_controller.hpp:15[m[K,
+[5.435s]                  from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/src/controllers/lbr_wrench_command_controller.cpp:1[m[K:
+[5.435s] [01m[K/opt/ros/humble/include/realtime_tools/realtime_tools/realtime_buffer.h:22:100:[m[K [01;36m[Knote: [m[K‘[01m[K#pragma message: This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header.[m[K’
+[5.435s]    22 |   "This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header."[01;36m[K)[m[K  //NOLINT
+[5.436s]       |                                                                                                    [01;36m[K^[m[K
+[5.455s] In file included from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/include/lbr_ros2_control/controllers/twist_controller.hpp:17[m[K,
+[5.455s]                  from [01m[K/home/genisis/Boneparte/src/manipulation/lbr_ros2_control/src/controllers/twist_controller.cpp:1[m[K:
+[5.455s] [01m[K/opt/ros/humble/include/realtime_tools/realtime_tools/realtime_buffer.h:22:100:[m[K [01;36m[Knote: [m[K‘[01m[K#pragma message: This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header.[m[K’
+[5.455s]    22 |   "This header include is deprecated. Please update your code to use 'realtime_buffer.hpp' header."[01;36m[K)[m[K  //NOLINT
+[5.455s]       |                                                                                                    [01;36m[K^[m[K
+[17.789s] [100%] [32m[1mLinking CXX shared library liblbr_ros2_control.so[0m
+[18.095s] [100%] Built target lbr_ros2_control
+[18.106s] Invoked command in '/home/genisis/Boneparte/build/lbr_ros2_control' returned '0': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_ros2_control -- -j8 -l8
+[18.108s] Invoking command in '/home/genisis/Boneparte/build/lbr_ros2_control': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_ros2_control
+[18.115s] -- Install configuration: "Release"
+[18.115s] -- Execute custom install script
+[18.115s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/plugin_description_files/controllers.xml
+[18.124s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/plugin_description_files/system_interface.xml
+[18.132s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/environment/library_path.sh
+[18.140s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/environment/library_path.dsv
+[18.148s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/controllers/admittance_controller.hpp
+[18.156s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_joint_position_command_controller.hpp
+[18.164s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_state_broadcaster.hpp
+[18.172s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_torque_command_controller.hpp
+[18.180s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/controllers/lbr_wrench_command_controller.hpp
+[18.189s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/controllers/twist_controller.hpp
+[18.197s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/system_interface.hpp
+[18.205s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/include/lbr_ros2_control/system_interface_type_values.hpp
+[18.213s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/ament_index/resource_index/package_run_dependencies/lbr_ros2_control
+[18.221s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/ament_index/resource_index/parent_prefix_path/lbr_ros2_control
+[18.230s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/environment/ament_prefix_path.sh
+[18.238s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/environment/ament_prefix_path.dsv
+[18.246s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/environment/path.sh
+[18.254s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/environment/path.dsv
+[18.262s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/local_setup.bash
+[18.270s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/local_setup.sh
+[18.278s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/local_setup.zsh
+[18.286s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/local_setup.dsv
+[18.294s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/package.dsv
+[18.302s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/ament_index/resource_index/packages/lbr_ros2_control
+[18.310s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/ament_index/resource_index/controller_interface__pluginlib__plugin/lbr_ros2_control
+[18.318s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/lbr_ros2_control
+[18.326s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/ament_cmake_export_targets-extras.cmake
+[18.334s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/ament_cmake_export_dependencies-extras.cmake
+[18.342s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/lbr_ros2_controlConfig.cmake
+[18.351s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/lbr_ros2_controlConfig-version.cmake
+[18.359s] -- Symlinking: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/package.xml
+[18.367s] -- Installing: /home/genisis/Boneparte/install/lbr_ros2_control/lib/lbr_ros2_control/liblbr_ros2_control.so
+[18.369s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_ros2_control/lib/lbr_ros2_control/liblbr_ros2_control.so" to ""
+[18.370s] -- Installing: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/lbr_ros2_control_exportExport.cmake
+[18.370s] -- Installing: /home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/lbr_ros2_control_exportExport-release.cmake
+[18.372s] Invoked command in '/home/genisis/Boneparte/build/lbr_ros2_control' returned '0': AMENT_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2:/home/genisis/Boneparte/install/lbr_fri_idl:/home/genisis/Boneparte/install/lbr_description:/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/lbr_fri_ros2/lib:/home/genisis/Boneparte/install/lbr_fri_idl/lib:/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig PYTHONPATH=/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_ros2_control

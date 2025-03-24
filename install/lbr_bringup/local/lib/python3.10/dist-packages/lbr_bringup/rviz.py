@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/src/manipulation/lbr_bringup/lbr_bringup/rviz.py

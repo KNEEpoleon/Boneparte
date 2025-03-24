@@ -1,0 +1,364 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "libFRIClient.so"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"install",
+			"target_compile_options",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 91,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 145,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 119,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 98,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -Wno-format-security -Wno-parentheses -O3 -DNDEBUG -fPIC"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-Wall"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-O2"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_SOCKLEN_T"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DPB_SYSTEM_HEADER=\\\"pb_syshdr.h\\\""
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DPB_FIELD_16BIT"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDINT_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDDEF_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDBOOL_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDLIB_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STRING_H"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "FRIClient_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/include"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/base"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/nanopb-0.2.8"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf_gen"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -Wno-format-security -Wno-parentheses -O3 -DNDEBUG -fPIC"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-Wall"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-O2"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_SOCKLEN_T"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DPB_SYSTEM_HEADER=\\\"pb_syshdr.h\\\""
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DPB_FIELD_16BIT"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDINT_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDDEF_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDBOOL_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STDLIB_H"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-DHAVE_STRING_H"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "FRIClient_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/include"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/base"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/nanopb-0.2.8"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf_gen"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				8,
+				9,
+				10,
+				11
+			]
+		}
+	],
+	"id" : "FRIClient::@6890427a1f51a3e7e1df",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 2,
+				"path" : "lib"
+			},
+			{
+				"backtrace" : 2,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/home/genisis/Boneparte/install/fri_client_sdk"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "",
+				"role" : "flags"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "FRIClient",
+	"nameOnDisk" : "libFRIClient.so",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/base/friClientApplication.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/client_lbr/friLBRClient.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/client_lbr/friLBRCommand.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/client_lbr/friLBRState.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/client_trafo/friTransformationClient.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/connection/friUdpConnection.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf/friCommandMessageEncoder.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf/friMonitoringMessageDecoder.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf/pb_frimessages_callbacks.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/protobuf_gen/FRIMessages.pb.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/nanopb-0.2.8/pb_decode.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "/home/genisis/Boneparte/build/fri_client_sdk/FRI-Client-SDK_Cpp/src/nanopb-0.2.8/pb_encode.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_generator_c/lbr_fri_idl/msg/detail/lbr_joint_position_command__struct.h

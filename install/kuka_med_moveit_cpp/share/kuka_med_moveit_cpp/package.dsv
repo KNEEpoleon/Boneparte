@@ -1,0 +1,8 @@
+source;share/kuka_med_moveit_cpp/hook/cmake_prefix_path.ps1
+source;share/kuka_med_moveit_cpp/hook/cmake_prefix_path.dsv
+source;share/kuka_med_moveit_cpp/hook/cmake_prefix_path.sh
+source;share/kuka_med_moveit_cpp/local_setup.bash
+source;share/kuka_med_moveit_cpp/local_setup.dsv
+source;share/kuka_med_moveit_cpp/local_setup.ps1
+source;share/kuka_med_moveit_cpp/local_setup.sh
+source;share/kuka_med_moveit_cpp/local_setup.zsh

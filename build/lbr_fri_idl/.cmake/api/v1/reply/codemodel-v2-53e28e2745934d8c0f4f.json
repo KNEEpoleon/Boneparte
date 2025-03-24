@@ -1,0 +1,290 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-7632d06655d4f4231fd5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						4,
+						5,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20
+					]
+				},
+				{
+					"build" : "lbr_fri_idl__py",
+					"jsonFile" : "directory-lbr_fri_idl__py-Release-f1ac4b45daa0e2923272.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "/home/genisis/Boneparte/build/lbr_fri_idl/lbr_fri_idl__py",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "gtest",
+					"jsonFile" : "directory-gtest-Release-a2408fe1a73b92c5e636.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "/opt/ros/humble/src/gtest_vendor",
+					"targetIndexes" : 
+					[
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						1
+					],
+					"name" : "lbr_fri_idl",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "gtest",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_build_lbr_fri_idl_egg::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_build_lbr_fri_idl_egg-Release-2f77624166e8640353a9.json",
+					"name" : "ament_cmake_python_build_lbr_fri_idl_egg",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_symlink_lbr_fri_idl::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_symlink_lbr_fri_idl-Release-7973fd52af2850128851.json",
+					"name" : "ament_cmake_python_symlink_lbr_fri_idl",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "gtest::@0af4add9fe94340e763e",
+					"jsonFile" : "target-gtest-Release-7f5dd951d1865a308266.json",
+					"name" : "gtest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "gtest_main::@0af4add9fe94340e763e",
+					"jsonFile" : "target-gtest_main-Release-42409fb1a859fad5ec00.json",
+					"name" : "gtest_main",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl-Release-286f77d00a7284d16da6.json",
+					"name" : "lbr_fri_idl",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__cpp-Release-df320b828ef9cdd1462d.json",
+					"name" : "lbr_fri_idl__cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "lbr_fri_idl__py::@68c9a0fd057a815a9442",
+					"jsonFile" : "target-lbr_fri_idl__py-Release-ad054e44534876d3d064.json",
+					"name" : "lbr_fri_idl__py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_generator_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_generator_c-Release-094718c6a0ce91fb7c47.json",
+					"name" : "lbr_fri_idl__rosidl_generator_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_generator_py::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_generator_py-Release-2495609c043c61f8ec58.json",
+					"name" : "lbr_fri_idl__rosidl_generator_py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_c-Release-f04a658a923b22eea861.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_c__pyext-Release-a8b3efe7ef0eb03f7408.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_cpp-Release-c339c768ba371642d524.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_fastrtps_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_fastrtps_c-Release-a6848f244c1b266912ef.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_fastrtps_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_fastrtps_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_fastrtps_c__pyext-Release-7d162134909559a58c1a.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_fastrtps_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_fastrtps_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_fastrtps_cpp-Release-c0431aede5fa41169367.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_fastrtps_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_introspection_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_introspection_c-Release-f97dd96a73e7cc08f5e4.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_introspection_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_introspection_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_introspection_c__pyext-Release-b34d1269099da15ea43e.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_introspection_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl__rosidl_typesupport_introspection_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl__rosidl_typesupport_introspection_cpp-Release-3de3d1326160b3788b48.json",
+					"name" : "lbr_fri_idl__rosidl_typesupport_introspection_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl_test_command_interfaces::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl_test_command_interfaces-Release-8e387d3406ff2218853c.json",
+					"name" : "lbr_fri_idl_test_command_interfaces",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "lbr_fri_idl_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lbr_fri_idl_uninstall-Release-c2b69d8d7843e2b7c6b7.json",
+					"name" : "lbr_fri_idl_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-Release-41b33b545a5477ad7727.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/genisis/Boneparte/build/lbr_fri_idl",
+		"source" : "/home/genisis/Boneparte/src/manipulation/lbr_fri_idl"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

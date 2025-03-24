@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/src/manipulation/lbr_moveit_config/med7_moveit_config/launch/moveit_rviz.launch.py

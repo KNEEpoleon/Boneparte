@@ -1,0 +1,2 @@
+Invoking command in '/home/genisis/Boneparte/build/lbr_description': /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_description
+Invoked command in '/home/genisis/Boneparte/build/lbr_description' returned '1': /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_description

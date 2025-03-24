@@ -1,0 +1,1 @@
+Invoking command in '/home/genisis/Boneparte/build/fri_client_sdk': /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/fri -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/fri_client_sdk

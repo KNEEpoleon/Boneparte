@@ -1,0 +1,26 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from lbr_fri_idl/msg/LBRCommand.msg
+// generated code does not contain a copyright notice
+
+
+module lbr_fri_idl {
+  module msg {
+    typedef double double__7[7];
+    typedef double double__6[6];
+    @verbatim (language="comment", text=
+      "Message that holds commands that are exposed through the" "\n"
+      "Fast Robot Interface (FRI)." "\n"
+      "Following commands are exposed (refer to KUKA::FRI::LBRCommand in friLBRCommand.h for documentation):" "\n"
+      "" "\n"
+      " * joint_position [rad]" "\n"
+      " * torque [Nm]" "\n"
+      " * wrench [N/Nm]")
+    struct LBRCommand {
+      double__7 joint_position;
+
+      double__7 torque;
+
+      double__6 wrench;
+    };
+  };
+};

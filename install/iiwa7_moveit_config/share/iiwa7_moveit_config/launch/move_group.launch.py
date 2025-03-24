@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/src/manipulation/lbr_moveit_config/iiwa7_moveit_config/launch/move_group.launch.py

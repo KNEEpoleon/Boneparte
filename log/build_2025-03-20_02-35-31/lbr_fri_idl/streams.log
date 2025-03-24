@@ -1,0 +1,325 @@
+[0.009s] Invoking command in '/home/genisis/Boneparte/build/lbr_fri_idl': CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_fri_idl -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_fri_idl
+[0.059s] -- The C compiler identification is GNU 11.4.0
+[0.115s] -- The CXX compiler identification is GNU 11.4.0
+[0.124s] -- Detecting C compiler ABI info
+[0.206s] -- Detecting C compiler ABI info - done
+[0.217s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.217s] -- Detecting C compile features
+[0.217s] -- Detecting C compile features - done
+[0.221s] -- Detecting CXX compiler ABI info
+[0.300s] -- Detecting CXX compiler ABI info - done
+[0.309s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.309s] -- Detecting CXX compile features
+[0.310s] -- Detecting CXX compile features - done
+[0.312s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.488s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.564s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.602s] -- Found builtin_interfaces: 1.2.1 (/opt/ros/humble/share/builtin_interfaces/cmake)
+[0.654s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.661s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.675s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.697s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.726s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.748s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[1.028s] -- Found ament_cmake_cppcheck: 0.12.11 (/opt/ros/humble/share/ament_cmake_cppcheck/cmake)
+[1.030s] -- Found ament_cmake_cpplint: 0.12.11 (/opt/ros/humble/share/ament_cmake_cpplint/cmake)
+[1.032s] -- Found ament_cmake_uncrustify: 0.12.11 (/opt/ros/humble/share/ament_cmake_uncrustify/cmake)
+[1.035s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[1.372s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.544s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.577s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") 
+[1.580s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[1.617s] -- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") 
+[1.617s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[1.617s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[1.617s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[1.637s] -- Found PythonExtra: .so  
+[1.679s] -- Found ament_cmake_flake8: 0.12.11 (/opt/ros/humble/share/ament_cmake_flake8/cmake)
+[1.683s] -- Found ament_cmake_pep257: 0.12.11 (/opt/ros/humble/share/ament_cmake_pep257/cmake)
+[1.690s] -- Found gtest sources under '/opt/ros/humble/src/gtest_vendor': C++ tests using 'Google Test' will be built
+[1.694s] -- Looking for pthread.h
+[1.791s] -- Looking for pthread.h - found
+[1.791s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.988s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[1.989s] -- Found Threads: TRUE  
+[1.998s] -- Configuring done
+[2.080s] -- Generating done
+[2.091s] -- Build files have been written to: /home/genisis/Boneparte/build/lbr_fri_idl
+[2.098s] Invoked command in '/home/genisis/Boneparte/build/lbr_fri_idl' returned '0': CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/lbr_fri_idl -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/lbr_fri_idl
+[2.100s] Invoking command in '/home/genisis/Boneparte/build/lbr_fri_idl': CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_fri_idl -- -j8 -l8
+[2.159s] [  1%] [34m[1mGenerating C code for ROS interfaces[0m
+[2.189s] [  2%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[2.190s] [  2%] Built target ament_cmake_python_symlink_lbr_fri_idl
+[2.196s] [  4%] [32mBuilding CXX object gtest/CMakeFiles/gtest.dir/src/gtest-all.cc.o[0m
+[2.197s] [  5%] [32mBuilding CXX object gtest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o[0m
+[2.745s] running egg_info
+[2.746s] creating lbr_fri_idl.egg-info
+[2.752s] writing lbr_fri_idl.egg-info/PKG-INFO
+[2.752s] writing dependency_links to lbr_fri_idl.egg-info/dependency_links.txt
+[2.752s] writing top-level names to lbr_fri_idl.egg-info/top_level.txt
+[2.752s] writing manifest file 'lbr_fri_idl.egg-info/SOURCES.txt'
+[2.755s] reading manifest file 'lbr_fri_idl.egg-info/SOURCES.txt'
+[2.755s] writing manifest file 'lbr_fri_idl.egg-info/SOURCES.txt'
+[2.806s] [  5%] Built target ament_cmake_python_build_lbr_fri_idl_egg
+[3.268s] [  8%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_c.dir/rosidl_generator_c/lbr_fri_idl/msg/detail/lbr_joint_position_command__functions.c.o[0m
+[3.268s] [  8%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_c.dir/rosidl_generator_c/lbr_fri_idl/msg/detail/lbr_command__functions.c.o[0m
+[3.268s] [ 10%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_c.dir/rosidl_generator_c/lbr_fri_idl/msg/detail/lbr_torque_command__functions.c.o[0m
+[3.268s] [ 11%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_c.dir/rosidl_generator_c/lbr_fri_idl/msg/detail/lbr_state__functions.c.o[0m
+[3.275s] [ 13%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_c.dir/rosidl_generator_c/lbr_fri_idl/msg/detail/lbr_wrench_command__functions.c.o[0m
+[3.282s] [ 14%] [32m[1mLinking CXX static library libgtest_main.a[0m
+[3.361s] [ 14%] Built target gtest_main
+[3.484s] [ 15%] [32m[1mLinking C shared library liblbr_fri_idl__rosidl_generator_c.so[0m
+[3.494s] [ 15%] Built target lbr_fri_idl__cpp
+[3.509s] [ 20%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[3.509s] [ 20%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[3.509s] [ 20%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[3.529s] [ 20%] Built target lbr_fri_idl__rosidl_generator_c
+[3.541s] [ 21%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[3.544s] [ 23%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[3.551s] [ 24%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[4.388s] [ 26%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/lbr_fri_idl/msg/lbr_command__type_support.cpp.o[0m
+[4.416s] [ 27%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/lbr_fri_idl/msg/lbr_joint_position_command__type_support.cpp.o[0m
+[4.425s] [ 28%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_c.dir/rosidl_typesupport_c/lbr_fri_idl/msg/lbr_command__type_support.cpp.o[0m
+[4.503s] [ 30%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_c.dir/rosidl_typesupport_c/lbr_fri_idl/msg/lbr_joint_position_command__type_support.cpp.o[0m
+[4.549s] [ 31%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_c.dir/rosidl_typesupport_c/lbr_fri_idl/msg/lbr_state__type_support.cpp.o[0m
+[4.574s] [ 33%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/lbr_fri_idl/msg/detail/lbr_command__type_support.cpp.o[0m
+[4.599s] [ 34%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_c.dir/rosidl_typesupport_c/lbr_fri_idl/msg/lbr_torque_command__type_support.cpp.o[0m
+[4.635s] [ 36%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/lbr_fri_idl/msg/detail/dds_fastrtps/lbr_command__type_support.cpp.o[0m
+[4.647s] [ 37%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/lbr_fri_idl/msg/detail/lbr_command__type_support_c.cpp.o[0m
+[4.665s] [ 39%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/lbr_fri_idl/msg/detail/lbr_command__type_support.c.o[0m
+[4.723s] [ 40%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_c.dir/rosidl_typesupport_c/lbr_fri_idl/msg/lbr_wrench_command__type_support.cpp.o[0m
+[4.782s] [ 42%] [32m[1mLinking CXX shared library liblbr_fri_idl__rosidl_typesupport_c.so[0m
+[4.794s] [ 43%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/lbr_fri_idl/msg/detail/lbr_joint_position_command__type_support.c.o[0m
+[4.851s] [ 43%] Built target lbr_fri_idl__rosidl_typesupport_c
+[4.861s] [ 44%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/lbr_fri_idl/msg/detail/lbr_joint_position_command__type_support.cpp.o[0m
+[4.872s] [ 46%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/lbr_fri_idl/msg/detail/dds_fastrtps/lbr_joint_position_command__type_support.cpp.o[0m
+[4.910s] [ 47%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/lbr_fri_idl/msg/lbr_state__type_support.cpp.o[0m
+[4.917s] [ 49%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/lbr_fri_idl/msg/detail/lbr_state__type_support.c.o[0m
+[5.139s] [ 50%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/lbr_fri_idl/msg/detail/lbr_torque_command__type_support.c.o[0m
+[5.236s] [ 52%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/lbr_fri_idl/msg/detail/lbr_wrench_command__type_support.c.o[0m
+[5.299s] [ 53%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/lbr_fri_idl/msg/detail/dds_fastrtps/lbr_state__type_support.cpp.o[0m
+[5.350s] [ 56%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/lbr_fri_idl/msg/detail/lbr_joint_position_command__type_support_c.cpp.o[0m
+[5.355s] [ 56%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/lbr_fri_idl/msg/lbr_torque_command__type_support.cpp.o[0m
+[5.360s] [ 57%] [32m[1mLinking C shared library liblbr_fri_idl__rosidl_typesupport_introspection_c.so[0m
+[5.410s] [ 59%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/lbr_fri_idl/msg/detail/lbr_state__type_support.cpp.o[0m
+[5.449s] [ 59%] Built target lbr_fri_idl__rosidl_typesupport_introspection_c
+[5.481s] [ 60%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/lbr_fri_idl/msg/detail/lbr_state__type_support_c.cpp.o[0m
+[5.546s] [ 62%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/lbr_fri_idl/msg/detail/dds_fastrtps/lbr_torque_command__type_support.cpp.o[0m
+[5.661s] [ 63%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/lbr_fri_idl/msg/lbr_wrench_command__type_support.cpp.o[0m
+[5.829s] [ 65%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/lbr_fri_idl/msg/detail/lbr_torque_command__type_support_c.cpp.o[0m
+[6.123s] [ 66%] [32m[1mLinking CXX shared library liblbr_fri_idl__rosidl_typesupport_cpp.so[0m
+[6.129s] [ 68%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/lbr_fri_idl/msg/detail/lbr_torque_command__type_support.cpp.o[0m
+[6.137s] [ 69%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/lbr_fri_idl/msg/detail/dds_fastrtps/lbr_wrench_command__type_support.cpp.o[0m
+[6.217s] [ 72%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/lbr_fri_idl/msg/detail/lbr_wrench_command__type_support_c.cpp.o[0m
+[6.220s] [ 72%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/lbr_fri_idl/msg/detail/lbr_wrench_command__type_support.cpp.o[0m
+[6.231s] [ 72%] Built target lbr_fri_idl__rosidl_typesupport_cpp
+[6.668s] [ 73%] [32m[1mLinking CXX shared library liblbr_fri_idl__rosidl_typesupport_fastrtps_c.so[0m
+[6.755s] [ 73%] Built target lbr_fri_idl__rosidl_typesupport_fastrtps_c
+[6.830s] [ 75%] [32m[1mLinking CXX shared library liblbr_fri_idl__rosidl_typesupport_fastrtps_cpp.so[0m
+[6.835s] [ 76%] [32m[1mLinking CXX shared library liblbr_fri_idl__rosidl_typesupport_introspection_cpp.so[0m
+[6.880s] [ 76%] Built target lbr_fri_idl__rosidl_typesupport_introspection_cpp
+[6.950s] [ 76%] Built target lbr_fri_idl__rosidl_typesupport_fastrtps_cpp
+[6.969s] [ 76%] Built target lbr_fri_idl
+[6.990s] [ 78%] [34m[1mGenerating Python code for ROS interfaces[0m
+[7.997s] [ 78%] Built target lbr_fri_idl__py
+[8.022s] [ 81%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_py.dir/rosidl_generator_py/lbr_fri_idl/msg/_lbr_state_s.c.o[0m
+[8.022s] [ 81%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_py.dir/rosidl_generator_py/lbr_fri_idl/msg/_lbr_command_s.c.o[0m
+[8.022s] [ 82%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_py.dir/rosidl_generator_py/lbr_fri_idl/msg/_lbr_joint_position_command_s.c.o[0m
+[8.022s] [ 84%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_py.dir/rosidl_generator_py/lbr_fri_idl/msg/_lbr_wrench_command_s.c.o[0m
+[8.022s] [ 85%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_generator_py.dir/rosidl_generator_py/lbr_fri_idl/msg/_lbr_torque_command_s.c.o[0m
+[8.438s] [ 86%] [32m[1mLinking C shared library rosidl_generator_py/lbr_fri_idl/liblbr_fri_idl__rosidl_generator_py.so[0m
+[8.479s] [ 86%] Built target lbr_fri_idl__rosidl_generator_py
+[8.500s] [ 88%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/lbr_fri_idl/_lbr_fri_idl_s.ep.rosidl_typesupport_c.c.o[0m
+[8.503s] [ 89%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/lbr_fri_idl/_lbr_fri_idl_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[8.503s] [ 91%] [32mBuilding C object CMakeFiles/lbr_fri_idl__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/lbr_fri_idl/_lbr_fri_idl_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[8.682s] [ 92%] [32m[1mLinking C shared library rosidl_generator_py/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so[0m
+[8.721s] [ 92%] Built target lbr_fri_idl__rosidl_typesupport_fastrtps_c__pyext
+[8.740s] [ 94%] [32m[1mLinking C shared library rosidl_generator_py/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so[0m
+[8.752s] [ 95%] [32m[1mLinking C shared library rosidl_generator_py/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so[0m
+[8.776s] [ 95%] Built target lbr_fri_idl__rosidl_typesupport_c__pyext
+[8.788s] [ 95%] Built target lbr_fri_idl__rosidl_typesupport_introspection_c__pyext
+[11.295s] [ 97%] [32m[1mLinking CXX static library libgtest.a[0m
+[11.329s] [ 97%] Built target gtest
+[11.347s] [ 98%] [32mBuilding CXX object CMakeFiles/lbr_fri_idl_test_command_interfaces.dir/test/test_command_interfaces.cpp.o[0m
+[12.155s] [100%] [32m[1mLinking CXX executable lbr_fri_idl_test_command_interfaces[0m
+[12.235s] [100%] Built target lbr_fri_idl_test_command_interfaces
+[12.246s] Invoked command in '/home/genisis/Boneparte/build/lbr_fri_idl' returned '0': CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake --build /home/genisis/Boneparte/build/lbr_fri_idl -- -j8 -l8
+[12.247s] Invoking command in '/home/genisis/Boneparte/build/lbr_fri_idl': CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_fri_idl
+[12.254s] -- Install configuration: "Release"
+[12.255s] -- Execute custom install script
+[12.255s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/ament_index/resource_index/rosidl_interfaces/lbr_fri_idl
+[12.263s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__functions.h
+[12.271s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__struct.h
+[12.278s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__type_support.h
+[12.286s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__functions.h
+[12.294s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__struct.h
+[12.302s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__type_support.h
+[12.309s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__functions.h
+[12.317s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__struct.h
+[12.325s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__type_support.h
+[12.332s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__functions.h
+[12.340s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__struct.h
+[12.348s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__type_support.h
+[12.356s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__functions.h
+[12.363s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__struct.h
+[12.371s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__type_support.h
+[12.379s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_command.h
+[12.386s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_joint_position_command.h
+[12.394s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_state.h
+[12.401s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_torque_command.h
+[12.409s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_wrench_command.h
+[12.417s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/rosidl_generator_c__visibility_control.h
+[12.425s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/library_path.sh
+[12.433s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/library_path.dsv
+[12.441s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__rosidl_typesupport_fastrtps_c.h
+[12.448s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__rosidl_typesupport_fastrtps_c.h
+[12.456s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__rosidl_typesupport_fastrtps_c.h
+[12.464s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__rosidl_typesupport_fastrtps_c.h
+[12.471s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__rosidl_typesupport_fastrtps_c.h
+[12.479s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[12.487s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__builder.hpp
+[12.495s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__struct.hpp
+[12.503s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__traits.hpp
+[12.510s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__type_support.hpp
+[12.518s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__builder.hpp
+[12.526s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__struct.hpp
+[12.533s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__traits.hpp
+[12.541s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__type_support.hpp
+[12.549s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__builder.hpp
+[12.557s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__struct.hpp
+[12.565s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__traits.hpp
+[12.572s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__type_support.hpp
+[12.580s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__builder.hpp
+[12.588s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__struct.hpp
+[12.595s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__traits.hpp
+[12.603s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__type_support.hpp
+[12.611s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__builder.hpp
+[12.618s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__struct.hpp
+[12.626s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__traits.hpp
+[12.634s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__type_support.hpp
+[12.641s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_command.hpp
+[12.649s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_joint_position_command.hpp
+[12.657s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_state.hpp
+[12.664s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_torque_command.hpp
+[12.672s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/lbr_wrench_command.hpp
+[12.680s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/rosidl_generator_cpp__visibility_control.hpp
+[12.688s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__rosidl_typesupport_fastrtps_cpp.hpp
+[12.696s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__rosidl_typesupport_fastrtps_cpp.hpp
+[12.703s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__rosidl_typesupport_fastrtps_cpp.hpp
+[12.711s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__rosidl_typesupport_fastrtps_cpp.hpp
+[12.719s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__rosidl_typesupport_fastrtps_cpp.hpp
+[12.726s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[12.734s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__rosidl_typesupport_introspection_c.h
+[12.742s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__rosidl_typesupport_introspection_c.h
+[12.750s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__rosidl_typesupport_introspection_c.h
+[12.757s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__rosidl_typesupport_introspection_c.h
+[12.765s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__rosidl_typesupport_introspection_c.h
+[12.773s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[12.781s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_command__rosidl_typesupport_introspection_cpp.hpp
+[12.788s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_joint_position_command__rosidl_typesupport_introspection_cpp.hpp
+[12.796s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_state__rosidl_typesupport_introspection_cpp.hpp
+[12.804s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_torque_command__rosidl_typesupport_introspection_cpp.hpp
+[12.812s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/include/lbr_fri_idl/lbr_fri_idl/msg/detail/lbr_wrench_command__rosidl_typesupport_introspection_cpp.hpp
+[12.820s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/pythonpath.sh
+[12.827s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/pythonpath.dsv
+[12.835s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl-1.5.0-py3.10.egg-info/PKG-INFO
+[12.843s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl-1.5.0-py3.10.egg-info/SOURCES.txt
+[12.851s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl-1.5.0-py3.10.egg-info/dependency_links.txt
+[12.859s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl-1.5.0-py3.10.egg-info/top_level.txt
+[12.867s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/__init__.py
+[12.874s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/_lbr_fri_idl_s.ep.rosidl_typesupport_c.c
+[12.883s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/_lbr_fri_idl_s.ep.rosidl_typesupport_fastrtps_c.c
+[12.890s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/_lbr_fri_idl_s.ep.rosidl_typesupport_introspection_c.c
+[12.898s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[12.905s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[12.913s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[12.921s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/liblbr_fri_idl__rosidl_generator_py.so
+[12.929s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/__init__.py
+[12.936s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_command.py
+[12.944s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_command_s.c
+[12.952s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_joint_position_command.py
+[12.959s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_joint_position_command_s.c
+[12.967s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_state.py
+[12.975s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_state_s.c
+[12.982s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_torque_command.py
+[12.990s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_torque_command_s.c
+[12.998s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_wrench_command.py
+[13.006s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_wrench_command_s.c
+[13.013s] -- Up-to-date symlink: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[13.014s] -- Up-to-date symlink: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[13.014s] -- Up-to-date symlink: /home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/lbr_fri_idl_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[13.014s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRCommand.idl
+[13.022s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRJointPositionCommand.idl
+[13.030s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRState.idl
+[13.037s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRTorqueCommand.idl
+[13.045s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRWrenchCommand.idl
+[13.053s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRCommand.msg
+[13.061s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRJointPositionCommand.msg
+[13.068s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRState.msg
+[13.076s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRTorqueCommand.msg
+[13.084s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/msg/LBRWrenchCommand.msg
+[13.092s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/ament_index/resource_index/package_run_dependencies/lbr_fri_idl
+[13.099s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/ament_index/resource_index/parent_prefix_path/lbr_fri_idl
+[13.107s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/ament_prefix_path.sh
+[13.114s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/ament_prefix_path.dsv
+[13.122s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/path.sh
+[13.130s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/environment/path.dsv
+[13.138s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/local_setup.bash
+[13.145s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/local_setup.sh
+[13.153s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/local_setup.zsh
+[13.161s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/local_setup.dsv
+[13.168s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.dsv
+[13.176s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/ament_index/resource_index/packages/lbr_fri_idl
+[13.184s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/rosidl_cmake-extras.cmake
+[13.191s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/ament_cmake_export_dependencies-extras.cmake
+[13.199s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/ament_cmake_export_include_directories-extras.cmake
+[13.207s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/ament_cmake_export_libraries-extras.cmake
+[13.215s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/ament_cmake_export_targets-extras.cmake
+[13.223s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[13.230s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[13.238s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idlConfig.cmake
+[13.246s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idlConfig-version.cmake
+[13.254s] -- Symlinking: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.xml
+[13.261s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_generator_c.so
+[13.262s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_generator_c.so" to ""
+[13.262s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_fastrtps_c.so
+[13.262s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_fastrtps_c.so" to ""
+[13.262s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_fastrtps_cpp.so
+[13.263s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_fastrtps_cpp.so" to ""
+[13.263s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_introspection_c.so
+[13.263s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_introspection_c.so" to ""
+[13.263s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_c.so
+[13.264s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_c.so" to ""
+[13.264s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_introspection_cpp.so
+[13.264s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_introspection_cpp.so" to ""
+[13.264s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_cpp.so
+[13.265s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_typesupport_cpp.so" to ""
+[13.317s] Listing '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl'...
+[13.317s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/__init__.py'...
+[13.318s] Listing '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg'...
+[13.318s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/__init__.py'...
+[13.318s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_command.py'...
+[13.318s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_joint_position_command.py'...
+[13.318s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_state.py'...
+[13.318s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_torque_command.py'...
+[13.318s] Compiling '/home/genisis/Boneparte/install/lbr_fri_idl/local/lib/python3.10/dist-packages/lbr_fri_idl/msg/_lbr_wrench_command.py'...
+[13.323s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_generator_py.so
+[13.323s] -- Set runtime path of "/home/genisis/Boneparte/install/lbr_fri_idl/lib/liblbr_fri_idl__rosidl_generator_py.so" to ""
+[13.323s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_generator_cExport.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_generator_cExport-release.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_typesupport_fastrtps_cExport.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_typesupport_fastrtps_cExport-release.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_generator_cppExport.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_typesupport_fastrtps_cppExport.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_typesupport_fastrtps_cppExport-release.cmake
+[13.324s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_introspection_cExport.cmake
+[13.325s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_introspection_cExport-release.cmake
+[13.325s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_cExport.cmake
+[13.325s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_cExport-release.cmake
+[13.325s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_introspection_cppExport.cmake
+[13.325s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_introspection_cppExport-release.cmake
+[13.325s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_cppExport.cmake
+[13.326s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/lbr_fri_idl__rosidl_typesupport_cppExport-release.cmake
+[13.326s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_generator_pyExport.cmake
+[13.326s] -- Installing: /home/genisis/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/cmake/export_lbr_fri_idl__rosidl_generator_pyExport-release.cmake
+[13.328s] Invoked command in '/home/genisis/Boneparte/build/lbr_fri_idl' returned '0': CMAKE_PREFIX_PATH=/home/genisis/Boneparte/install/fri_client_sdk:/opt/ros/humble LD_LIBRARY_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/home/genisis/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/home/genisis/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake --install /home/genisis/Boneparte/build/lbr_fri_idl

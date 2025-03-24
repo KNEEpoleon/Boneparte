@@ -1,0 +1,1 @@
+controller_manager;ign_ros2_control;joint_state_broadcaster;joint_trajectory_controller;lbr_description;lbr_fri_ros2;lbr_ros2_control;moveit_planners_chomp;moveit_planners_ompl;moveit_ros_move_group;moveit_servo;rclpy;robot_state_publisher;ros_gz_sim;ros_gz_bridge;rviz2;xacro

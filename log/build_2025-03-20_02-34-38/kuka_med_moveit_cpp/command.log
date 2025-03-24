@@ -1,0 +1,2 @@
+Invoking command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp': /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/kuka_med_moveit_cpp -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/kuka_med_moveit_cpp
+Invoked command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp' returned '1': /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/kuka_med_moveit_cpp -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/kuka_med_moveit_cpp

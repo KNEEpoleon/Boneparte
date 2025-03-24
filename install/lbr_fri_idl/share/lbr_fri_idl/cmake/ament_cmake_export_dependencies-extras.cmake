@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/build/lbr_fri_idl/ament_cmake_export_dependencies/ament_cmake_export_dependencies-extras.cmake

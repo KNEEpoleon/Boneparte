@@ -1,0 +1,3 @@
+/home/genisis/Boneparte/install/lbr_ros2_control/lib/lbr_ros2_control/liblbr_ros2_control.so
+/home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/lbr_ros2_control_exportExport.cmake
+/home/genisis/Boneparte/install/lbr_ros2_control/share/lbr_ros2_control/cmake/lbr_ros2_control_exportExport-release.cmake

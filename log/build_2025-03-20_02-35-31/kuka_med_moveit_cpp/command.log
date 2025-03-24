@@ -1,0 +1,6 @@
+Invoking command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/kuka_med_moveit_cpp -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/kuka_med_moveit_cpp
+Invoked command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/genisis/Boneparte/src/manipulation/kuka_med_moveit_cpp -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/genisis/Boneparte/install/kuka_med_moveit_cpp
+Invoking command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/genisis/Boneparte/build/kuka_med_moveit_cpp -- -j8 -l8
+Invoked command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/genisis/Boneparte/build/kuka_med_moveit_cpp -- -j8 -l8
+Invoking command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/genisis/Boneparte/build/kuka_med_moveit_cpp
+Invoked command in '/home/genisis/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/genisis/Boneparte/build/kuka_med_moveit_cpp

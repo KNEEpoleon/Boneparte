@@ -1,0 +1,6 @@
+setup.py
+lbr_fri_idl/__init__.py
+lbr_fri_idl.egg-info/PKG-INFO
+lbr_fri_idl.egg-info/SOURCES.txt
+lbr_fri_idl.egg-info/dependency_links.txt
+lbr_fri_idl.egg-info/top_level.txt

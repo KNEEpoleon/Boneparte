@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "lbr_fri_idl__py",
+		"source" : "/home/genisis/Boneparte/build/lbr_fri_idl/lbr_fri_idl__py"
+	}
+}

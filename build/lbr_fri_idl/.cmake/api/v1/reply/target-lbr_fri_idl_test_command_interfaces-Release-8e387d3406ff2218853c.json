@@ -1,0 +1,369 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "lbr_fri_idl_test_command_interfaces"
+		}
+	],
+	"backtrace" : 4,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"_ament_add_gtest_executable",
+			"ament_add_gtest_executable",
+			"ament_add_gtest",
+			"target_link_libraries",
+			"add_dependencies",
+			"include",
+			"ament_execute_extensions",
+			"rosidl_generate_interfaces",
+			"add_compile_options",
+			"add_definitions",
+			"find_package",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"/opt/ros/humble/share/ament_cmake_gtest/cmake/ament_add_gtest_executable.cmake",
+			"/opt/ros/humble/share/ament_cmake_gtest/cmake/ament_add_gtest.cmake",
+			"CMakeLists.txt",
+			"/opt/ros/humble/share/rosidl_generator_cpp/cmake/rosidl_generator_cpp_generate_interfaces.cmake",
+			"/opt/ros/humble/share/ament_cmake_core/cmake/core/ament_execute_extensions.cmake",
+			"/opt/ros/humble/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake",
+			"/opt/ros/humble/share/ament_cmake_ros/cmake/ament_cmake_ros-extras.cmake",
+			"/opt/ros/humble/share/ament_cmake_ros/cmake/ament_cmake_rosConfig.cmake",
+			"/opt/ros/humble/share/rosidl_typesupport_fastrtps_c/cmake/rosidl_typesupport_fastrtps_c_generate_interfaces.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 2,
+				"line" : 50,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 68,
+				"parent" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 37,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 50,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 53,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 55,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 2,
+				"line" : 53,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 2,
+				"line" : 22,
+				"parent" : 0
+			},
+			{
+				"command" : 7,
+				"file" : 5,
+				"line" : 286,
+				"parent" : 8
+			},
+			{
+				"command" : 6,
+				"file" : 4,
+				"line" : 48,
+				"parent" : 9
+			},
+			{
+				"file" : 3,
+				"parent" : 10
+			},
+			{
+				"command" : 5,
+				"file" : 3,
+				"line" : 139,
+				"parent" : 11
+			},
+			{
+				"command" : 9,
+				"file" : 2,
+				"line" : 10,
+				"parent" : 0
+			},
+			{
+				"command" : 6,
+				"file" : 4,
+				"line" : 48,
+				"parent" : 9
+			},
+			{
+				"file" : 8,
+				"parent" : 14
+			},
+			{
+				"command" : 11,
+				"file" : 8,
+				"line" : 21,
+				"parent" : 15
+			},
+			{
+				"file" : 7,
+				"parent" : 16
+			},
+			{
+				"command" : 6,
+				"file" : 7,
+				"line" : 41,
+				"parent" : 17
+			},
+			{
+				"file" : 6,
+				"parent" : 18
+			},
+			{
+				"command" : 10,
+				"file" : 6,
+				"line" : 25,
+				"parent" : 19
+			},
+			{
+				"command" : 12,
+				"file" : 0,
+				"line" : 51,
+				"parent" : 3
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-O3 -DNDEBUG"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-Wall"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-Wextra"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-Wpedantic"
+				},
+				{
+					"fragment" : "-std=gnu++14"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 7,
+					"define" : "RCUTILS_ENABLE_FAULT_INJECTION"
+				},
+				{
+					"backtrace" : 20,
+					"define" : "ROS_PACKAGE_NAME=\"lbr_fri_idl\""
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "/home/genisis/Boneparte/src/manipulation/lbr_fri_idl/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/genisis/Boneparte/build/lbr_fri_idl/rosidl_generator_cpp"
+				},
+				{
+					"backtrace" : 21,
+					"isSystem" : true,
+					"path" : "/opt/ros/humble/src/gtest_vendor/include"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/opt/ros/humble/include/builtin_interfaces"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/opt/ros/humble/include/rosidl_runtime_cpp"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/opt/ros/humble/include/rosidl_runtime_c"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/opt/ros/humble/include/rcutils"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/opt/ros/humble/include/rosidl_typesupport_interface"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/home/genisis/Boneparte/install/fri_client_sdk/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					5
+				],
+				"standard" : "14"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 7,
+			"id" : "lbr_fri_idl__rosidl_typesupport_cpp::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 12,
+			"id" : "lbr_fri_idl__cpp::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 6,
+			"id" : "gtest::@0af4add9fe94340e763e"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "gtest_main::@0af4add9fe94340e763e"
+		}
+	],
+	"id" : "lbr_fri_idl_test_command_interfaces::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-O3 -DNDEBUG",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/home/genisis/Boneparte/install/fri_client_sdk/lib:/home/genisis/Boneparte/build/lbr_fri_idl:/opt/ros/humble/lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "gtest/libgtest_main.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "gtest/libgtest.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "/home/genisis/Boneparte/install/fri_client_sdk/lib/libFRIClient.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-pthread",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "liblbr_fri_idl__rosidl_typesupport_cpp.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_typesupport_cpp.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/opt/ros/humble/lib/librosidl_runtime_c.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/opt/ros/humble/lib/librcutils.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-ldl",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-Wl,-rpath-link,/opt/ros/humble/lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "lbr_fri_idl_test_command_interfaces",
+	"nameOnDisk" : "lbr_fri_idl_test_command_interfaces",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "test/test_command_interfaces.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

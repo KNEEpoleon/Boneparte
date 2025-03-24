@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/src/manipulation/lbr_fri_idl/msg/LBRWrenchCommand.msg

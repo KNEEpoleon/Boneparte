@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/build/lbr_description/ament_cmake_core/lbr_descriptionConfig.cmake

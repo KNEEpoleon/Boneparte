@@ -1,0 +1,74 @@
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/genisis/Boneparte/build/lbr_bringup
+Built target ament_cmake_python_symlink_lbr_bringup
+running egg_info
+creating lbr_bringup.egg-info
+writing lbr_bringup.egg-info/PKG-INFO
+writing dependency_links to lbr_bringup.egg-info/dependency_links.txt
+writing top-level names to lbr_bringup.egg-info/top_level.txt
+writing manifest file 'lbr_bringup.egg-info/SOURCES.txt'
+reading manifest file 'lbr_bringup.egg-info/SOURCES.txt'
+writing manifest file 'lbr_bringup.egg-info/SOURCES.txt'
+Built target ament_cmake_python_build_lbr_bringup_egg
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/gazebo.rviz
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/hardware.rviz
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/mock.rviz
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/config/moveit_servo.yaml
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/gazebo.launch.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/hardware.launch.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/mock.launch.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/move_group.launch.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/moveit_servo.launch.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/launch/rviz.launch.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/pythonpath.sh
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/pythonpath.dsv
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/PKG-INFO
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/SOURCES.txt
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/dependency_links.txt
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup-2.2.0-py3.10.egg-info/top_level.txt
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/__init__.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/description.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/gazebo.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/moveit.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/ros2_control.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/rviz.py
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/ament_index/resource_index/package_run_dependencies/lbr_bringup
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/ament_index/resource_index/parent_prefix_path/lbr_bringup
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/ament_prefix_path.sh
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/ament_prefix_path.dsv
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/path.sh
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/environment/path.dsv
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.bash
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.sh
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.zsh
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/local_setup.dsv
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/package.dsv
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/ament_index/resource_index/packages/lbr_bringup
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/cmake/lbr_bringupConfig.cmake
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/cmake/lbr_bringupConfig-version.cmake
+-- Symlinking: /home/genisis/Boneparte/install/lbr_bringup/share/lbr_bringup/package.xml
+Listing '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup'...
+Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/__init__.py'...
+Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/description.py'...
+Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/gazebo.py'...
+Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/moveit.py'...
+Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/ros2_control.py'...
+Compiling '/home/genisis/Boneparte/install/lbr_bringup/local/lib/python3.10/dist-packages/lbr_bringup/rviz.py'...

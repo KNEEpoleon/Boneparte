@@ -1,0 +1,4 @@
+source;share/med7_moveit_config/local_setup.bash
+source;share/med7_moveit_config/local_setup.dsv
+source;share/med7_moveit_config/local_setup.sh
+source;share/med7_moveit_config/local_setup.zsh

@@ -1,0 +1,1 @@
+/home/genisis/Boneparte/src/manipulation/lbr_moveit_config/iiwa14_moveit_config/launch/setup_assistant.launch.py
