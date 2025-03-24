@@ -1,1 +1,0 @@
-/home/genisis/Boneparte/build/lbr_fri_idl/ament_cmake_core/lbr_fri_idlConfig-version.cmake

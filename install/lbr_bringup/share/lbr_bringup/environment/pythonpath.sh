@@ -1,1 +1,0 @@
-/home/genisis/Boneparte/build/lbr_bringup/ament_cmake_environment_hooks/pythonpath.sh

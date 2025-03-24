@@ -1,7 +1,0 @@
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/FRIClient.dir
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/edit_cache.dir
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/rebuild_cache.dir
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/list_install_components.dir
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/install.dir
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/install/local.dir
-/home/genisis/Boneparte/build/fri_client_sdk/CMakeFiles/install/strip.dir

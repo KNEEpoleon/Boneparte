@@ -1,3 +1,0 @@
-/home/genisis/Boneparte/install/lbr_fri_ros2/lib/liblbr_fri_ros2.so
-/home/genisis/Boneparte/install/lbr_fri_ros2/share/lbr_fri_ros2/cmake/lbr_fri_ros2_exportExport.cmake
-/home/genisis/Boneparte/install/lbr_fri_ros2/share/lbr_fri_ros2/cmake/lbr_fri_ros2_exportExport-release.cmake

@@ -1,1 +1,0 @@
-/home/genisis/Boneparte/src/manipulation/lbr_bringup/launch/rviz.launch.py
