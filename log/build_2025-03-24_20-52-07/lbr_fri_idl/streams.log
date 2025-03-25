@@ -1,0 +1,46 @@
+[0.168s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl': CMAKE_PREFIX_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk:/home/fwqzh/ws_moveit/install/moveit_task_constructor_visualization:/home/fwqzh/ws_moveit/install/moveit_task_constructor_demo:/home/fwqzh/ws_moveit/install/moveit_task_constructor_capabilities:/home/fwqzh/ws_moveit/install/moveit2_tutorials:/home/fwqzh/ws_moveit/install/moveit_task_constructor_core:/home/fwqzh/ws_moveit/install/rviz_marker_tools:/home/fwqzh/ws_moveit/install/moveit_task_constructor_msgs:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl
+[0.333s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.745s] -- Found builtin_interfaces: 1.2.1 (/opt/ros/humble/share/builtin_interfaces/cmake)
+[0.890s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.898s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.909s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.927s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.948s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.964s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[1.407s] [31mCMake Error at /opt/ros/humble/share/rosidl_adapter/cmake/rosidl_adapt_interfaces.cmake:59 (message):
+[1.408s]   execute_process(/home/fwqzh/anaconda3/bin/python3 -m rosidl_adapter
+[1.409s]   --package-name lbr_fri_idl --arguments-file
+[1.409s]   /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl/rosidl_adapter__arguments__lbr_fri_idl.json
+[1.410s]   --output-dir
+[1.412s]   /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl
+[1.413s]   --output-file
+[1.414s]   /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl/rosidl_adapter/lbr_fri_idl.idls)
+[1.415s]   returned error code 1:
+[1.416s] 
+[1.417s]   Traceback (most recent call last):
+[1.417s] 
+[1.418s]     File "<frozen runpy>", line 198, in _run_module_as_main
+[1.419s]     File "<frozen runpy>", line 88, in _run_code
+[1.422s]     File "/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_adapter/__main__.py", line 19, in <module>
+[1.423s]       sys.exit(main())
+[1.423s]                ^^^^^^
+[1.424s]     File "/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_adapter/main.py", line 53, in main
+[1.425s]       abs_idl_file = convert_to_idl(
+[1.426s]                      ^^^^^^^^^^^^^^^
+[1.427s]     File "/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_adapter/__init__.py", line 18, in convert_to_idl
+[1.428s]       from rosidl_adapter.msg import convert_msg_to_idl
+[1.429s]     File "/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_adapter/msg/__init__.py", line 16, in <module>
+[1.430s]       from rosidl_adapter.resource import expand_template
+[1.430s]     File "/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_adapter/resource/__init__.py", line 19, in <module>
+[1.431s]       import em
+[1.432s] 
+[1.433s]   ModuleNotFoundError: No module named 'em'
+[1.434s] 
+[1.435s] Call Stack (most recent call first):
+[1.436s]   /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:130 (rosidl_adapt_interfaces)
+[1.437s]   CMakeLists.txt:22 (rosidl_generate_interfaces)
+[1.438s] 
+[1.438s] [0m
+[1.441s] -- Configuring incomplete, errors occurred!
+[1.442s] See also "/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl/CMakeFiles/CMakeOutput.log".
+[1.453s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl' returned '1': CMAKE_PREFIX_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk:/home/fwqzh/ws_moveit/install/moveit_task_constructor_visualization:/home/fwqzh/ws_moveit/install/moveit_task_constructor_demo:/home/fwqzh/ws_moveit/install/moveit_task_constructor_capabilities:/home/fwqzh/ws_moveit/install/moveit2_tutorials:/home/fwqzh/ws_moveit/install/moveit_task_constructor_core:/home/fwqzh/ws_moveit/install/rviz_marker_tools:/home/fwqzh/ws_moveit/install/moveit_task_constructor_msgs:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl

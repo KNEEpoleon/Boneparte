@@ -1,0 +1,10 @@
+{
+  "package_name": "lbr_fri_idl",
+  "non_idl_tuples": [
+    "/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl:msg/LBRCommand.msg",
+    "/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl:msg/LBRJointPositionCommand.msg",
+    "/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl:msg/LBRState.msg",
+    "/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl:msg/LBRTorqueCommand.msg",
+    "/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl:msg/LBRWrenchCommand.msg"
+  ]
+}

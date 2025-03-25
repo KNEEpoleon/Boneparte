@@ -1,0 +1,7 @@
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/FRIClient.dir
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/edit_cache.dir
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/list_install_components.dir
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/install.dir
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/install/local.dir
+/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk/CMakeFiles/install/strip.dir

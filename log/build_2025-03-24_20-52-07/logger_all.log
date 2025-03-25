@@ -1,0 +1,491 @@
+[0.267s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.268s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=4, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7fd036ffebf0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7fd0371ac100>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7fd0371ac100>>)
+[0.571s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.572s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.572s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.573s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.573s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.573s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.573s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/mnt/c/Users/12693/Desktop/Boneparte'
+[0.575s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.575s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.576s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.576s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.576s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.577s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.577s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.577s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.577s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.608s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.608s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.609s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.609s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.609s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.612s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.613s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.614s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.617s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.617s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.619s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.624s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.624s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.625s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.628s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.628s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.629s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.630s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.630s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.631s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.631s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.632s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.632s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.635s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.635s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.636s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.636s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.637s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.641s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extensions ['ignore', 'ignore_ament_install']
+[0.641s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'ignore'
+[0.642s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'ignore_ament_install'
+[0.645s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extensions ['colcon_pkg']
+[0.645s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'colcon_pkg'
+[0.646s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extensions ['colcon_meta']
+[0.646s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'colcon_meta'
+[0.648s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extensions ['ros']
+[0.648s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'ros'
+[0.654s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extensions ['cmake', 'python']
+[0.654s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'cmake'
+[0.655s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'python'
+[0.656s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extensions ['python_setup_py']
+[0.656s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation) by extension 'python_setup_py'
+[0.663s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extensions ['ignore', 'ignore_ament_install']
+[0.664s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extension 'ignore'
+[0.665s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extension 'ignore_ament_install'
+[0.668s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extensions ['colcon_pkg']
+[0.668s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extension 'colcon_pkg'
+[0.670s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extensions ['colcon_meta']
+[0.670s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extension 'colcon_meta'
+[0.674s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extensions ['ros']
+[0.674s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/fri) by extension 'ros'
+[0.703s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/fri' with type 'ros.cmake' and name 'fri_client_sdk'
+[0.710s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extensions ['ignore', 'ignore_ament_install']
+[0.710s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extension 'ignore'
+[0.712s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extension 'ignore_ament_install'
+[0.715s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extensions ['colcon_pkg']
+[0.715s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extension 'colcon_pkg'
+[0.717s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extensions ['colcon_meta']
+[0.717s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extension 'colcon_meta'
+[0.721s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extensions ['ros']
+[0.722s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/kuka_med_moveit_cpp) by extension 'ros'
+[0.738s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/kuka_med_moveit_cpp' with type 'ros.ament_cmake' and name 'kuka_med_moveit_cpp'
+[0.744s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extensions ['ignore', 'ignore_ament_install']
+[0.744s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extension 'ignore'
+[0.745s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extension 'ignore_ament_install'
+[0.748s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extensions ['colcon_pkg']
+[0.748s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extension 'colcon_pkg'
+[0.750s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extensions ['colcon_meta']
+[0.750s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extension 'colcon_meta'
+[0.754s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extensions ['ros']
+[0.754s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_bringup) by extension 'ros'
+[0.771s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_bringup' with type 'ros.ament_cmake' and name 'lbr_bringup'
+[0.777s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extensions ['ignore', 'ignore_ament_install']
+[0.777s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extension 'ignore'
+[0.779s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extension 'ignore_ament_install'
+[0.781s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extensions ['colcon_pkg']
+[0.782s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extension 'colcon_pkg'
+[0.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extensions ['colcon_meta']
+[0.784s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extension 'colcon_meta'
+[0.787s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extensions ['ros']
+[0.787s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_description) by extension 'ros'
+[0.803s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_description' with type 'ros.ament_cmake' and name 'lbr_description'
+[0.809s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extensions ['ignore', 'ignore_ament_install']
+[0.809s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extension 'ignore'
+[0.811s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extension 'ignore_ament_install'
+[0.814s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extensions ['colcon_pkg']
+[0.814s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extension 'colcon_pkg'
+[0.816s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extensions ['colcon_meta']
+[0.816s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extension 'colcon_meta'
+[0.819s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extensions ['ros']
+[0.820s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_idl) by extension 'ros'
+[0.837s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_fri_idl' with type 'ros.ament_cmake' and name 'lbr_fri_idl'
+[0.843s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extensions ['ignore', 'ignore_ament_install']
+[0.844s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extension 'ignore'
+[0.846s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extension 'ignore_ament_install'
+[0.849s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extensions ['colcon_pkg']
+[0.849s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extension 'colcon_pkg'
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extensions ['colcon_meta']
+[0.851s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extension 'colcon_meta'
+[0.854s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extensions ['ros']
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_fri_ros2) by extension 'ros'
+[0.874s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_fri_ros2' with type 'ros.ament_cmake' and name 'lbr_fri_ros2'
+[0.881s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extensions ['ignore', 'ignore_ament_install']
+[0.882s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'ignore'
+[0.883s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'ignore_ament_install'
+[0.886s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extensions ['colcon_pkg']
+[0.886s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'colcon_pkg'
+[0.888s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extensions ['colcon_meta']
+[0.888s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'colcon_meta'
+[0.891s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extensions ['ros']
+[0.891s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'ros'
+[0.899s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extensions ['cmake', 'python']
+[0.900s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'cmake'
+[0.902s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'python'
+[0.903s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extensions ['python_setup_py']
+[0.904s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config) by extension 'python_setup_py'
+[0.913s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extensions ['ignore', 'ignore_ament_install']
+[0.914s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'ignore'
+[0.916s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'ignore_ament_install'
+[0.919s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extensions ['colcon_pkg']
+[0.919s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'colcon_pkg'
+[0.921s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extensions ['colcon_meta']
+[0.922s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'colcon_meta'
+[0.927s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extensions ['ros']
+[0.927s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'ros'
+[0.935s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extensions ['cmake', 'python']
+[0.935s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'cmake'
+[0.937s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'python'
+[0.939s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extensions ['python_setup_py']
+[0.939s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc) by extension 'python_setup_py'
+[0.951s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extensions ['ignore', 'ignore_ament_install']
+[0.951s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'ignore'
+[0.954s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'ignore_ament_install'
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extensions ['colcon_pkg']
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'colcon_pkg'
+[0.966s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extensions ['colcon_meta']
+[0.966s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'colcon_meta'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extensions ['ros']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'ros'
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extensions ['cmake', 'python']
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'cmake'
+[0.987s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'python'
+[0.989s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extensions ['python_setup_py']
+[0.990s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/doc/img) by extension 'python_setup_py'
+[0.999s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extensions ['ignore', 'ignore_ament_install']
+[0.999s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extension 'ignore'
+[1.001s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extension 'ignore_ament_install'
+[1.005s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extensions ['colcon_pkg']
+[1.005s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extension 'colcon_pkg'
+[1.007s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extensions ['colcon_meta']
+[1.007s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extension 'colcon_meta'
+[1.011s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extensions ['ros']
+[1.011s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa14_moveit_config) by extension 'ros'
+[1.027s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_moveit_config/iiwa14_moveit_config' with type 'ros.ament_cmake' and name 'iiwa14_moveit_config'
+[1.033s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extensions ['ignore', 'ignore_ament_install']
+[1.033s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extension 'ignore'
+[1.034s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extension 'ignore_ament_install'
+[1.037s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extensions ['colcon_pkg']
+[1.037s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extension 'colcon_pkg'
+[1.039s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extensions ['colcon_meta']
+[1.039s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extension 'colcon_meta'
+[1.043s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extensions ['ros']
+[1.043s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/iiwa7_moveit_config) by extension 'ros'
+[1.058s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_moveit_config/iiwa7_moveit_config' with type 'ros.ament_cmake' and name 'iiwa7_moveit_config'
+[1.068s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extensions ['ignore', 'ignore_ament_install']
+[1.069s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extension 'ignore'
+[1.071s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extension 'ignore_ament_install'
+[1.074s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extensions ['colcon_pkg']
+[1.074s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extension 'colcon_pkg'
+[1.076s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extensions ['colcon_meta']
+[1.077s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extension 'colcon_meta'
+[1.082s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extensions ['ros']
+[1.082s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med14_moveit_config) by extension 'ros'
+[1.101s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_moveit_config/med14_moveit_config' with type 'ros.ament_cmake' and name 'med14_moveit_config'
+[1.108s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extensions ['ignore', 'ignore_ament_install']
+[1.108s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extension 'ignore'
+[1.110s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extension 'ignore_ament_install'
+[1.114s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extensions ['colcon_pkg']
+[1.114s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extension 'colcon_pkg'
+[1.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extensions ['colcon_meta']
+[1.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extension 'colcon_meta'
+[1.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extensions ['ros']
+[1.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_moveit_config/med7_moveit_config) by extension 'ros'
+[1.140s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_moveit_config/med7_moveit_config' with type 'ros.ament_cmake' and name 'med7_moveit_config'
+[1.146s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extensions ['ignore', 'ignore_ament_install']
+[1.146s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extension 'ignore'
+[1.148s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extension 'ignore_ament_install'
+[1.151s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extensions ['colcon_pkg']
+[1.151s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extension 'colcon_pkg'
+[1.153s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extensions ['colcon_meta']
+[1.153s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extension 'colcon_meta'
+[1.157s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extensions ['ros']
+[1.157s] Level 1:colcon.colcon_core.package_identification:_identify(src/manipulation/lbr_ros2_control) by extension 'ros'
+[1.174s] DEBUG:colcon.colcon_core.package_identification:Package 'src/manipulation/lbr_ros2_control' with type 'ros.ament_cmake' and name 'lbr_ros2_control'
+[1.177s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extensions ['ignore', 'ignore_ament_install']
+[1.177s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'ignore'
+[1.178s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'ignore_ament_install'
+[1.181s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extensions ['colcon_pkg']
+[1.181s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'colcon_pkg'
+[1.182s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extensions ['colcon_meta']
+[1.182s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'colcon_meta'
+[1.184s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extensions ['ros']
+[1.184s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'ros'
+[1.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extensions ['cmake', 'python']
+[1.188s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'cmake'
+[1.189s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'python'
+[1.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extensions ['python_setup_py']
+[1.190s] Level 1:colcon.colcon_core.package_identification:_identify(src/perception) by extension 'python_setup_py'
+[1.194s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extensions ['ignore', 'ignore_ament_install']
+[1.194s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'ignore'
+[1.195s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'ignore_ament_install'
+[1.197s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extensions ['colcon_pkg']
+[1.197s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'colcon_pkg'
+[1.198s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extensions ['colcon_meta']
+[1.198s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'colcon_meta'
+[1.199s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extensions ['ros']
+[1.199s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'ros'
+[1.204s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extensions ['cmake', 'python']
+[1.204s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'cmake'
+[1.206s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'python'
+[1.206s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extensions ['python_setup_py']
+[1.207s] Level 1:colcon.colcon_core.package_identification:_identify(src/vision_pro) by extension 'python_setup_py'
+[1.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[1.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[1.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[1.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[1.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[1.297s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[1.297s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[1.303s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 7 installed packages in /home/fwqzh/ws_moveit/install
+[1.305s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 347 installed packages in /opt/ros/humble
+[1.307s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[1.351s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'cmake_args' from command line to 'None'
+[1.351s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'cmake_target' from command line to 'None'
+[1.351s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.351s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'cmake_clean_cache' from command line to 'False'
+[1.352s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'cmake_clean_first' from command line to 'False'
+[1.352s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'cmake_force_configure' from command line to 'False'
+[1.352s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'ament_cmake_args' from command line to 'None'
+[1.352s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'catkin_cmake_args' from command line to 'None'
+[1.352s] Level 5:colcon.colcon_core.verb:set package 'fri_client_sdk' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.352s] DEBUG:colcon.colcon_core.verb:Building package 'fri_client_sdk' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/fri', 'symlink_install': False, 'test_result_base': None}
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'cmake_args' from command line to 'None'
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'cmake_target' from command line to 'None'
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'cmake_clean_cache' from command line to 'False'
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'cmake_clean_first' from command line to 'False'
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'cmake_force_configure' from command line to 'False'
+[1.353s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'ament_cmake_args' from command line to 'None'
+[1.354s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'catkin_cmake_args' from command line to 'None'
+[1.354s] Level 5:colcon.colcon_core.verb:set package 'kuka_med_moveit_cpp' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.354s] DEBUG:colcon.colcon_core.verb:Building package 'kuka_med_moveit_cpp' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/kuka_med_moveit_cpp', 'symlink_install': False, 'test_result_base': None}
+[1.354s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'cmake_args' from command line to 'None'
+[1.354s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'cmake_target' from command line to 'None'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'cmake_clean_cache' from command line to 'False'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'cmake_clean_first' from command line to 'False'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'cmake_force_configure' from command line to 'False'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'ament_cmake_args' from command line to 'None'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'catkin_cmake_args' from command line to 'None'
+[1.355s] Level 5:colcon.colcon_core.verb:set package 'lbr_description' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.355s] DEBUG:colcon.colcon_core.verb:Building package 'lbr_description' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_description', 'symlink_install': False, 'test_result_base': None}
+[1.356s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'cmake_args' from command line to 'None'
+[1.356s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'cmake_target' from command line to 'None'
+[1.357s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.357s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'cmake_clean_cache' from command line to 'False'
+[1.357s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'cmake_clean_first' from command line to 'False'
+[1.357s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'cmake_force_configure' from command line to 'False'
+[1.357s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'ament_cmake_args' from command line to 'None'
+[1.357s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'catkin_cmake_args' from command line to 'None'
+[1.358s] Level 5:colcon.colcon_core.verb:set package 'iiwa14_moveit_config' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.358s] DEBUG:colcon.colcon_core.verb:Building package 'iiwa14_moveit_config' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/iiwa14_moveit_config', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/iiwa14_moveit_config', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_moveit_config/iiwa14_moveit_config', 'symlink_install': False, 'test_result_base': None}
+[1.358s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'cmake_args' from command line to 'None'
+[1.359s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'cmake_target' from command line to 'None'
+[1.359s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.359s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'cmake_clean_cache' from command line to 'False'
+[1.359s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'cmake_clean_first' from command line to 'False'
+[1.359s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'cmake_force_configure' from command line to 'False'
+[1.359s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'ament_cmake_args' from command line to 'None'
+[1.360s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'catkin_cmake_args' from command line to 'None'
+[1.360s] Level 5:colcon.colcon_core.verb:set package 'iiwa7_moveit_config' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.360s] DEBUG:colcon.colcon_core.verb:Building package 'iiwa7_moveit_config' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/iiwa7_moveit_config', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/iiwa7_moveit_config', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_moveit_config/iiwa7_moveit_config', 'symlink_install': False, 'test_result_base': None}
+[1.360s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'cmake_args' from command line to 'None'
+[1.361s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'cmake_target' from command line to 'None'
+[1.361s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.361s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'cmake_clean_cache' from command line to 'False'
+[1.361s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'cmake_clean_first' from command line to 'False'
+[1.362s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'cmake_force_configure' from command line to 'False'
+[1.362s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'ament_cmake_args' from command line to 'None'
+[1.362s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'catkin_cmake_args' from command line to 'None'
+[1.362s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_idl' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.362s] DEBUG:colcon.colcon_core.verb:Building package 'lbr_fri_idl' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl', 'symlink_install': False, 'test_result_base': None}
+[1.362s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'cmake_args' from command line to 'None'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'cmake_target' from command line to 'None'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'cmake_clean_cache' from command line to 'False'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'cmake_clean_first' from command line to 'False'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'cmake_force_configure' from command line to 'False'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'ament_cmake_args' from command line to 'None'
+[1.363s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'catkin_cmake_args' from command line to 'None'
+[1.364s] Level 5:colcon.colcon_core.verb:set package 'med14_moveit_config' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.364s] DEBUG:colcon.colcon_core.verb:Building package 'med14_moveit_config' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/med14_moveit_config', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/med14_moveit_config', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_moveit_config/med14_moveit_config', 'symlink_install': False, 'test_result_base': None}
+[1.364s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'cmake_args' from command line to 'None'
+[1.364s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'cmake_target' from command line to 'None'
+[1.364s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.365s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'cmake_clean_cache' from command line to 'False'
+[1.365s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'cmake_clean_first' from command line to 'False'
+[1.365s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'cmake_force_configure' from command line to 'False'
+[1.365s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'ament_cmake_args' from command line to 'None'
+[1.365s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'catkin_cmake_args' from command line to 'None'
+[1.365s] Level 5:colcon.colcon_core.verb:set package 'med7_moveit_config' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.365s] DEBUG:colcon.colcon_core.verb:Building package 'med7_moveit_config' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/med7_moveit_config', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/med7_moveit_config', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_moveit_config/med7_moveit_config', 'symlink_install': False, 'test_result_base': None}
+[1.366s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'cmake_args' from command line to 'None'
+[1.366s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'cmake_target' from command line to 'None'
+[1.366s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.366s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'cmake_clean_cache' from command line to 'False'
+[1.366s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'cmake_clean_first' from command line to 'False'
+[1.366s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'cmake_force_configure' from command line to 'False'
+[1.367s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'ament_cmake_args' from command line to 'None'
+[1.367s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'catkin_cmake_args' from command line to 'None'
+[1.367s] Level 5:colcon.colcon_core.verb:set package 'lbr_fri_ros2' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.367s] DEBUG:colcon.colcon_core.verb:Building package 'lbr_fri_ros2' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_ros2', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_ros2', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_ros2', 'symlink_install': False, 'test_result_base': None}
+[1.367s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'cmake_args' from command line to 'None'
+[1.367s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'cmake_target' from command line to 'None'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'cmake_clean_cache' from command line to 'False'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'cmake_clean_first' from command line to 'False'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'cmake_force_configure' from command line to 'False'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'ament_cmake_args' from command line to 'None'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'catkin_cmake_args' from command line to 'None'
+[1.368s] Level 5:colcon.colcon_core.verb:set package 'lbr_ros2_control' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.368s] DEBUG:colcon.colcon_core.verb:Building package 'lbr_ros2_control' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_ros2_control', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_ros2_control', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_ros2_control', 'symlink_install': False, 'test_result_base': None}
+[1.369s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'cmake_args' from command line to 'None'
+[1.369s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'cmake_target' from command line to 'None'
+[1.369s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.369s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'cmake_clean_cache' from command line to 'False'
+[1.370s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'cmake_clean_first' from command line to 'False'
+[1.370s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'cmake_force_configure' from command line to 'False'
+[1.370s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'ament_cmake_args' from command line to 'None'
+[1.370s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'catkin_cmake_args' from command line to 'None'
+[1.370s] Level 5:colcon.colcon_core.verb:set package 'lbr_bringup' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.370s] DEBUG:colcon.colcon_core.verb:Building package 'lbr_bringup' with the following arguments: {'ament_cmake_args': None, 'build_base': '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_bringup', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_bringup', 'merge_install': False, 'path': '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_bringup', 'symlink_install': False, 'test_result_base': None}
+[1.371s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.372s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.373s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_description' with build type 'ament_cmake'
+[1.373s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_description'
+[1.380s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.380s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.380s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.392s] INFO:colcon.colcon_ros.task.cmake.build:Building ROS package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/fri' with build type 'cmake'
+[1.393s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/fri'
+[1.393s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.394s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.405s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/kuka_med_moveit_cpp' with build type 'ament_cmake'
+[1.405s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/kuka_med_moveit_cpp'
+[1.406s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.406s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.458s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description -- -j4 -l4
+[1.486s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk -- -j4 -l4
+[1.517s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp -- -j4 -l4
+[1.600s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description -- -j4 -l4
+[1.630s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description
+[1.632s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp -- -j4 -l4
+[1.654s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp
+[2.145s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(kuka_med_moveit_cpp)
+[2.146s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp
+[2.153s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp' for CMake module files
+[2.252s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp' for CMake config files
+[2.325s] Level 1:colcon.colcon_core.shell:create_environment_hook('kuka_med_moveit_cpp', 'cmake_prefix_path')
+[2.325s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/hook/cmake_prefix_path.ps1'
+[2.341s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/hook/cmake_prefix_path.dsv'
+[2.355s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/hook/cmake_prefix_path.sh'
+[2.377s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib'
+[2.382s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/bin'
+[2.383s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib/pkgconfig/kuka_med_moveit_cpp.pc'
+[2.385s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib/python3.10/site-packages'
+[2.386s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/bin'
+[2.388s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.ps1'
+[2.401s] INFO:colcon.colcon_core.shell:Creating package descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.dsv'
+[2.415s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.sh'
+[2.427s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.bash'
+[2.441s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.zsh'
+[2.452s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/colcon-core/packages/kuka_med_moveit_cpp)
+[2.478s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(kuka_med_moveit_cpp)
+[2.478s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp' for CMake module files
+[2.565s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp' for CMake config files
+[2.637s] Level 1:colcon.colcon_core.shell:create_environment_hook('kuka_med_moveit_cpp', 'cmake_prefix_path')
+[2.637s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/hook/cmake_prefix_path.ps1'
+[2.654s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/hook/cmake_prefix_path.dsv'
+[2.668s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/hook/cmake_prefix_path.sh'
+[2.690s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib'
+[2.694s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/bin'
+[2.695s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib/pkgconfig/kuka_med_moveit_cpp.pc'
+[2.696s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib/python3.10/site-packages'
+[2.699s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/bin'
+[2.701s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.ps1'
+[2.714s] INFO:colcon.colcon_core.shell:Creating package descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.dsv'
+[2.726s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.sh'
+[2.739s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.bash'
+[2.752s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.zsh'
+[2.763s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/colcon-core/packages/kuka_med_moveit_cpp)
+[2.780s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk -- -j4 -l4
+[2.796s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk
+[3.118s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk
+[3.132s] Level 1:colcon.colcon_core.shell:create_environment_hook('fri_client_sdk', 'pkg_config_path')
+[3.133s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/pkg_config_path.ps1'
+[3.146s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/pkg_config_path.dsv'
+[3.160s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/pkg_config_path.sh'
+[3.186s] Level 1:colcon.colcon_core.shell:create_environment_hook('fri_client_sdk', 'pkg_config_path_multiarch')
+[3.187s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/pkg_config_path_multiarch.ps1'
+[3.200s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/pkg_config_path_multiarch.dsv'
+[3.214s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/pkg_config_path_multiarch.sh'
+[3.229s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(fri_client_sdk)
+[3.230s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk' for CMake module files
+[3.277s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk' for CMake config files
+[3.299s] Level 1:colcon.colcon_core.shell:create_environment_hook('fri_client_sdk', 'cmake_prefix_path')
+[3.300s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/cmake_prefix_path.ps1'
+[3.315s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/cmake_prefix_path.dsv'
+[3.329s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/cmake_prefix_path.sh'
+[3.346s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib'
+[3.350s] Level 1:colcon.colcon_core.shell:create_environment_hook('fri_client_sdk', 'ld_library_path_lib')
+[3.350s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/ld_library_path_lib.ps1'
+[3.364s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/ld_library_path_lib.dsv'
+[3.379s] INFO:colcon.colcon_core.shell:Creating environment hook '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/hook/ld_library_path_lib.sh'
+[3.392s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/bin'
+[3.394s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/pkgconfig/fri_client_sdk.pc'
+[3.396s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/python3.10/site-packages'
+[3.398s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/bin'
+[3.399s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/package.ps1'
+[3.410s] INFO:colcon.colcon_core.shell:Creating package descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/package.dsv'
+[3.422s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/package.sh'
+[3.435s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/package.bash'
+[3.446s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/fri_client_sdk/package.zsh'
+[3.458s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/share/colcon-core/packages/fri_client_sdk)
+[3.467s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl' with build type 'ament_cmake'
+[3.468s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl'
+[3.468s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[3.468s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[3.643s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl': CMAKE_PREFIX_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk:/home/fwqzh/ws_moveit/install/moveit_task_constructor_visualization:/home/fwqzh/ws_moveit/install/moveit_task_constructor_demo:/home/fwqzh/ws_moveit/install/moveit_task_constructor_capabilities:/home/fwqzh/ws_moveit/install/moveit2_tutorials:/home/fwqzh/ws_moveit/install/moveit_task_constructor_core:/home/fwqzh/ws_moveit/install/rviz_marker_tools:/home/fwqzh/ws_moveit/install/moveit_task_constructor_msgs:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl
+[4.928s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_fri_idl' returned '1': CMAKE_PREFIX_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk:/home/fwqzh/ws_moveit/install/moveit_task_constructor_visualization:/home/fwqzh/ws_moveit/install/moveit_task_constructor_demo:/home/fwqzh/ws_moveit/install/moveit_task_constructor_capabilities:/home/fwqzh/ws_moveit/install/moveit2_tutorials:/home/fwqzh/ws_moveit/install/moveit_task_constructor_core:/home/fwqzh/ws_moveit/install/rviz_marker_tools:/home/fwqzh/ws_moveit/install/moveit_task_constructor_msgs:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib:${LD_LIBRARY_PATH} PKG_CONFIG_PATH=/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/x86_64-linux-gnu/pkgconfig:/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/pkgconfig /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_fri_idl -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl
+[4.965s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(lbr_fri_idl)
+[4.965s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl' for CMake module files
+[5.007s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl' for CMake config files
+[5.034s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/bin'
+[5.036s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/lib/pkgconfig/lbr_fri_idl.pc'
+[5.038s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/lib/python3.10/site-packages'
+[5.039s] Level 1:colcon.colcon_core.environment:checking '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/bin'
+[5.040s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.ps1'
+[5.054s] INFO:colcon.colcon_core.shell:Creating package descriptor '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.dsv'
+[5.067s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.sh'
+[5.080s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.bash'
+[5.094s] INFO:colcon.colcon_core.shell:Creating package script '/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/share/lbr_fri_idl/package.zsh'
+[5.106s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_fri_idl/share/colcon-core/packages/lbr_fri_idl)
+[5.594s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[5.594s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[5.595s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '1'
+[5.595s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[5.645s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[5.645s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[5.646s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[5.646s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[5.646s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.FileNotFound: Failed to connect to socket /run/user/1000/bus: No such file or directory
+[5.647s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[5.647s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/c/Users/12693/Desktop/Boneparte/install/local_setup.ps1'
+[5.654s] INFO:colcon.colcon_core.shell:Creating prefix util module '/mnt/c/Users/12693/Desktop/Boneparte/install/_local_setup_util_ps1.py'
+[5.661s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/c/Users/12693/Desktop/Boneparte/install/setup.ps1'
+[5.669s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/c/Users/12693/Desktop/Boneparte/install/local_setup.sh'
+[5.676s] INFO:colcon.colcon_core.shell:Creating prefix util module '/mnt/c/Users/12693/Desktop/Boneparte/install/_local_setup_util_sh.py'
+[5.682s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/c/Users/12693/Desktop/Boneparte/install/setup.sh'
+[5.690s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/c/Users/12693/Desktop/Boneparte/install/local_setup.bash'
+[5.697s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/c/Users/12693/Desktop/Boneparte/install/setup.bash'
+[5.704s] INFO:colcon.colcon_core.shell:Creating prefix script '/mnt/c/Users/12693/Desktop/Boneparte/install/local_setup.zsh'
+[5.711s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/mnt/c/Users/12693/Desktop/Boneparte/install/setup.zsh'

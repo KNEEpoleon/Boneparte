@@ -1,0 +1,22 @@
+[0.093s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk -- -j4 -l4
+[0.308s] [35m[1mConsolidate compiler generated dependencies of target FRIClient[0m
+[0.789s] [100%] Built target FRIClient
+[1.387s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk -- -j4 -l4
+[1.403s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk
+[1.415s] -- Install configuration: "Release"
+[1.444s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/libFRIClient.so
+[1.458s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include
+[1.475s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friClientApplication.h
+[1.492s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friClientIf.h
+[1.508s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friClientVersion.h
+[1.524s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friConnectionIf.h
+[1.540s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friException.h
+[1.555s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friLBRClient.h
+[1.570s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friLBRCommand.h
+[1.586s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friLBRState.h
+[1.602s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friTransformationClient.h
+[1.619s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friUdpConnection.h
+[1.664s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/cmake/FRIClient/FRIClientConfig.cmake
+[1.695s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/cmake/FRIClient/FRIClientConfig-release.cmake
+[1.714s] -- Up-to-date: /mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/cmake/FRIClient/FRIClientConfigVersion.cmake
+[1.725s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/fri_client_sdk

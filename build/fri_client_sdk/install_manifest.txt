@@ -1,0 +1,14 @@
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/libFRIClient.so
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friClientApplication.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friClientIf.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friClientVersion.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friConnectionIf.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friException.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friLBRClient.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friLBRCommand.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friLBRState.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friTransformationClient.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/include/friUdpConnection.h
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/cmake/FRIClient/FRIClientConfig.cmake
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/cmake/FRIClient/FRIClientConfig-release.cmake
+/mnt/c/Users/12693/Desktop/Boneparte/install/fri_client_sdk/lib/cmake/FRIClient/FRIClientConfigVersion.cmake

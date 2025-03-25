@@ -1,0 +1,154 @@
+[0.083s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_description -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description
+[0.414s] -- The C compiler identification is GNU 11.4.0
+[0.809s] -- The CXX compiler identification is GNU 11.4.0
+[1.001s] -- Detecting C compiler ABI info
+[1.796s] -- Detecting C compiler ABI info - done
+[1.823s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.823s] -- Detecting C compile features
+[1.825s] -- Detecting C compile features - done
+[1.903s] -- Detecting CXX compiler ABI info
+[2.676s] -- Detecting CXX compiler ABI info - done
+[2.703s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[2.705s] -- Detecting CXX compile features
+[2.706s] -- Detecting CXX compile features - done
+[2.775s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[3.261s] -- Found Python3: /home/fwqzh/anaconda3/bin/python3 (found version "3.12.7") found components: Interpreter 
+[3.487s] -- Found ament_cmake_pytest: 1.3.11 (/opt/ros/humble/share/ament_cmake_pytest/cmake)
+[3.903s] [33mCMake Warning at /opt/ros/humble/share/ament_cmake_pytest/cmake/ament_add_pytest_test.cmake:79 (message):
+[3.904s]   The Python module 'pytest' was not found, pytests cannot be run.  On Linux,
+[3.905s]   install the 'python3-pytest' package.  On other platforms, install 'pytest'
+[3.906s]   using pip.
+[3.907s] Call Stack (most recent call first):
+[3.908s]   CMakeLists.txt:21 (ament_add_pytest_test)
+[3.909s] 
+[3.910s] [0m
+[4.486s] -- Configuring done
+[4.847s] -- Generating done
+[5.083s] -- Build files have been written to: /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description
+[5.087s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/lbr_description -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description
+[5.103s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description -- -j4 -l4
+[5.224s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description -- -j4 -l4
+[5.259s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/lbr_description
+[5.273s] -- Install configuration: ""
+[5.286s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/gazebo
+[5.329s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/gazebo/lbr_gazebo.xacro
+[5.425s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes
+[5.467s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14
+[5.522s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision
+[5.590s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_0.stl
+[5.792s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_1.stl
+[5.984s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_2.stl
+[6.164s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_3.stl
+[6.367s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_4.stl
+[6.560s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_5.stl
+[6.777s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_6.stl
+[6.966s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/collision/link_7.stl
+[7.135s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual
+[7.195s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_0.dae
+[7.408s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_1.dae
+[7.600s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_2.dae
+[7.807s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_3.dae
+[7.994s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_4.dae
+[8.266s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_5.dae
+[8.474s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_6.dae
+[8.733s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa14/visual/link_7.dae
+[8.874s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7
+[8.911s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision
+[8.964s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_0.stl
+[9.124s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_1.stl
+[9.283s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_2.stl
+[9.445s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_3.stl
+[9.596s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_4.stl
+[9.774s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_5.stl
+[9.917s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_6.stl
+[10.103s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/collision/link_7.stl
+[10.273s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual
+[10.335s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_0.dae
+[10.555s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_1.dae
+[10.758s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_2.dae
+[11.032s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_3.dae
+[11.233s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_4.dae
+[11.488s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_5.dae
+[11.685s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_6.dae
+[11.919s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/iiwa7/visual/link_7.dae
+[12.068s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14
+[12.112s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision
+[12.167s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_0.stl
+[12.315s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_1.stl
+[12.475s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_2.stl
+[12.648s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_3.stl
+[12.809s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_4.stl
+[12.989s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_5.stl
+[13.161s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_6.stl
+[13.343s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/collision/link_7.stl
+[13.479s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual
+[13.540s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_0.dae
+[13.704s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_1.dae
+[13.886s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_2.dae
+[14.086s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_3.dae
+[14.285s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_4.dae
+[14.546s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_5.dae
+[14.767s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_6.dae
+[15.004s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med14/visual/link_7.dae
+[15.153s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7
+[15.192s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision
+[15.247s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_0.stl
+[15.390s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_1.stl
+[15.544s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_2.stl
+[15.722s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_3.stl
+[15.875s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_4.stl
+[16.071s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_5.stl
+[16.224s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_6.stl
+[16.399s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/collision/link_7.stl
+[16.529s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual
+[16.588s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_0.dae
+[16.758s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_1.dae
+[16.954s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_2.dae
+[17.211s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_3.dae
+[17.397s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_4.dae
+[17.669s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_5.dae
+[17.886s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_6.dae
+[18.121s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/meshes/med7/visual/link_7.dae
+[18.275s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/ros2_control
+[18.316s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/ros2_control/lbr_controllers.yaml
+[18.406s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/ros2_control/lbr_system_config.yaml
+[18.497s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/ros2_control/lbr_system_interface.xacro
+[18.583s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf
+[18.617s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa14
+[18.668s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa14/iiwa14.xacro
+[18.783s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa14/iiwa14_description.xacro
+[18.907s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa14/joint_limits.yaml
+[19.024s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa7
+[19.084s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa7/iiwa7.xacro
+[19.200s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa7/iiwa7_description.xacro
+[19.317s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/iiwa7/joint_limits.yaml
+[19.427s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med14
+[19.481s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med14/joint_limits.yaml
+[19.595s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med14/med14.xacro
+[19.712s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med14/med14_description.xacro
+[19.822s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7
+[19.865s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/custom
+[19.923s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/custom/med7.xacro
+[20.048s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/custom/med7_description.xacro
+[20.175s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/Default
+[20.236s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/Default/med7.xacro
+[20.372s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/Default/med7_description.xacro
+[20.503s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/joint_limits.yaml
+[20.625s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/med7.xacro
+[20.744s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/urdf/med7/med7_description.xacro
+[20.875s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/environment/lbr_description.dsv
+[21.004s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/ament_index/resource_index/package_run_dependencies/lbr_description
+[21.137s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/ament_index/resource_index/parent_prefix_path/lbr_description
+[21.244s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/environment/ament_prefix_path.sh
+[21.334s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/environment/ament_prefix_path.dsv
+[21.418s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/environment/path.sh
+[21.495s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/environment/path.dsv
+[21.579s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/local_setup.bash
+[21.659s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/local_setup.sh
+[21.741s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/local_setup.zsh
+[21.825s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/local_setup.dsv
+[21.905s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/package.dsv
+[22.008s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/ament_index/resource_index/packages/lbr_description
+[22.113s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/cmake/lbr_descriptionConfig.cmake
+[22.185s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/cmake/lbr_descriptionConfig-version.cmake
+[22.263s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/lbr_description/share/lbr_description/package.xml

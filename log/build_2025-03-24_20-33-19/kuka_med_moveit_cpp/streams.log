@@ -1,0 +1,63 @@
+[0.135s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/kuka_med_moveit_cpp -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp
+[0.463s] -- The C compiler identification is GNU 11.4.0
+[0.935s] -- The CXX compiler identification is GNU 11.4.0
+[1.201s] -- Detecting C compiler ABI info
+[1.979s] -- Detecting C compiler ABI info - done
+[2.009s] -- Check for working C compiler: /usr/bin/cc - skipped
+[2.010s] -- Detecting C compile features
+[2.011s] -- Detecting C compile features - done
+[2.089s] -- Detecting CXX compiler ABI info
+[2.878s] -- Detecting CXX compiler ABI info - done
+[2.905s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[2.906s] -- Detecting CXX compile features
+[2.907s] -- Detecting CXX compile features - done
+[2.979s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[3.465s] -- Found Python3: /home/fwqzh/anaconda3/bin/python3 (found version "3.12.7") found components: Interpreter 
+[3.715s] -- Found rclcpp: 16.0.11 (/opt/ros/humble/share/rclcpp/cmake)
+[3.848s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[3.854s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[3.864s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[3.878s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[3.895s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[3.945s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[3.950s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[4.806s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[5.754s] -- Found FastRTPS: /opt/ros/humble/include  
+[7.564s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[7.630s] -- Looking for pthread.h
+[8.392s] -- Looking for pthread.h - found
+[8.406s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[9.185s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[9.197s] -- Found Threads: TRUE  
+[9.241s] -- Found rclpy: 3.3.15 (/opt/ros/humble/share/rclpy/cmake)
+[9.244s] -- Found control_msgs: 4.7.0 (/opt/ros/humble/share/control_msgs/cmake)
+[9.329s] -- Found ament_lint_auto: 0.12.11 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[9.946s] -- Added test 'flake8' to check Python code syntax and style conventions
+[9.983s] -- Added test 'lint_cmake' to check CMake code style
+[10.004s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[10.204s] -- Added test 'xmllint' to check XML markup files
+[10.366s] -- Configuring done
+[10.740s] -- Generating done
+[10.963s] -- Build files have been written to: /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp
+[10.973s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /mnt/c/Users/12693/Desktop/Boneparte/src/manipulation/kuka_med_moveit_cpp -DCMAKE_INSTALL_PREFIX=/mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp
+[10.983s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp -- -j4 -l4
+[11.114s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp -- -j4 -l4
+[11.137s] Invoking command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp
+[11.148s] -- Install configuration: ""
+[11.185s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/ament_index/resource_index/package_run_dependencies/kuka_med_moveit_cpp
+[11.312s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/ament_index/resource_index/parent_prefix_path/kuka_med_moveit_cpp
+[11.409s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/environment/ament_prefix_path.sh
+[11.474s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/environment/ament_prefix_path.dsv
+[11.546s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/environment/path.sh
+[11.617s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/environment/path.dsv
+[11.694s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/local_setup.bash
+[11.761s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/local_setup.sh
+[11.828s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/local_setup.zsh
+[11.894s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/local_setup.dsv
+[11.960s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.dsv
+[12.056s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/ament_index/resource_index/packages/kuka_med_moveit_cpp
+[12.178s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/cmake/kuka_med_moveit_cppConfig.cmake
+[12.255s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/cmake/kuka_med_moveit_cppConfig-version.cmake
+[12.341s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/share/kuka_med_moveit_cpp/package.xml
+[12.431s] -- Installing: /mnt/c/Users/12693/Desktop/Boneparte/install/kuka_med_moveit_cpp/lib/kuka_med_moveit_cpp/moveit_point_to_point.py
+[12.505s] Invoked command in '/mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /mnt/c/Users/12693/Desktop/Boneparte/build/kuka_med_moveit_cpp
