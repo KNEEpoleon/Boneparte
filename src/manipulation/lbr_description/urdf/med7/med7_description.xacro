@@ -286,44 +286,13 @@
             </collision>
         </link>
 
-  	<!-- Joint connecting Link 7 to End Effector -->
         <joint name="${robot_name}_joint_ee" type="fixed">
             <parent link="${robot_name}_link_7" />
             <child link="${robot_name}_link_ee" />
-            <origin xyz="-0.046 0 0.161" rpy="0 0 0" />
+            <origin xyz="0 0 0.035" rpy="0 0 0" />
         </joint>
 
-        <!-- End Effector (Link EE) -->
         <link name="${robot_name}_link_ee">
-            <!-- Inertial properties -->
-            <inertial>
-                <origin rpy="0 0 0" xyz="0.0 -0.029824 0.076267" />
-                <mass value="1.474048" />
-                <inertia ixx="0.008179" ixy="0.0" ixz="0.0"
-                        iyy="0.006879" iyz="0.002704"
-                        izz="0.003709"/>
-            </inertial>
-
-            <!-- Visual representation -->
-            <visual>
-                <origin rpy="3.1415926 0 3.1415926" xyz="0 0 0"/>
-                <geometry>
-                    <mesh filename="package://lbr_description/meshes/med7/visual/end_effector_worx_with_d405.stl"
-                          scale="0.001 0.001 0.001"/>
-                </geometry>
-                <material name="blue">
-                    <color rgba=".5 .9 1 1"/>
-                </material>
-            </visual>
-
-            <!-- Collision geometry -->
-            <collision>
-                <origin rpy="3.1415926 0 3.1415926" xyz="0 0 0"/>
-                <geometry>
-                    <mesh filename="package://lbr_description/meshes/med7/collision/end_effector_worx_with_d405.stl"
-                          scale="0.001 0.001 0.001"/>
-                </geometry>
-            </collision>
         </link>
     </xacro:macro>
 </robot>
