@@ -47,14 +47,20 @@
     <disable_collisions link1="lbr_link_2" link2="lbr_link_5" reason="Never"/>
     <disable_collisions link1="lbr_link_2" link2="lbr_link_6" reason="Never"/>
     <disable_collisions link1="lbr_link_2" link2="lbr_link_7" reason="Never"/>
+    <!-- <disable_collisions link1="lbr_link_2" link2="lbr_link_7" reason="Never"/> -->
     <disable_collisions link1="lbr_link_3" link2="lbr_link_4" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_5" reason="Never"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_6" reason="Never"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_7" reason="Never"/>
+    <!-- <disable_collisions link1="lbr_link_3" link2="lbr_link_7" reason="Never"/> -->
     <disable_collisions link1="lbr_link_4" link2="lbr_link_5" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_4" link2="lbr_link_6" reason="Never"/>
     <disable_collisions link1="lbr_link_4" link2="lbr_link_7" reason="Never"/>
+    <!-- <disable_collisions link1="lbr_link_4" link2="lbr_link_7" reason="Never"/> -->
     <disable_collisions link1="lbr_link_5" link2="lbr_link_6" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_5" link2="lbr_link_7" reason="Never"/>
+    <!-- <disable_collisions link1="lbr_link_5" link2="lbr_link_7" reason="Never"/> -->
     <disable_collisions link1="lbr_link_6" link2="lbr_link_7" reason="Adjacent"/>
+    <!-- <disable_collisions link1="lbr_link_6" link2="lbr_link_7" reason="Adjacent"/> -->
+    <!-- <disable_collisions link1="lbr_link_6" link2="lbr_link_7" reason="Adjacent"/> -->
 </robot>
