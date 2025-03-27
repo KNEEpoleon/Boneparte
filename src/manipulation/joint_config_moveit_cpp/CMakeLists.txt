@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(kuka_med_moveit_cpp)
+project(joint_config_moveit_cpp)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -26,6 +26,6 @@ endif()
 
 ament_package()
 install(PROGRAMS
-  scripts/moveit_point_to_point.py
-  DESTINATION lib/kuka_med_moveit_cpp
+  scripts/moveit_joint_config.py
+  DESTINATION lib/joint_config_moveit_cpp
 )
