@@ -3,7 +3,7 @@
     This is a format for representing semantic information about the robot structure.
     A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
 -->
-<robot name="med14">
+<robot name="med7">
     <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
     <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
@@ -22,15 +22,17 @@
         <joint name="lbr_A6" value="0"/>
         <joint name="lbr_A7" value="0"/>
     </group_state>
-    <group_state name="transport" group="arm">
+    <group_state name="Boneparte_home" group="arm">
         <joint name="lbr_A1" value="0"/>
-        <joint name="lbr_A2" value="0.4363"/>
+        <joint name="lbr_A2" value="0"/>
         <joint name="lbr_A3" value="0"/>
-        <joint name="lbr_A4" value="1.5707"/>
+        <joint name="lbr_A4" value="1.5708"/>
         <joint name="lbr_A5" value="0"/>
-        <joint name="lbr_A6" value="0"/>
+        <joint name="lbr_A6" value="-1.5708"/>
         <joint name="lbr_A7" value="0"/>
     </group_state>
+    <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
+    <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="lbr_link_0"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="lbr_link_0" link2="lbr_link_1" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_0" link2="lbr_link_2" reason="Never"/>
@@ -47,14 +49,20 @@
     <disable_collisions link1="lbr_link_2" link2="lbr_link_5" reason="Never"/>
     <disable_collisions link1="lbr_link_2" link2="lbr_link_6" reason="Never"/>
     <disable_collisions link1="lbr_link_2" link2="lbr_link_7" reason="Never"/>
+    <disable_collisions link1="lbr_link_2" link2="lbr_link_ee" reason="Never"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_4" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_5" reason="Never"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_6" reason="Never"/>
     <disable_collisions link1="lbr_link_3" link2="lbr_link_7" reason="Never"/>
+    <disable_collisions link1="lbr_link_3" link2="lbr_link_ee" reason="Never"/>
     <disable_collisions link1="lbr_link_4" link2="lbr_link_5" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_4" link2="lbr_link_6" reason="Never"/>
     <disable_collisions link1="lbr_link_4" link2="lbr_link_7" reason="Never"/>
+    <disable_collisions link1="lbr_link_4" link2="lbr_link_ee" reason="Never"/>
     <disable_collisions link1="lbr_link_5" link2="lbr_link_6" reason="Adjacent"/>
     <disable_collisions link1="lbr_link_5" link2="lbr_link_7" reason="Never"/>
+    <disable_collisions link1="lbr_link_5" link2="lbr_link_ee" reason="Never"/>
     <disable_collisions link1="lbr_link_6" link2="lbr_link_7" reason="Adjacent"/>
+    <disable_collisions link1="lbr_link_6" link2="lbr_link_ee" reason="Never"/>
+    <disable_collisions link1="lbr_link_7" link2="lbr_link_ee" reason="Adjacent"/>
 </robot>

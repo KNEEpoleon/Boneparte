@@ -16,5 +16,6 @@ moveit_simple_controller_manager:
       - lbr_A5
       - lbr_A6
       - lbr_A7
+      - lbr_joint_ee
     action_ns: follow_joint_trajectory
     default: true
