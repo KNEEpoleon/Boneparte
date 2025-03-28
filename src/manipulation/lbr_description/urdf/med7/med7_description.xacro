@@ -289,18 +289,18 @@
         <joint name="${robot_name}_joint_ee" type="fixed">
             <parent link="${robot_name}_link_7" />
             <child link="${robot_name}_link_ee" />
-            <origin xyz="0 0 0.035" rpy="0 0 0" />
+            <!-- <origin xyz="0 0 0.035" rpy="0 0 0" /> -->
+            <origin xyz="0 0 0.189" rpy="0 0 0" />
         </joint>
 
         <link name="${robot_name}_link_ee">
             <inertial>
-            <!-- The CoM is 15.4 cm below the link's origin, along Z. There is no rotation of the inertial frame -->
-                <origin rpy="0 0 0" xyz="0.0 0.0 -0.154" />
+                <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
                 <mass value="0.674" />
                 <inertia ixx="0.008179" ixy="0.0" ixz="0.0" iyy="0.006879" iyz="0.002704" izz="0.003709" />
             </inertial>
             <visual>
-                <origin rpy="0 3.14157 0.0" xyz="0.0 0.0 0.154" />
+                <origin rpy="0 3.14157 0.0" xyz="0.0 0.0 0.0" />
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/med7/visual/worx+motor+mount+refined+3.stl" scale="0.001 0.001 0.001" />
                 </geometry>
@@ -309,7 +309,7 @@
                 </material>
             </visual>
             <collision>
-                <origin rpy="0 3.14157 0" xyz="0.0 0.0 0.1694" />
+                <origin rpy="0 3.14157 0" xyz="0.0 0.0 0.0" />
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/med7/collision/worx+motor+mount+refined+3.stl" scale="0.0011 0.0011 0.0011" />
                 </geometry>
