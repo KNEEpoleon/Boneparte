@@ -12,8 +12,8 @@ int main(int argc, char **argv) {
 
   // Create MoveGroupInterface (lives inside robot_name namespace)
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(
-      node_ptr, moveit::planning_interface::MoveGroupInterface::Options("arm", "robot_description",
-                                                                        robot_name));
+      node_ptr, moveit::planning_interface::MoveGroupInterface::Options
+      ("arm", "robot_description",robot_name));
 
   // Set a target pose
   geometry_msgs::msg::Pose target_pose;
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
   target_pose.position.x = -0.4;
   target_pose.position.y = 0.0;
   target_pose.position.z = 0.9;
-  move_group_interface.setPoseTarget(target_pose);
+  move_group_interface.setPoseTarget(target_pose, robot_name+"_link_ee");
 
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
