@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>surgical_robot_planner</name>
+  <version>0.1.0</version>
+  <description>MoveIt planner node that moves the robot to the first pose in a PoseArray topic.</description>
+
+  <maintainer email="dakshadhar1810@gmail.com">genisis</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>rclcpp</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
