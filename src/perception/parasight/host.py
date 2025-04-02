@@ -20,7 +20,7 @@ from parasight.utils import *
 
 import time
 
-from parasight_interfaces.srv import StartTracking, StopTracking
+# from parasight_interfaces.srv import StartTracking, StopTracking
 from parasight_interfaces.msg import TrackedPoints
 from std_srvs.srv import Empty as EmptySrv
 from functools import partial
@@ -32,23 +32,18 @@ from visualization_msgs.msg import Marker
 
 
 class ParaSightHost(Node):
-    states = ['waiting', 'ready', 'user_input', 'tracker_active', 'system_paused', 'stabilizing', 'lock_in']
+    states = ['ready', 'user_input', 'lock_in']
 
     def __init__(self):
         super().__init__('parasight_host')
         
         # Create state machine
-        self.machine = Machine(model=self, states=ParaSightHost.states, initial='waiting',
+        self.machine = Machine(model=self, states=ParaSightHost.states, initial='ready',
                                after_state_change='publish_state')
 
         # Transitions
-        self.machine.add_transition(trigger='all_systems_ready', source='waiting', dest='ready')
         self.machine.add_transition(trigger='start_parasight', source='ready', dest='user_input')
-        self.machine.add_transition(trigger='input_received', source='user_input', dest='tracker_active')
-        self.machine.add_transition(trigger='tracking_lost', source='tracker_active', dest='system_paused')
-        self.machine.add_transition(trigger='tracking_restored', source='system_paused', dest='stabilizing')
-        self.machine.add_transition(trigger='stabilized', source='stabilizing', dest='tracker_active')
-        self.machine.add_transition(trigger='ready_to_drill', source='tracker_active', dest='lock_in')
+        self.machine.add_transition(trigger='ready_to_drill', source='user_input', dest='lock_in')
         self.machine.add_transition(trigger='drill_complete', source='lock_in', dest='ready')
 
         self.machine.add_transition(trigger='hard_reset', source='*', dest='waiting')
@@ -83,13 +78,19 @@ class ParaSightHost(Node):
         # Trigger Subscribers
         self.ui_trigger_subscription = self.create_subscription(
             Empty,
-            '/trigger_host_ui',
+            '/trigger_host_ui', # Calls Segment Using UI
             self.ui_trigger_callback,
             10)
+        # self.hard_reset_subscription = self.create_subscription(
+        #     Empty,
+        #     '/hard_reset_host',
+        #     self.hard_reset_callback,
+        #     10)
+        ## Sreeharsha
         self.hard_reset_subscription = self.create_subscription(
             Empty,
             '/hard_reset_host',
-            self.hard_reset_callback,
+            self.custom_callback_to_reset_FSM,
             10)
         
         # Data Subscribers
@@ -129,10 +130,6 @@ class ParaSightHost(Node):
         self.pose_array_publisher = self.create_publisher(PoseArray, '/surgical_drill_pose', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
-        # Service Clients
-        self.start_tracking_client = self.create_client(StartTracking, '/start_tracking')
-        self.stop_tracking_client = self.create_client(StopTracking, '/stop_tracking')
-
         # Parameters
         self.declare_parameter('selected_bones', 'both')
         self.update_bones(self.get_parameter('selected_bones').value)
@@ -150,15 +147,11 @@ class ParaSightHost(Node):
         # Interfaces
         self.regpipe = RegistrationPipeline()
         self.segmentation_ui = SegmentAnythingUI()
+        print(f"Made the SAM object")
         self.bridge = CvBridge()
 
-        # Create timer to check systems
-        self.create_timer(1.0, self.check_all_systems)
-
-    def check_all_systems(self):
-        if self.state == 'waiting':
-            if self.all_systems_ready():
-                self.trigger('all_systems_ready')
+    def custom_callback_to_reset_FSM(self, rand_arg=True):
+        self.state == 'ready'
 
     def all_systems_ready(self, dummy=True):
         if dummy:
@@ -182,51 +175,17 @@ class ParaSightHost(Node):
         self.get_logger().info(f'Current state: {self.state}')
 
     def ui_trigger_callback(self, msg):
+        print(f"\n! The self state is: {self.state}")
+
         self.get_logger().info('UI trigger received')
         if self.state == 'ready':
             self.trigger('start_parasight')
-            # print(f"\n\n What is last rgb image: {self.last_rgb_image}")
             masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
             self.annotated_points = annotated_points
+            print(f"\n The annotated points are: {self.annotated_points}")
             self.trigger('input_received')
         else:
             self.get_logger().warn('UI trigger received but not in ready state')
-
-    def on_enter_tracker_active(self):
-        assert self.annotated_points is not None
-        # Convert points to geometry_msgs/Point
-        ros_points = [Point(x=float(p[0]), y=float(p[1]), z=0.0) for p in self.annotated_points]
-        
-        # Prepare the request
-        request = StartTracking.Request(points=ros_points, resume=False)
-        
-        # Call asynchronously to avoid blocking
-        self.start_tracking_client.wait_for_service()
-        self.future = self.start_tracking_client.call_async(request)
-        self.future.add_done_callback(partial(self.tracking_response_callback))
-
-    def tracking_response_callback(self, future):
-        try:
-            response = future.result()
-            if not response.success:
-                self.get_logger().error("Failed to start tracking")
-            else:
-                self.get_logger().info("Tracking started")
-        except Exception as e:
-            self.get_logger().error(f"Service call failed: {e}")
-
-    def hard_reset_callback(self, msg):
-        self.get_logger().info('Hard reset received, attempting to stop tracking...')
-        
-        # Create an empty request for the stop_tracking service
-        stop_tracking_request = StopTracking.Request(reset=True)
-        
-        # Call stop_tracking service asynchronously
-        self.stop_tracking_client.wait_for_service()
-        future = self.stop_tracking_client.call_async(stop_tracking_request)
-        
-        # Add a callback to handle after stopping tracking
-        future.add_done_callback(partial(self.after_stop_tracking, reset=True))
 
     def after_stop_tracking(self, future, reset=True):
         try:
@@ -239,18 +198,6 @@ class ParaSightHost(Node):
         # Now, trigger the state machine reset
         if reset:
             self.trigger('hard_reset')
-
-    def pause_tracking(self):
-        request = StopTracking.Request(reset=False)
-        self.stop_tracking_client.wait_for_service()
-        self.future = self.stop_tracking_client.call_async(request)
-        self.future.add_done_callback(partial(self.after_stop_tracking, reset=False))
-
-    def resume_tracking(self):
-        request = StartTracking.Request(resume=True)
-        self.start_tracking_client.wait_for_service()
-        self.future = self.start_tracking_client.call_async(request)
-        self.future.add_done_callback(partial(self.tracking_response_callback))
 
     def update_bones(self, selected_bones):
         """Update self.bones based on the /selected_bones parameter."""
@@ -265,7 +212,7 @@ class ParaSightHost(Node):
             self.bones = []
         self.get_logger().info(f"Updated bones to: {self.bones}")
     
-    def parameter_change_callback(self, params):
+    def parameter_change_callback(self, params): # huh 
         for param in params:
             if param.name == 'selected_bones':
                 self.update_bones(param.value)
@@ -374,28 +321,6 @@ class ParaSightHost(Node):
             masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
             self.annotated_points = annotated_points
             self.register_and_publish(annotated_points)
-
-    def tracked_points_callback(self, msg):
-        if not self.state == 'tracker_active':
-            return
-        
-        if not msg.all_visible:
-            self.get_logger().info('Not all points are visible')
-            return
-        
-        if self.spam_counter > 0 and self.last_drill_pose_array is not None:
-            self.spam_counter -= 1
-            self.pose_array_publisher.publish(self.last_drill_pose_array)
-            return
-        
-        if not msg.stable:
-            self.need_to_register = True
-            return # Wait for tracking to stabilize
-        elif self.need_to_register:
-            annotated_points = [(p.x, p.y) for p in msg.points]
-            self.get_logger().info('Registering...')
-            self.register_and_publish(annotated_points)
-            self.need_to_register = False
 
     def publish_point_cloud(self, clouds):
         # Combine all clouds into one
