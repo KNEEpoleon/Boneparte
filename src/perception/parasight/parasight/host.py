@@ -21,7 +21,7 @@ from parasight.utils import *
 import time
 
 # from parasight_interfaces.srv import StartTracking, StopTracking
-from parasight_interfaces.msg import TrackedPoints
+# from parasight_interfaces.msg import TrackedPoints
 from std_srvs.srv import Empty as EmptySrv
 from functools import partial
 
@@ -109,11 +109,11 @@ class ParaSightHost(Node):
             '/camera/depth/color/points',
             self.pcd_callback,
             10)
-        self.tracked_points_subscription = self.create_subscription(
-            TrackedPoints,
-            '/tracked_points',
-            self.tracked_points_callback,
-            10)
+        # self.tracked_points_subscription = self.create_subscription(
+        #     TrackedPoints,
+        #     '/tracked_points',
+        #     self.tracked_points_callback,
+        #     10)
         self.reg_request_subscription = self.create_subscription(
             Int32,
             '/trigger_reg',
@@ -187,17 +187,17 @@ class ParaSightHost(Node):
         else:
             self.get_logger().warn('UI trigger received but not in ready state')
 
-    def after_stop_tracking(self, future, reset=True):
-        try:
-            # Check if the service call was successful
-            future.result()  # This will raise an exception if the service failed
-            self.get_logger().info("Tracking successfully stopped, proceeding with reset." if reset else "Tracking successfully paused.")
-        except Exception as e:
-            self.get_logger().error(f"Failed to stop tracking: {e}")
+    # def after_stop_tracking(self, future, reset=True):
+    #     try:
+    #         # Check if the service call was successful
+    #         future.result()  # This will raise an exception if the service failed
+    #         self.get_logger().info("Tracking successfully stopped, proceeding with reset." if reset else "Tracking successfully paused.")
+    #     except Exception as e:
+    #         self.get_logger().error(f"Failed to stop tracking: {e}")
         
-        # Now, trigger the state machine reset
-        if reset:
-            self.trigger('hard_reset')
+    #     # Now, trigger the state machine reset
+    #     if reset:
+    #         self.trigger('hard_reset')
 
     def update_bones(self, selected_bones):
         """Update self.bones based on the /selected_bones parameter."""

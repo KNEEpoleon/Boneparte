@@ -1,6 +1,9 @@
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 MODIFIED_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9_\-]/-/g')
 MODIFIED_BRANCH_NAME="ament_test"
+# MODIFIED_BRANCH_NAME="lrs2tst"
+
+
 echo $BRANCH_NAME
 
 echo $MODIFIED_BRANCH_NAME

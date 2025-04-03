@@ -137,6 +137,5 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 
 # Set the default command to run when starting the container
 COPY docker/entrypoint.sh /ros_ws/
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 # ENTRYPOINT ["./entrypoint.sh"]
 # CMD ["/bin/bash"]

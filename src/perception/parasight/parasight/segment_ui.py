@@ -30,12 +30,12 @@ class SegmentAnythingUI:
 
         if size == "small":
             sam2_checkpoint = (
-                "/ros_ws/src/segment-anything-2/checkpoints/sam2_hiera_small.pt"
+                "/ros_ws/src/perception/segment-anything-2/checkpoints/sam2_hiera_small.pt"
             )
             model_cfg = "sam2_hiera_s.yaml"
         elif size == "large":
             sam2_checkpoint = (
-                "/ros_ws/src/segment-anything-2/checkpoints/sam2_hiera_large.pt"
+                "/ros_ws/src/perception/segment-anything-2/checkpoints/sam2_hiera_large.pt"
             )
             model_cfg = "sam2_hiera_l.yaml"
         else:
@@ -313,12 +313,12 @@ class SegmentAnythingUI:
 
 #         if size == "small":
 #             sam2_checkpoint = (
-#                 "/ros_ws/src/segment-anything-2/checkpoints/sam2_hiera_small.pt"
+#                 "/ros_ws/src/perception/segment-anything-2/checkpoints/sam2_hiera_small.pt"
 #             )
 #             model_cfg = "sam2_hiera_s.yaml"
 #         elif size == "large":
 #             sam2_checkpoint = (
-#                 "/ros_ws/src/segment-anything-2/checkpoints/sam2_hiera_large.pt"
+#                 "/ros_ws/src/perception/segment-anything-2/checkpoints/sam2_hiera_large.pt"
 #             )
 #             model_cfg = "sam2_hiera_l.yaml"
 #         else:
