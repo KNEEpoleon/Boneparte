@@ -44,39 +44,6 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https && \
     locale-gen en_US en_US.UTF-8 && \
     update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-# Ensure keyrings directory exists
-# RUN mkdir -p /etc/apt/keyrings
-
-# Install kernel headers
-# RUN apt-get update && apt-get install -y linux-headers-generic
-
-
-
-# # 1. Download the key using gpg
-# RUN apt-get update && apt-get install gnupg -y
-# RUN gpg --keyserver keyserver.ubuntu.com --recv-keys C8B3A55A6F3EFCDE
-
-# # Export the key to a file
-# RUN gpg --armor --export C8B3A55A6F3EFCDE > /usr/share/keyrings/ros2.gpg
-# # 2. Update package lists
-# RUN apt-get update
-
-# # Option 1: Use the key with apt-get in the sources list.
-# RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros2.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2.list
-# RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C8B3A55A6F3EFCDE
-
-# # Update package lists
-# RUN apt-get update
-# # Setup and install Intel RealSense libraries
-# # RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | tee /etc/apt/keyrings/librealsense.pgp > /dev/null
-# # RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp >> librealsense.pgp 
-# # RUN echo librealsense.pgp
-# # RUN mv librealsense.pgp /etc/apt/keyrings/  
-# RUN echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo jammy main" | tee /etc/apt/sources.list.d/librealsense.list
-# # # RUN echo "deb https://librealsense.intel.com/Debian/apt-repo jammy main" | tee /etc/apt/sources.list.d/librealsense.list
-# RUN apt-get update && apt-get install -y --allow-unauthenticated \
-#     librealsense2-dkms \
-#     librealsense2-utils
 
 RUN apt-get install apt-transport-https \
 mkdir -p /etc/apt/keyrings \
@@ -94,6 +61,7 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | a
     sh -c 'echo "deb [trusted=yes] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list' && \
     apt-get update && apt-get install -y \
     ros-humble-desktop \
+    ros-humble-ament-cmake \
     python3-rosdep2 \
     python3-pip \
     python3-nose \
@@ -101,7 +69,8 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | a
     python3-vcstool \
     python-is-python3
 # Install ROS 2 RealSense package separately
-RUN apt-get update && apt-get install -y ros-humble-realsense2-camera
+RUN apt-get update && apt-get install -y ros-humble-realsense2-camera \
+    ros-humble-librealsense2*
 
 # Install ROS 2 control, controllers, and visualization tools
 RUN apt-get install -y \
@@ -126,15 +95,6 @@ RUN apt-get install -y \
     ros-humble-pick-ik \
     vim-gtk3 \
     ament-cmake-nose
-
-# Setup and install Intel RealSense libraries
-# RUN curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | tee /etc/apt/keyrings/librealsense.pgp > /dev/null && \
-#     echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/librealsense.list && \
-#     apt-get update && apt-get install -y \
-#     librealsense2-dkms \
-#     librealsense2-utils \
-#     ros-humble-librealsense2* \
-#     ros-humble-realsense2-camera
 
 # Install torch
 RUN pip install torch==2.3.1+cu121 torchvision==0.18.1+cu121 torchaudio==2.3.1+cu121 --index-url https://download.pytorch.org/whl/cu121
@@ -177,5 +137,6 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 
 # Set the default command to run when starting the container
 COPY docker/entrypoint.sh /ros_ws/
-ENTRYPOINT ["./entrypoint.sh"]
-CMD ["/bin/bash"]
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+# ENTRYPOINT ["./entrypoint.sh"]
+# CMD ["/bin/bash"]

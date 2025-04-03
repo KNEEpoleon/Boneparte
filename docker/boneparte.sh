@@ -30,7 +30,9 @@ function run_container {
 
     MODE=${1:-default}  # Mode comes first (default, sim, camera, etc.)
     CMD=${2:-/bin/bash}  # Optional command comes second
-
+    echo "!"
+    echo ${CMD}
+    echo ${MODE}
     # Define device options based on mode
     DEVICES=""
     if [ "$MODE" == "default" ]; then
@@ -50,6 +52,7 @@ function run_container {
         done
     fi
 
+    echo "!!"
 
     # Run the container with different configurations based on the mode
     sudo docker run -it --rm \
@@ -70,6 +73,8 @@ function run_container {
 
     # Clean up after container exits
     xhost -local:root
+    echo "!!!!"
+
 }
 
 # Command-line options
