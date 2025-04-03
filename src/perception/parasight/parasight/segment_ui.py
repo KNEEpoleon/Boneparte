@@ -9,8 +9,8 @@ from sam2.sam2_image_predictor import SAM2ImagePredictor
 class SegmentAnythingUI:
     def __init__(self, size="small"):
         self.bones = ["femur", "tibia"]
-        # self.label_map = {"femur": np.array([1, 0]), "tibia": np.array([0, 1])}
-        self.label_map = {"femur": np.array([1, 0]), "tibia": np.array([1, 0])}
+        self.label_map = {"femur": np.array([1, 0]), "tibia": np.array([0, 1])}
+        # self.label_map = {"femur": np.array([1, 0]), "tibia": np.array([1, 0])}
         # self.label_map = {"femur": np.array([0]), "tibia": np.array([0])}
 
         self.mask_colors = np.array([[30, 144, 255, 153], [255, 144, 30, 153]])
@@ -248,9 +248,10 @@ class SegmentAnythingUI:
 
             # Update the prompt after the femur is selected
             if self.femur_point is not None and self.tibia_point is None:
-                self.tibia_point = self.femur_point
-                print(f"tibia: {self.tibia_point} , femur: {self.femur_point}")
-                # self.update_prompt("Click a point on the Tibia")
+                # self.tibia_point = self.femur_point
+                # print(f"tibia: {self.tibia_point} , femur: {self.femur_point}")
+                print(f"self femur point: {self.femur_point}")
+                self.update_prompt("Click a point on the Tibia")
 
             if self.femur_point is not None and self.tibia_point is not None:
                 if not self.mask_generated:

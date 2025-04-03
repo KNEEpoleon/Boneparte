@@ -114,16 +114,16 @@ class ParaSightHost(Node):
         #     '/tracked_points',
         #     self.tracked_points_callback,
         #     10)
-        self.reg_request_subscription = self.create_subscription(
-            Int32,
-            '/trigger_reg',
-            self.reg_request_callback,
-            10)
-        self.log_request_subscription = self.create_subscription(
-            Empty,
-            '/log_request',
-            self.log_request_callback,
-            10)
+        # self.reg_request_subscription = self.create_subscription(
+        #     Int32,
+        #     '/trigger_reg',
+        #     self.reg_request_callback,
+        #     10)
+        # self.log_request_subscription = self.create_subscription(
+        #     Empty,
+        #     '/log_request',
+        #     self.log_request_callback,
+        #     10)
         
         # Publishers
         self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
@@ -183,7 +183,10 @@ class ParaSightHost(Node):
             masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
             self.annotated_points = annotated_points
             print(f"\n The annotated points are: {self.annotated_points}")
-            self.trigger('input_received')
+            # self.trigger('input_received')
+            self.trigger('ready_to_drill')
+            self.register_and_publish(annotated_points)
+
         else:
             self.get_logger().warn('UI trigger received but not in ready state')
 
@@ -309,18 +312,18 @@ class ParaSightHost(Node):
         marker.text = f"{fitness:.2f}"  # Format the fitness value
         self.marker_publisher.publish(marker)
 
-    def reg_request_callback(self, msg):
-        if msg.data == 0:
-            if self.annotated_points is not None:
-                print('Re-Registering...')
-                self.register_and_publish(self.annotated_points)
-            else:
-                self.get_logger().warn('No annotated points set. Register with UI first')
-        elif msg.data == 1:
-            print('Re-Registering with UI...')
-            masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
-            self.annotated_points = annotated_points
-            self.register_and_publish(annotated_points)
+    # def reg_request_callback(self, msg):
+    #     if msg.data == 0:
+    #         if self.annotated_points is not None:
+    #             print('Re-Registering...')
+    #             self.register_and_publish(self.annotated_points)
+    #         else:
+    #             self.get_logger().warn('No annotated points set. Register with UI first')
+    #     elif msg.data == 1:
+    #         print('Re-Registering with UI...')
+    #         masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
+    #         self.annotated_points = annotated_points
+    #         self.register_and_publish(annotated_points)
 
     def publish_point_cloud(self, clouds):
         # Combine all clouds into one
@@ -390,8 +393,8 @@ class ParaSightHost(Node):
                 pose.orientation.z = quat[2]
                 pose.orientation.w = quat[3]
 
-                base_transform = self.tf_buffer.lookup_transform(self.base_frame, self.camera_frame, rclpy.time.Time())
-                pose = do_transform_pose(pose, base_transform)
+                # base_transform = self.tf_buffer.lookup_transform(self.base_frame, self.camera_frame, rclpy.time.Time())
+                # pose = do_transform_pose(pose, base_transform)
 
                 drill_pose_array.poses.append(pose)
 
@@ -404,11 +407,11 @@ class ParaSightHost(Node):
             pose.position.z += z_off
         return pose_array
 
-    def log_request_callback(self, msg):
-        self.get_logger().info('Log requested')
-        base_to_tool = self.tf_buffer.lookup_transform(self.base_frame, self.tool_frame, rclpy.time.Time())
-        self.get_logger().info(f'Base to tool: {base_to_tool}')
-        self.get_logger().info(f'Drill pose: {self.last_drill_pose}') # Target in World Frame
+    # def log_request_callback(self, msg):
+    #     self.get_logger().info('Log requested')
+    #     base_to_tool = self.tf_buffer.lookup_transform(self.base_frame, self.tool_frame, rclpy.time.Time())
+    #     self.get_logger().info(f'Base to tool: {base_to_tool}')
+    #     self.get_logger().info(f'Drill pose: {self.last_drill_pose}') # Target in World Frame
 
 
 def main(args=None):

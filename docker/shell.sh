@@ -3,7 +3,7 @@
 xhost +
 
 # Specify the container name or ID
-CONTAINER_NAME="frosty_matsumoto"
+CONTAINER_NAME="stupefied_pike"
 
 # Check if the container is running
 if [ $(docker ps -q -f name=^/${CONTAINER_NAME}$) ]; then
