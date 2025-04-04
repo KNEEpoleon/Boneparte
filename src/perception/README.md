@@ -1,8 +1,8 @@
 ## Commands to run the node to publish the drill site locations just once:
 
-#### after 'running' the docker container, rm install, then do a colcon build and then 
-#### source install/setup.bash
-#### To attach a new terminal, run docker/shell.sh
+Run ./docker/boneparte build to build the docker image - it should be named boneparu_perception-subsystem
+
+To attach another shell to the container, run: ./docker/shell.sh
 
 1) First fire up the realsense node: ros2 launch parasight rs_launch.py
 

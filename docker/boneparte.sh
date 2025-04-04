@@ -4,7 +4,7 @@
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 MODIFIED_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9_\-]/-/g')
 IMAGE_NAME="boneparu:${MODIFIED_BRANCH_NAME}"
-CONTAINER_NAME="boneparte_${MODIFIED_BRANCH_NAME}"
+CONTAINER_NAME="boneparu_${MODIFIED_BRANCH_NAME}"
 
 function build_image {
     echo "Building Docker image: $IMAGE_NAME"
@@ -12,6 +12,8 @@ function build_image {
 }
 
 function run_container {
+    echo "Building container named: $CONTAINER_NAME"
+
     XSOCK=/tmp/.X11-unix
     XAUTH=/tmp/.docker.xauth
 
@@ -30,9 +32,9 @@ function run_container {
 
     MODE=${1:-default}  # Mode comes first (default, sim, camera, etc.)
     CMD=${2:-/bin/bash}  # Optional command comes second
-    echo "!"
-    echo ${CMD}
-    echo ${MODE}
+    # echo "!"
+    # echo ${CMD}
+    # echo ${MODE}
     # Define device options based on mode
     DEVICES=""
     if [ "$MODE" == "default" ]; then
@@ -52,7 +54,7 @@ function run_container {
         done
     fi
 
-    echo "!!"
+    # echo "!!"
 
     # Run the container with different configurations based on the mode
     sudo docker run -it --rm \
@@ -73,7 +75,7 @@ function run_container {
 
     # Clean up after container exits
     xhost -local:root
-    echo "!!!!"
+    # echo "!!!!"
 
 }
 

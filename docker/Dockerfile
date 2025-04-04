@@ -132,10 +132,10 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
     /root/.oh-my-bash/themes/robbyrussell/robbyrussell.theme.sh
 
 # Copy custom commands into .bashrc
-# COPY docker/commands.bashrc /ros_ws/
-# RUN cat /ros_ws/commands.bashrc >> ~/.bashrc
+COPY docker/commands.bashrc /ros_ws/
+RUN cat /ros_ws/commands.bashrc >> ~/.bashrc
 
 # Set the default command to run when starting the container
 COPY docker/entrypoint.sh /ros_ws/
-# ENTRYPOINT ["./entrypoint.sh"]
-# CMD ["/bin/bash"]
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["/bin/bash"]

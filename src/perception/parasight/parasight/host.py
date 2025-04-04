@@ -267,7 +267,7 @@ class ParaSightHost(Node):
             mask_points = all_mask_points[i]
             source = self.sources[bone]
             mask_points = self.add_depth(mask_points)
-            transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone)
+            transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone) # aligns source to target
             t1 = time.time()
             self.get_logger().info(f'Registration time for {bone}: {t1 - t0}')
             source_cloud = source.voxel_down_sample(voxel_size=0.003)
@@ -275,42 +275,44 @@ class ParaSightHost(Node):
             source_cloud.paint_uniform_color(self.colors[bone])
             registered_clouds.append(source_cloud)
             transforms[bone] = transform
+            # print(f"\n\nFor bone {bone} we have transform: \n{transform}")
 
         self.publish_point_cloud(registered_clouds)
 
         theta = self.pose_direction(annotated_points)
         drill_pose_array = self.compute_plan(transforms,theta=theta)
-        drill_pose_array = self.calibration_offset(drill_pose_array,0.004,-0.0005,0.0)
-        drill_pose_array.header.frame_id = self.base_frame
+        # drill_pose_array = self.calibration_offset(drill_pose_array,0.004,-0.0005,0.0)
+        # drill_pose_array.header.frame_id = self.base_frame # Sreeharsha
+        drill_pose_array.header.frame_id = self.camera_frame
         drill_pose_array.header.stamp = self.get_clock().now().to_msg()
         self.pose_array_publisher.publish(drill_pose_array)
-        self.last_drill_pose_array = drill_pose_array
-        self.spam_counter = 3
+        # self.last_drill_pose_array = drill_pose_array
+        # self.spam_counter = 3
 
         # DEPRECATED
-        self.last_drill_pose = drill_pose_array.poses[0]
+        # self.last_drill_pose = drill_pose_array.poses[0]
         # self.publish_fitness_marker(self.last_drill_pose.position, fitness)
         # self.resume_tracking()
 
-    def publish_fitness_marker(self, position, fitness):
-        marker = Marker()
-        marker.header.frame_id = self.base_frame
-        marker.header.stamp = self.get_clock().now().to_msg()
-        marker.ns = "fitness_marker"
-        marker.id = 0
-        marker.type = Marker.TEXT_VIEW_FACING
-        marker.action = Marker.ADD
-        marker.pose.position.x = position.x
-        marker.pose.position.y = position.y
-        marker.pose.position.z = position.z + 0.1  # Offset slightly above the first pose
-        marker.pose.orientation.w = 1.0
-        marker.scale.z = 0.05  # Text size
-        marker.color.r = 1.0
-        marker.color.g = 1.0
-        marker.color.b = 1.0
-        marker.color.a = 1.0
-        marker.text = f"{fitness:.2f}"  # Format the fitness value
-        self.marker_publisher.publish(marker)
+    # def publish_fitness_marker(self, position, fitness):
+    #     marker = Marker()
+    #     marker.header.frame_id = self.base_frame
+    #     marker.header.stamp = self.get_clock().now().to_msg()
+    #     marker.ns = "fitness_marker"
+    #     marker.id = 0
+    #     marker.type = Marker.TEXT_VIEW_FACING
+    #     marker.action = Marker.ADD
+    #     marker.pose.position.x = position.x
+    #     marker.pose.position.y = position.y
+    #     marker.pose.position.z = position.z + 0.1  # Offset slightly above the first pose
+    #     marker.pose.orientation.w = 1.0
+    #     marker.scale.z = 0.05  # Text size
+    #     marker.color.r = 1.0
+    #     marker.color.g = 1.0
+    #     marker.color.b = 1.0
+    #     marker.color.a = 1.0
+    #     marker.text = f"{fitness:.2f}"  # Format the fitness value
+    #     self.marker_publisher.publish(marker)
 
     # def reg_request_callback(self, msg):
     #     if msg.data == 0:
@@ -400,12 +402,12 @@ class ParaSightHost(Node):
 
         return drill_pose_array
 
-    def calibration_offset(self,pose_array,x_off,y_off,z_off):
-        for pose in pose_array.poses:
-            pose.position.x += x_off
-            pose.position.y += y_off
-            pose.position.z += z_off
-        return pose_array
+    # def calibration_offset(self,pose_array,x_off,y_off,z_off):
+    #     for pose in pose_array.poses:
+    #         pose.position.x += x_off
+    #         pose.position.y += y_off
+    #         pose.position.z += z_off
+    #     return pose_array
 
     # def log_request_callback(self, msg):
     #     self.get_logger().info('Log requested')
