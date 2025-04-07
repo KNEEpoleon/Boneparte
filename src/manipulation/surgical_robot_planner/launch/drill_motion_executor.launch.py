@@ -4,7 +4,8 @@ from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 from lbr_bringup.description import LBRDescriptionMixin
 from lbr_bringup.moveit import LBRMoveGroupMixin
-
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def launch_setup(context, *args, **kwargs):
     model = LaunchConfiguration("model").perform(context)
@@ -14,6 +15,10 @@ def launch_setup(context, *args, **kwargs):
     moveit_configs = LBRMoveGroupMixin.moveit_configs_builder(
         robot_name=model,
         package_name=f"{model}_moveit_config",
+        # ompl_planning_yaml_file="config/ompl_planning.yaml",
+    ).planning_pipelines(
+        default_planning_pipeline="pilz_industrial_motion_planner",
+        pipelines=["pilz_industrial_motion_planner", "ompl"],
     )
 
     return [
