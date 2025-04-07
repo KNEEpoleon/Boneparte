@@ -15,7 +15,8 @@ setup(
         ('share/' + package_name + '/resource', ['resource/plan_config.yaml']),
         ('share/' + package_name + '/resource', ['resource/plan_config_v2.yaml']),
         ('share/' + package_name + '/checkpoints', ['checkpoints/scaled_online.pth']),
-        ('share/' + package_name + '/launch', ['launch/rs_launch.py'])
+        ('share/' + package_name + '/launch', ['launch/rs_launch.py']),
+        ('share/' + package_name + '/launch', ['launch/segment_rs_launch.py'])
     ],
     install_requires=['setuptools'],
     zip_safe=True,

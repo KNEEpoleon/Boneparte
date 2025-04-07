@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import cv2
 import rclpy
 from cv_bridge import CvBridge
@@ -127,7 +128,7 @@ class ParaSightHost(Node):
         
         # Publishers
         self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
-        self.pose_array_publisher = self.create_publisher(PoseArray, '/surgical_drill_pose', 10)
+        self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
         # Parameters
