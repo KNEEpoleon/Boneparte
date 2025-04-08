@@ -43,9 +43,9 @@ public:
       RCLCPP_WARN(this->get_logger(), "Received empty pose array.");
       return;
     }
-
-    geometry_msgs::msg::Pose target_pose = msg->poses[0];
-    geometry_msgs::msg::Pose above_pose = target_pose;
+    geometry_msgs::msg::Pose target_pose = msg->poses[0]; //robot base frame.
+    geometry_msgs::msg::Pose above_pose = target_pose; // robot base frame.
+    RCLCPP_INFO(this->get_logger(), "\n\nIN POSE CALLBACK\n\n");
 
     tf2::Quaternion q(
         target_pose.orientation.x,
@@ -54,7 +54,7 @@ public:
         target_pose.orientation.w);
     tf2::Matrix3x3 rot(q);
 
-    // find a point 10cm above drill site along drill axis
+    // find a point 10cm above drill site along surgical site normal
     tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.1);
 
     above_pose.position.x += offset.x();
