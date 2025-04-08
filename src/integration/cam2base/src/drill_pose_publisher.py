@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import PoseStamped, PoseArray
+from geometry_msgs.msg import PoseStamped, PoseArray, Pose
 import tf2_ros
 import tf2_geometry_msgs  # Must be imported to register the conversions
-from tf2_geometry_msgs.tf2_geometry_msgs import do_transform_pose
+from tf2_geometry_msgs import do_transform_pose
 
 
 class CameraPoseTransformer(Node):
@@ -41,14 +41,17 @@ class CameraPoseTransformer(Node):
             transformed_array.header.stamp = self.get_clock().now().to_msg()
 
             for pose in msg.poses:
-                stamped_pose = PoseStamped()
-                stamped_pose.header.frame_id = 'camera_frame'
-                stamped_pose.header.stamp = self.get_clock().now().to_msg()
-                stamped_pose.pose = pose
+                stamped_pose = Pose()
+                # stamped_pose.header.frame_id = 'camera_frame'
+                # stamped_pose.header.stamp = self.get_clock().now().to_msg()
+                stamped_pose = pose
 
                 # Transform the pose
                 transformed_pose_stamped = do_transform_pose(stamped_pose, transform)
-                transformed_array.poses.append(transformed_pose_stamped.pose)
+                self.get_logger().info(f"\n\nTF pose stampled: {transformed_pose_stamped}")
+                transformed_array.poses.append(transformed_pose_stamped)
+                # [drill_pose_publisher.py-2] TF pose stampled: geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=-0.10903048778940018, y=0.029565822633570195, z=1.686571510661826), orientation=geometry_msgs.msg.Quaternion(x=-0.05757796911066912, y=0.2452627003257707, z=-0.7175222634022639, w=0.6493787699209871))
+
 
             self.pose_publisher.publish(transformed_array)
             self.get_logger().info(f"Published {len(transformed_array.poses)} transformed poses.")
