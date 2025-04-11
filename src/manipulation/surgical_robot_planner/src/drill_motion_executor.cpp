@@ -66,7 +66,7 @@ public:
     move_group_interface_->setPoseTarget(above_pose, robot_name_ + "_link_ee");
     
     // point-to-point (PTP) for home to above drill
-    move_group_interface_->setPlannerId("PTP");
+    move_group_interface_->setPlannerId("LIN");
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_above;
     if (move_group_interface_->plan(plan_above) == moveit::core::MoveItErrorCode::SUCCESS) {
