@@ -5,12 +5,16 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include "moveit/planning_scene_interface/planning_scene_interface.h"
+#include "moveit_msgs/msg/collision_object.hpp"
+#include "shape_msgs/msg/solid_primitive.hpp"
 
 class PoseSubscriberNode : public rclcpp::Node {
 private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr drill_command_publisher_;
   std::string robot_name_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
+  std::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_; 
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_;
 
 public:
@@ -30,7 +34,7 @@ public:
           "arm", "robot_description", robot_name_));
     
     move_group_interface_->setPlanningPipelineId("pilz_industrial_motion_planner");
-
+    planning_scene_interface_ = std::make_shared<moveit::planning_interface::PlanningSceneInterface>(robot_name_);
     subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/surgical_drill_pose", 10,
         std::bind(&PoseSubscriberNode::pose_callback, this, std::placeholders::_1));
@@ -38,6 +42,27 @@ public:
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
   }
 
+  void addDrilledPinAsObstacle(const geometry_msgs::msg::Pose& pin_pose)
+  {moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.header.frame_id = robot_name_ + "_link_0";  // your robot base frame
+
+    collision_object.id = "drilled_pin";
+
+    shape_msgs::msg::SolidPrimitive primitive;
+    primitive.type = primitive.CYLINDER;
+    primitive.dimensions.resize(2);
+    primitive.dimensions[0] = 0.08;  // height (meters)
+    primitive.dimensions[1] = 0.005; // radius (meters)
+
+    collision_object.primitives.push_back(primitive);
+    collision_object.primitive_poses.push_back(pin_pose);
+    collision_object.operation = collision_object.ADD;
+
+    planning_scene_interface_->applyCollisionObjects({collision_object}); // Note the -> instead of .
+
+    RCLCPP_INFO(this->get_logger(), "Added drilled pin as obstacle.");
+  }
+  
   void pose_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
     if (msg->poses.empty()) {
       RCLCPP_WARN(this->get_logger(), "Received empty pose array.");
@@ -103,7 +128,7 @@ public:
       stop_msg.data = "stop";
       drill_command_publisher_->publish(stop_msg);
       RCLCPP_INFO(this->get_logger(), "Published 'stop' to /drill_commands.");
-      
+      addDrilledPinAsObstacle(target_pose);
       // Plan and execute return to pre-drill position
       returnToPreDrillPosition(above_pose);
     } else {
