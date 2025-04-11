@@ -234,7 +234,7 @@ class SegmentAnythingUI:
         if bones is not None:
             self.bones = bones
 
-        self.update_prompt("Click a point on the Bone")
+        self.update_prompt("Click a point on the Femur")
 
         # Set mouse callback function
         cv2.setMouseCallback("Image", self.select_point)
