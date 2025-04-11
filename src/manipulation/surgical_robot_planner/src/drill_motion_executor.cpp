@@ -51,8 +51,8 @@ public:
     shape_msgs::msg::SolidPrimitive primitive;
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(2);
-    primitive.dimensions[0] = 0.08;  // height (meters)
-    primitive.dimensions[1] = 0.005; // radius (meters)
+    primitive.dimensions[0] = 0.08;   
+    primitive.dimensions[1] = 0.008; 
 
     collision_object.primitives.push_back(primitive);
     collision_object.primitive_poses.push_back(pin_pose);
