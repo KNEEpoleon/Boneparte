@@ -28,6 +28,11 @@ install(PROGRAMS
   DESTINATION lib/cam2base
 )
 
+install(PROGRAMS
+  src/pointcloud_base_publisher.py
+  DESTINATION lib/cam2base
+)
+
 install(DIRECTORY launch/
   DESTINATION share/cam2base/launch
 )

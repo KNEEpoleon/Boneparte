@@ -3,7 +3,7 @@
 xhost +
 
 # Specify the container name or ID
-CONTAINER_NAME="boneparu_perception-subsystem"
+CONTAINER_NAME="boneparu_main"
 
 # Check if the container is running
 if [ $(docker ps -q -f name=^/${CONTAINER_NAME}$) ]; then
