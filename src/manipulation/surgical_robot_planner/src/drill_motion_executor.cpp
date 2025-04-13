@@ -16,6 +16,7 @@ private:
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   std::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_; 
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_;
+  int pin_counter = 0;
 
 public:
   static std::shared_ptr<PoseSubscriberNode> create() {
@@ -30,35 +31,39 @@ public:
   void initialize() {
     move_group_interface_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(
         std::static_pointer_cast<rclcpp::Node>(shared_from_this()),
-        moveit::planning_interface::MoveGroupInterface::Options(
-          "arm", "robot_description", robot_name_));
-    
+        moveit::planning_interface::MoveGroupInterface::Options("arm", "robot_description", robot_name_));
     move_group_interface_->setPlanningPipelineId("pilz_industrial_motion_planner");
+    move_group_interface_ -> setPlanningTime(5.0);
+
     planning_scene_interface_ = std::make_shared<moveit::planning_interface::PlanningSceneInterface>(robot_name_);
-    subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
-        "/surgical_drill_pose", 10,
+
+    subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>("/surgical_drill_pose", 10,
         std::bind(&PoseSubscriberNode::pose_callback, this, std::placeholders::_1));
 
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
   }
 
-  void addDrilledPinAsObstacle(const geometry_msgs::msg::Pose& pin_pose)
-  {moveit_msgs::msg::CollisionObject collision_object;
-    collision_object.header.frame_id = robot_name_ + "_link_0";  // your robot base frame
-
-    collision_object.id = "drilled_pin";
+  void add_drilled_pin_as_obstacle(const geometry_msgs::msg::Pose& pin_pose) {
+    pin_counter++;
+    
+    // Create a unique ID for each pin
+    moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.header.frame_id = robot_name_ + "_link_0"; 
+    
+    collision_object.id = "drilled_pin_" + std::to_string(pin_counter);
 
     shape_msgs::msg::SolidPrimitive primitive;
+    // Declare a cylinder obstacle for the pin
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(2);
-    primitive.dimensions[0] = 0.08;   
-    primitive.dimensions[1] = 0.008; 
+    primitive.dimensions[0] = 0.08;   // surgical pin length 8cm
+    primitive.dimensions[1] = 0.008;    // accuracy cylinder radius 8mm
 
     collision_object.primitives.push_back(primitive);
     collision_object.primitive_poses.push_back(pin_pose);
     collision_object.operation = collision_object.ADD;
 
-    planning_scene_interface_->applyCollisionObjects({collision_object}); // Note the -> instead of .
+    planning_scene_interface_->applyCollisionObjects({collision_object}); 
 
     RCLCPP_INFO(this->get_logger(), "Added drilled pin as obstacle.");
   }
@@ -69,6 +74,7 @@ public:
       return;
     }
 
+    // TODO: Change this to accept use input from GUI
     geometry_msgs::msg::Pose target_pose = msg->poses[0];
     geometry_msgs::msg::Pose above_pose = target_pose;
 
@@ -79,7 +85,8 @@ public:
         target_pose.orientation.w);
     tf2::Matrix3x3 rot(q);
 
-    // find a point 10cm above drill site along drill axis
+    // TODO: Change according to drill length
+    // A point 10cm above drill site along drill axis
     tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.1);
 
     above_pose.position.x += offset.x();
@@ -89,30 +96,33 @@ public:
     // Move to pre-drill position
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setPoseTarget(above_pose, robot_name_ + "_link_ee");
-    
-    // point-to-point (PTP) for home to above drill
     move_group_interface_->setPlannerId("LIN");
+    move_group_interface_->setMaxVelocityScalingFactor(1);
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_above;
-    if (move_group_interface_->plan(plan_above) == moveit::core::MoveItErrorCode::SUCCESS) {
+    auto pre_drill_plan = move_group_interface_->plan(plan_above);
+    if (pre_drill_plan == moveit::core::MoveItErrorCode::SUCCESS) {
       RCLCPP_INFO(this->get_logger(), "Moving to pre-drill pose...");
-      move_group_interface_->execute(plan_above);
+      auto execution_result = move_group_interface_->execute(plan_above);
+      
+      if (execution_result != moveit::core::MoveItErrorCode::SUCCESS) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to execute pre-drill movement with error code: %d", execution_result.val);
+        return;
+      }
     } else {
-      RCLCPP_ERROR(this->get_logger(), "Failed to plan to pre-drill pose.");
+      RCLCPP_ERROR(this->get_logger(), "Failed to plan to pre-drill pose with error code: %d", pre_drill_plan.val);
       return;
     }
 
-    // Plan drilling motion with LIN first, then execute if successful
+    // Move to drill position 
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setPoseTarget(target_pose, robot_name_ + "_link_ee");
     move_group_interface_->setPlannerId("LIN");
-    move_group_interface_->setMaxVelocityScalingFactor(0.05);  // 0.5% of max velocity
-    move_group_interface_->setMaxAccelerationScalingFactor(0.05);  // 0.5% of max acceleration
+    move_group_interface_->setMaxVelocityScalingFactor(0.05);
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_drill;
-    bool plan_success = (move_group_interface_->plan(plan_drill) == moveit::core::MoveItErrorCode::SUCCESS);
-    
-    if (plan_success) {
+    auto drilling_plan = move_group_interface_->plan(plan_drill);
+    if (drilling_plan == moveit::core::MoveItErrorCode::SUCCESS) {    
       // Start drill only after successful motion planning
       auto start_msg = std_msgs::msg::String();
       start_msg.data = "start";
@@ -121,39 +131,70 @@ public:
       
       // Execute the drilling motion
       RCLCPP_INFO(this->get_logger(), "Drilling motion executing...");
-      move_group_interface_->execute(plan_drill);
+      auto execution_result = move_group_interface_->execute(plan_drill);
       
-      // Stop drill after motion completes
+      // Stop drill after motion completes or fails
       auto stop_msg = std_msgs::msg::String();
       stop_msg.data = "stop";
       drill_command_publisher_->publish(stop_msg);
       RCLCPP_INFO(this->get_logger(), "Published 'stop' to /drill_commands.");
-      addDrilledPinAsObstacle(target_pose);
-      // Plan and execute return to pre-drill position
-      returnToPreDrillPosition(above_pose);
+      
+      if (execution_result == moveit::core::MoveItErrorCode::SUCCESS) {
+        // Plan and execute return to pre-drill position
+        return_to_pre_drill_position(above_pose);
+        add_drilled_pin_as_obstacle(target_pose);
+        return_to_home_pose();
+      } else {
+        RCLCPP_ERROR(this->get_logger(), "Drilling motion execution failed with error code: %d", execution_result.val);
+        return_to_home_pose();
+      }
     } else {
-      RCLCPP_ERROR(this->get_logger(), "Failed to plan drilling motion.");
+      RCLCPP_ERROR(this->get_logger(), "Drilling motion planning failed with error code: %d", drilling_plan.val);
+      return_to_home_pose();
     }
   }
 
-  // New method for error recovery - returning to pre-drill position
-  void returnToPreDrillPosition(const geometry_msgs::msg::Pose& above_pose) {
+  void return_to_pre_drill_position(const geometry_msgs::msg::Pose& above_pose) {
     RCLCPP_INFO(this->get_logger(), "Planning return to pre-drill position...");
     
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setPoseTarget(above_pose, robot_name_ + "_link_ee");
-    move_group_interface_->setPlannerId("LIN");  // Using LIN for controlled retraction
+    move_group_interface_->setPlannerId("LIN"); 
     
     // Reset to reasonable speed for retraction
-    move_group_interface_->setMaxVelocityScalingFactor(0.05);  // 5% of max velocity
-    move_group_interface_->setMaxAccelerationScalingFactor(0.05);  // 5% of max acceleration
+    move_group_interface_->setMaxVelocityScalingFactor(0.5);  
     
     moveit::planning_interface::MoveGroupInterface::Plan retract_plan;
-    if (move_group_interface_->plan(retract_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
+    auto plan_result = move_group_interface_->plan(retract_plan);
+    if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
       RCLCPP_INFO(this->get_logger(), "Returning to pre-drill position...");
-      move_group_interface_->execute(retract_plan);
+      auto execution_result = move_group_interface_->execute(retract_plan);
+      
+      if (execution_result != moveit::core::MoveItErrorCode::SUCCESS) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to execute return to pre-drill position with error code: %d", execution_result.val);
+      }
     } else {
-      RCLCPP_ERROR(this->get_logger(), "Failed to plan return to pre-drill position.");
+      RCLCPP_ERROR(this->get_logger(), "Failed to plan return to pre-drill position with error code: %d", plan_result.val);
+    }
+  }
+
+  void return_to_home_pose() {
+    RCLCPP_INFO(this->get_logger(), "Attempting to return to home pose due to error...");
+    
+    move_group_interface_->setStartStateToCurrentState();
+    move_group_interface_->setNamedTarget("Boneparte_home");  // target from SRDF
+    move_group_interface_->setPlannerId("PTP");
+    move_group_interface_->setMaxVelocityScalingFactor(1);
+
+        
+    moveit::planning_interface::MoveGroupInterface::Plan home_plan;
+    auto plan_result = move_group_interface_->plan(home_plan);
+    if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
+      RCLCPP_INFO(this->get_logger(), "Moving to home pose for recovery...");
+      move_group_interface_->execute(home_plan);
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "CRITICAL: Failed to plan return to home pose with error code: %d", plan_result.val);
+      RCLCPP_ERROR(this->get_logger(), "Manual recovery may be required.");
     }
   }
 };
