@@ -56,7 +56,7 @@ public:
     // Declare a cylinder obstacle for the pin
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(2);
-    primitive.dimensions[0] = 0.08;   // surgical pin length 8cm
+    primitive.dimensions[0] = 0.12;   // surgical pin length 12cm
     primitive.dimensions[1] = 0.008;    // accuracy cylinder radius 8mm
 
     collision_object.primitives.push_back(primitive);
@@ -77,6 +77,7 @@ public:
     // TODO: Change this to accept use input from GUI
     geometry_msgs::msg::Pose target_pose = msg->poses[0];
     geometry_msgs::msg::Pose above_pose = target_pose;
+    geometry_msgs::msg::Pose final_pose= target_pose;
 
     tf2::Quaternion q(
         target_pose.orientation.x,
@@ -85,13 +86,17 @@ public:
         target_pose.orientation.w);
     tf2::Matrix3x3 rot(q);
 
-    // TODO: Change according to drill length
-    // A point 10cm above drill site along drill axis
-    tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.1);
+    // A point 12cm above drill site along drill axis
+    tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.12);
+    tf2::Vector3 offset_2 = rot * tf2::Vector3(0, 0, -0.052);
 
     above_pose.position.x += offset.x();
     above_pose.position.y += offset.y();
     above_pose.position.z += offset.z();
+
+    final_pose.position.x += offset_2.x();
+    final_pose.position.y += offset_2.y();
+    final_pose.position.z += offset_2.z();
 
     // Move to pre-drill position
     move_group_interface_->setStartStateToCurrentState();
@@ -116,9 +121,9 @@ public:
 
     // Move to drill position 
     move_group_interface_->setStartStateToCurrentState();
-    move_group_interface_->setPoseTarget(target_pose, robot_name_ + "_link_ee");
+    move_group_interface_->setPoseTarget(final_pose, robot_name_ + "_link_ee");
     move_group_interface_->setPlannerId("LIN");
-    move_group_interface_->setMaxVelocityScalingFactor(0.05);
+    move_group_interface_->setMaxVelocityScalingFactor(0.01);
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_drill;
     auto drilling_plan = move_group_interface_->plan(plan_drill);
