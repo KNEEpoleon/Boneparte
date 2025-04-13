@@ -48,10 +48,10 @@ class CameraPoseTransformer(Node):
 
                 # Transform the pose
                 transformed_pose_stamped = do_transform_pose(stamped_pose, transform)
-                transformed_pose_stamped.orientation[0] = 1.0 # this obviously won't work as the identity R will not allow for reorientation of Z!!
-                transformed_pose_stamped.orientation[1] = 0.0
-                transformed_pose_stamped.orientation[2] = 0.0
-                transformed_pose_stamped.orientation[3] = 0.0
+                # transformed_pose_stamped.orientation[0] = 1.0 # this obviously won't work as the identity R will not allow for reorientation of Z!!
+                # transformed_pose_stamped.orientation[1] = 0.0
+                # transformed_pose_stamped.orientation[2] = 0.0
+                # transformed_pose_stamped.orientation[3] = 0.0
                 
                 self.get_logger().info(f"\n\nTF pose stampled: {transformed_pose_stamped}")
                 transformed_array.poses.append(transformed_pose_stamped)
