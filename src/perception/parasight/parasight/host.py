@@ -127,7 +127,7 @@ class ParaSightHost(Node):
         #     10)
         
         # Publishers
-        self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
+        self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10) # of the femur and tibia
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
@@ -332,6 +332,7 @@ class ParaSightHost(Node):
         # Combine all clouds into one
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
+            print(f"\nin host py we have a cloud!")
             combined_cloud += c
         cloud_msg = to_msg(combined_cloud,frame_id=self.camera_frame)
         self.pcd_publisher.publish(cloud_msg)

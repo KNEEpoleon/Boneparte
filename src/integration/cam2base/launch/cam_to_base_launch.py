@@ -20,4 +20,10 @@ def generate_launch_description():
             name='drill_pose_publisher_python',
             output='screen',  # Show logs in the terminal
         ),
+        Node(
+            package='cam2base',  # Name of your ROS 2 package
+            executable='pointcloud_base_publisher.py',  # Name of the Python script
+            name='pointcloud_base_publisher_python',
+            output='screen',  # Show logs in the terminal
+        ),
     ])

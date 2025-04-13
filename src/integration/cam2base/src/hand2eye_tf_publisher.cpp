@@ -20,14 +20,24 @@ void publish_transform(
     transform.header.frame_id = "lbr_link_7";
     transform.child_frame_id = "camera_frame";
 
-    transform.transform.translation.x = -0.07745074;
-    transform.transform.translation.y =  0.00696204;
-    transform.transform.translation.z =  0.24017838;
+    // transform.transform.translation.x = -0.07745074;
+    // transform.transform.translation.y =  0.00696204;
+    // transform.transform.translation.z =  0.24017838;
+
+    transform.transform.translation.x =  0.03775;
+    transform.transform.translation.y =  0.00900;
+    transform.transform.translation.z =  0.14623;
+
+    // tf2::Matrix3x3 rot(
+    //     0.99490036,  0.04955656,  0.08784881,
+    //    -0.0508049,   0.99863614,  0.01203032,
+    //    -0.08713282, -0.01643212,  0.99606117
+    // );
 
     tf2::Matrix3x3 rot(
-        0.99490036,  0.04955656,  0.08784881,
-       -0.0508049,   0.99863614,  0.01203032,
-       -0.08713282, -0.01643212,  0.99606117
+        1.0,  0.0,  0.0,
+       0.0,   1.0,  0.0,
+       0.0, 0.0,  1.0
     );
 
     tf2::Quaternion q;
