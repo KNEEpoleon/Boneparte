@@ -73,7 +73,7 @@ RUN apt-get update && apt-get install -y ros-humble-realsense2-camera \
     ros-humble-librealsense2*
 
 # Install ROS 2 control, controllers, and visualization tools
-RUN apt-get install -y \
+RUN apt-get install -y \ 
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
     ros-humble-control-toolbox \
@@ -90,8 +90,6 @@ RUN apt-get install -y \
     ros-humble-moveit-ros-visualization \
     ros-humble-moveit-setup-assistant \
     ros-humble-moveit-visual-tools \
-    ros-humble-gazebo-ros2-control \
-    ros-humble-gazebo-ros-pkgs \
     ros-humble-pick-ik \
     vim-gtk3 \
     ament-cmake-nose
