@@ -25,8 +25,8 @@ void publish_transform(
     // transform.transform.translation.z =  0.24017838;
 
     transform.transform.translation.x =  0.03775;
-    transform.transform.translation.y =  0.00900;
-    transform.transform.translation.z =  0.14623;
+    transform.transform.translation.y =  -0.00900;
+    transform.transform.translation.z =  0.18123;
 
     // tf2::Matrix3x3 rot(
     //     0.99490036,  0.04955656,  0.08784881,

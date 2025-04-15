@@ -8,6 +8,7 @@
 #include "moveit/planning_scene_interface/planning_scene_interface.h"
 #include "moveit_msgs/msg/collision_object.hpp"
 #include "shape_msgs/msg/solid_primitive.hpp"
+#include "surgical_robot_planner/srv/select_pose.hpp"
 
 class PoseSubscriberNode : public rclcpp::Node {
 private:
@@ -16,6 +17,8 @@ private:
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   std::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_; 
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_;
+  rclcpp::Service<surgical_robot_planner::srv::SelectPose>::SharedPtr select_pose_service_;
+  std::vector<geometry_msgs::msg::Pose> stored_poses_;
   int pin_counter = 0;
 
 public:
@@ -39,8 +42,31 @@ public:
 
     subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>("/surgical_drill_pose", 10,
         std::bind(&PoseSubscriberNode::pose_callback, this, std::placeholders::_1));
-
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
+    select_pose_service_ = this->create_service<surgical_robot_planner::srv::SelectPose>("/select_pose",
+      std::bind(&PoseSubscriberNode::select_pose_callback, this, std::placeholders::_1, std::placeholders::_2));
+  }
+  void pose_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
+    if (msg->poses.empty()) {
+      RCLCPP_WARN(this->get_logger(), "Received empty pose array.");
+      return;
+    }
+    stored_poses_ = msg->poses;
+    RCLCPP_INFO(this->get_logger(), "Stored %zu poses. Ready for user selection via service.", stored_poses_.size());
+  }
+  
+  void select_pose_callback(const std::shared_ptr<surgical_robot_planner::srv::SelectPose::Request> request,std::shared_ptr<surgical_robot_planner::srv::SelectPose::Response> response) {
+    int index = request->index;
+    if (index < 0 || static_cast<size_t>(index) >= stored_poses_.size()) {
+      response->success = false;
+      response->message = "Invalid pose index selected.";
+      RCLCPP_ERROR(this->get_logger(), "User selected invalid pose index %d.", index);
+      return;
+    }
+    RCLCPP_INFO(this->get_logger(), "User selected pose index %d.", index);
+    drill_at_pose(stored_poses_[index]);
+    response->success = true;
+    response->message = "Calling drill at selected pose.";
   }
 
   void add_drilled_pin_as_obstacle(const geometry_msgs::msg::Pose& pin_pose) {
@@ -68,13 +94,7 @@ public:
     RCLCPP_INFO(this->get_logger(), "Added drilled pin as obstacle.");
   }
   
-  void pose_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
-    if (msg->poses.empty()) {
-      RCLCPP_WARN(this->get_logger(), "Received empty pose array.");
-      return;
-    }
-    // TODO: Change this to accept use input from GUI
-    geometry_msgs::msg::Pose target_pose = msg->poses[0];
+  void drill_at_pose(const geometry_msgs::msg::Pose& target_pose) {
     geometry_msgs::msg::Pose above_pose = target_pose;
     geometry_msgs::msg::Pose final_pose= target_pose;
 
@@ -122,7 +142,7 @@ public:
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setPoseTarget(final_pose, robot_name_ + "_link_ee");
     move_group_interface_->setPlannerId("LIN");
-    move_group_interface_->setMaxVelocityScalingFactor(0.01);
+    move_group_interface_->setMaxVelocityScalingFactor(0.00485);  //0.001->1mm/sec
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_drill;
     auto drilling_plan = move_group_interface_->plan(plan_drill);
