@@ -343,6 +343,8 @@ class ParaSightHost(Node):
         drill_pose_array = PoseArray()
 
         parts = load_plan_points(self.plan_path, self.plan)
+        self.get_logger().info(f"\n\n Updated parts plan to: {parts}")
+        
         for bone, holes in parts.items():
             if bone not in self.bones:
                 continue
@@ -357,6 +359,8 @@ class ParaSightHost(Node):
                     curr_theta = np.pi if theta == 0 else 0
                 elif bone == 'tibia':
                     curr_theta = theta * -1
+
+                curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
 
                 mesh = o3d.geometry.TriangleMesh()
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
@@ -399,9 +403,9 @@ class ParaSightHost(Node):
 
                 # base_transform = self.tf_buffer.lookup_transform(self.base_frame, self.camera_frame, rclpy.time.Time())
                 # pose = do_transform_pose(pose, base_transform)
-
+                self.get_logger().info(f"\n\n Bone: {bone} \nholename: {hole_name} \nhole: {hole} \nPose: {pose}")
                 drill_pose_array.poses.append(pose)
-
+        # self.get_logger().info(f"\n\n DRILL pose arrayt: {parts}")
         return drill_pose_array
 
     # def calibration_offset(self,pose_array,x_off,y_off,z_off):
