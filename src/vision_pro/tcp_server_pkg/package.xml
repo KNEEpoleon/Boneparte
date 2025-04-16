@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>tcp_server_pkg</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>TODO: Package description</description>
   <maintainer email="dakshadhar1810@gmail.com">genisis</maintainer>
   <license>TODO: License declaration</license>
@@ -11,11 +11,28 @@
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-  
-  <exec_depend>rclpy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
+
+  <!--for the service-->
+  <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <build_depend>surgical_robot_planner</build_depend>
+  <exec_depend>surgical_robot_planner</exec_depend>
+
+
+  <build_depend>rclpy</build_depend>
+  <exec_depend>rclpy</exec_depend>    
+  <build_depend>std_msgs</build_depend>
+  <exec_depend>std_msgs</exec_depend>     
+  <build_depend>builtin_interfaces</build_depend>
+
 
   <export>
     <build_type>ament_python</build_type>
+    <ros2>
+      <python>
+        <executable>tcp_server_node.py</executable>
+      </python>
+    </ros2>
   </export>
 </package>

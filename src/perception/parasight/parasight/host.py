@@ -185,8 +185,9 @@ class ParaSightHost(Node):
             self.annotated_points = annotated_points
             print(f"\n The annotated points are: {self.annotated_points}")
             # self.trigger('input_received')
-            self.trigger('ready_to_drill')
+            # self.trigger('ready_to_drill')
             self.register_and_publish(annotated_points)
+            self.trigger('ready')
 
         else:
             self.get_logger().warn('UI trigger received but not in ready state')
