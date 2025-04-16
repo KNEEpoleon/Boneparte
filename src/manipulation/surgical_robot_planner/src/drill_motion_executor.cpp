@@ -142,7 +142,8 @@ public:
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setPoseTarget(final_pose, robot_name_ + "_link_ee");
     move_group_interface_->setPlannerId("LIN");
-    move_group_interface_->setMaxVelocityScalingFactor(0.00485);  //0.001->1mm/sec
+    // move_group_interface_->setMaxVelocityScalingFactor(0.00485);  //0.001->1mm/sec
+    move_group_interface_->setMaxVelocityScalingFactor(0.006);      //0.001->1mm/sec
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_drill;
     auto drilling_plan = move_group_interface_->plan(plan_drill);

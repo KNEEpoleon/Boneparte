@@ -227,7 +227,7 @@ class SegmentAnythingUI:
 
         if display:
             self.update_image_with_masks()
-            self.annotate_image() # Draws arrows
+            # self.annotate_image() # Draws arrows
 
     def segment_using_ui(self, image, bones=None):
         self.original_image = image.copy()
