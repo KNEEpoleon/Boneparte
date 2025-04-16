@@ -47,9 +47,17 @@ def generate_launch_description():
         output='screen' # Show node output directly in the terminal
     )
 
+    # 4. Run the tcp_pkg node
+    avp_ros_node = Node(
+        package='tcp_server_pkg',  # Name of your ROS 2 package
+        executable='tcp_server_node',  # Name of the Python script
+        name='tcp_server_node',
+        output='screen',  # Show logs in the terminal
+    )
     # Add the actions to the launch description
     ld.add_action(lbr_bringup_launch)
     ld.add_action(planner_launch)
     ld.add_action(serial_node)
+    ld.add_action(avp_ros_node)
 
     return ld
