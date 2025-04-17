@@ -44,8 +44,8 @@ class ParaSightHost(Node):
 
         # Transitions
         self.machine.add_transition(trigger='start_parasight', source='ready', dest='user_input')
-        self.machine.add_transition(trigger='ready_to_drill', source='user_input', dest='lock_in')
-        self.machine.add_transition(trigger='drill_complete', source='lock_in', dest='ready')
+        # self.machine.add_transition(trigger='ready_to_drill', source='user_input', dest='lock_in')
+        self.machine.add_transition(trigger='drill_complete', source='user_input', dest='ready')
 
         self.machine.add_transition(trigger='hard_reset', source='*', dest='waiting')
 
@@ -187,7 +187,7 @@ class ParaSightHost(Node):
             # self.trigger('input_received')
             # self.trigger('ready_to_drill')
             self.register_and_publish(annotated_points)
-            self.trigger('ready')
+            self.trigger('drill_complete')
 
         else:
             self.get_logger().warn('UI trigger received but not in ready state')
