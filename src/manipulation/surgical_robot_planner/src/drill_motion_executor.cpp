@@ -107,7 +107,7 @@ public:
 
     // A point 12cm above drill site along drill axis
     tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.12);
-    tf2::Vector3 offset_2 = rot * tf2::Vector3(0, 0, -0.052);
+    tf2::Vector3 offset_2 = rot * tf2::Vector3(0, 0, -0.047);
 
     above_pose.position.x += offset.x();
     above_pose.position.y += offset.y();
@@ -142,7 +142,8 @@ public:
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setPoseTarget(final_pose, robot_name_ + "_link_ee");
     move_group_interface_->setPlannerId("LIN");
-    move_group_interface_->setMaxVelocityScalingFactor(0.01);
+    // move_group_interface_->setMaxVelocityScalingFactor(0.00485);  //0.001->1mm/sec
+    move_group_interface_->setMaxVelocityScalingFactor(0.006);      //0.001->1mm/sec
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_drill;
     auto drilling_plan = move_group_interface_->plan(plan_drill);
