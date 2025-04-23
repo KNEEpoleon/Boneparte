@@ -11,6 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name, ['tcp_server_pkg/tcp_server_node.py']),
+        ('share/' + package_name, ['tcp_server_pkg/measure_latency.py']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

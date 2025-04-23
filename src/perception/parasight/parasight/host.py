@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# check the p12 p2 p3 vectors, how the normal is computed
 import cv2
 import rclpy
 from cv_bridge import CvBridge
@@ -142,7 +143,7 @@ class ParaSightHost(Node):
         tibia_cloud = o3d.io.read_point_cloud(package_dir + "/resource/tibia_shell.ply")
         self.sources = {'femur': femur_cloud, 'tibia': tibia_cloud}
         self.colors = {'femur': [1, 0, 0], 'tibia': [0, 0, 1]}
-        self.plan_path = package_dir + "/resource/plan_config_v2.yaml"
+        self.plan_path = package_dir + "/resource/plan_boneparte.yaml"
         self.plan = "plan1"
 
         # Interfaces
@@ -354,12 +355,18 @@ class ParaSightHost(Node):
             for hole_name, hole in holes.items():
                 p1, p2, p3 = hole
 
+                '''
                 # Toggle theta between 0 and -π/2 for femur curvature hole
                 curr_theta = theta
                 if bone == 'femur' and hole_name == 'hole3':
                     curr_theta = np.pi if theta == 0 else 0
                 elif bone == 'tibia':
                     curr_theta = theta * -1
+                '''
+
+
+                if bone == 'femur' and hole_name == 'hole1':
+                    curr_theta = np.pi
 
                 curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
 

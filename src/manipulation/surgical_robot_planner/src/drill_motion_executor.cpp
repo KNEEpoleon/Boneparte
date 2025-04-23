@@ -83,6 +83,7 @@ public:
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(2);
     primitive.dimensions[0] = 0.12;   // surgical pin length 12cm
+    // primitive.dimensions[0] = 0.16;   // surgical pin length 16cm - svd encore
     primitive.dimensions[1] = 0.008;    // accuracy cylinder radius 8mm
 
     collision_object.primitives.push_back(primitive);
@@ -106,7 +107,7 @@ public:
     tf2::Matrix3x3 rot(q);
 
     // A point 12cm above drill site along drill axis
-    tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.12);
+    tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.16);             // 16cm above the drill pose
     tf2::Vector3 offset_2 = rot * tf2::Vector3(0, 0, -0.047);
 
     above_pose.position.x += offset.x();
