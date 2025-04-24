@@ -378,10 +378,10 @@ class ParaSightHost(Node):
                 #     curr_theta = np.pi
 
 
-                # elif bone == 'femur' and hole_name == 'hole2':
-                #     curr_theta = np.pi
-                # elif bone == "tibia" and hole_name == 'hole1':
-                #     curr_theta = np.pi/2
+                if bone == 'femur' and hole_name == 'hole2':
+                    curr_theta = -np.pi/2
+                elif bone == "femur" and hole_name == 'hole1':
+                    curr_theta = -np.pi/2
                 # elif bone == "tibia" and hole_name == 'hole2':
                 #     curr_theta = np.pi/2
 
@@ -390,10 +390,10 @@ class ParaSightHost(Node):
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
                 mesh.compute_vertex_normals()
                 normal =  np.asarray(mesh.vertex_normals)[0]
-                if bone == "femur":
-                    actual_normal = normal
-                else:
-                    actual_normal = -normal
+                # if bone == "femur" and (hole_name == "hole2" or hole_name == "hole1") :
+                #     actual_normal = normal
+                # else:
+                actual_normal = -normal
                 z_axis = np.array([0, 0, 1])
                 rotation_axis = np.cross(z_axis, actual_normal)
                 rotation_axis /= np.linalg.norm(rotation_axis)

@@ -82,7 +82,7 @@ public:
     // Declare a cylinder obstacle for the pin
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(2);
-    primitive.dimensions[0] = 0.12;   // surgical pin length 12cm
+    primitive.dimensions[0] = 0.10;   // surgical pin length 12cm
     // primitive.dimensions[0] = 0.16;   // surgical pin length 16cm - svd encore
     primitive.dimensions[1] = 0.008;    // accuracy cylinder radius 8mm
 
