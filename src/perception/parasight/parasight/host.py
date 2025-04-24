@@ -132,6 +132,9 @@ class ParaSightHost(Node):
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
+        # self.registered_femur = self.create_publisher(PointCloud2, '/processed_femur_camera_frame', 10)
+        # self.registered_tibia = self.create_publisher(PointCloud2, '/processed_tibia_camera_frame', 10)
+
         # Parameters
         self.declare_parameter('selected_bones', 'both')
         self.update_bones(self.get_parameter('selected_bones').value)
@@ -365,17 +368,31 @@ class ParaSightHost(Node):
                 '''
 
 
-                if bone == 'femur' and hole_name == 'hole1':
+                curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
+                # if bone == 'femur' and hole_name == 'hole3':
+                #     curr_theta = (3*np.pi)/2
+                #     # curr_theta = -np.pi/2
+
+                if bone == 'femur' and hole_name == 'hole2':
                     curr_theta = np.pi
 
-                curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
+
+                # elif bone == 'femur' and hole_name == 'hole2':
+                #     curr_theta = np.pi
+                # elif bone == "tibia" and hole_name == 'hole1':
+                #     curr_theta = np.pi/2
+                # elif bone == "tibia" and hole_name == 'hole2':
+                #     curr_theta = np.pi/2
 
                 mesh = o3d.geometry.TriangleMesh()
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
                 mesh.compute_vertex_normals()
                 normal =  np.asarray(mesh.vertex_normals)[0]
-                actual_normal = -normal
+                if bone == "femur":
+                    actual_normal = normal
+                else:
+                    actual_normal = -normal
                 z_axis = np.array([0, 0, 1])
                 rotation_axis = np.cross(z_axis, actual_normal)
                 rotation_axis /= np.linalg.norm(rotation_axis)

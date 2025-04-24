@@ -30,7 +30,7 @@ class measure_latency():
                         sent_time = float(timestamp)
                         received_time = time.time()
                         latency_ms = (received_time - sent_time) * 1000
-                        print(f"Command: {command}, Latency: {latency_ms:.2f} ms")
+                        print(f"Command: {command}, Latency: {latency_ms:.2f} ms", flush=True)
 
                         self.command_list.append(command)
                         self.latency_list.append(latency_ms)
