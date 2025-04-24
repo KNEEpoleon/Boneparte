@@ -33,6 +33,7 @@
             </python>
             <python>
                 <executable>pointcloud_base_publisher.py</executable>
+                <executable>pointcloud_shell_base_publisher.py</executable>
             </python>
         </ros2>
     </export>

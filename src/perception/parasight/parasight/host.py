@@ -335,6 +335,7 @@ class ParaSightHost(Node):
 
     def publish_point_cloud(self, clouds):
         # Combine all clouds into one
+        print(f"How many clouds are there: {len(clouds)}")
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
             print(f"\nin host py we have a cloud!")
@@ -373,8 +374,8 @@ class ParaSightHost(Node):
                 #     curr_theta = (3*np.pi)/2
                 #     # curr_theta = -np.pi/2
 
-                if bone == 'femur' and hole_name == 'hole2':
-                    curr_theta = np.pi
+                # if bone == 'femur' and hole_name == 'hole2':
+                #     curr_theta = np.pi
 
 
                 # elif bone == 'femur' and hole_name == 'hole2':

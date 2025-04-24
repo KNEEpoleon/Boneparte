@@ -22,7 +22,7 @@ def generate_launch_description():
         # Pass launch arguments as a dictionary
         launch_arguments={
             'model': 'med7',
-            'mode': 'hardware',
+            'mode': 'mock',
             'rviz': 'true'
         }.items()
     )
