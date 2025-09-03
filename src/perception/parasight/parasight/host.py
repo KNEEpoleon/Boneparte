@@ -380,7 +380,7 @@ class ParaSightHost(Node):
 
                 if bone == 'femur' and hole_name == 'hole2':
                     curr_theta = -np.pi/2
-                elif bone == "femur" and hole_name == 'hole1':
+                elif bone == "femur" and hole_name == 'hole3':
                     curr_theta = -np.pi/2
                 # elif bone == "tibia" and hole_name == 'hole2':
                 #     curr_theta = np.pi/2
