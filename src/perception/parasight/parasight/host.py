@@ -271,7 +271,7 @@ class ParaSightHost(Node):
             mask_points = self.add_depth(mask_points)
             transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone) # aligns source to target
             t1 = time.time()
-            self.get_logger().info(f'Registration time for {bone}: {t1 - t0}')
+            self.get_logger().info(f'\n\nRegistration time for {bone}: {t1 - t0}, \nfitness: {fitness}')
             source_cloud = source.voxel_down_sample(voxel_size=0.003)
             source_cloud.transform(transform)
             source_cloud.paint_uniform_color(self.colors[bone])
