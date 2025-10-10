@@ -6,7 +6,7 @@ from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import Image, PointCloud2
 from geometry_msgs.msg import PoseArray, Point, Pose, PoseStamped, PointStamped
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, String
 from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
@@ -59,6 +59,9 @@ class ParaSightHost(Node):
         self.last_drill_pose_array = None
         self.last_drill_pose = None
         
+        # AVP annotations
+        self.avp_annotations = None
+        
         # D405 Intrinsics
         self.fx = 425.19189453125
         self.fy = 424.6562805175781
@@ -92,6 +95,13 @@ class ParaSightHost(Node):
             Empty,
             '/hard_reset_host',
             self.custom_callback_to_reset_FSM,
+            10)
+        
+        # AVP annotations subscription
+        self.avp_annotations_subscription = self.create_subscription(
+            String,
+            '/avp_annotations',
+            self.avp_annotations_callback,
             10)
         
         # Data Subscribers
@@ -154,6 +164,15 @@ class ParaSightHost(Node):
     def custom_callback_to_reset_FSM(self, rand_arg=True):
         self.state == 'ready'
 
+    def avp_annotations_callback(self, msg):
+        """Store AVP annotations for use in segmentation"""
+        try:
+            import json
+            self.avp_annotations = json.loads(msg.data)
+            self.get_logger().info(f'Received AVP annotations: {self.avp_annotations}')
+        except Exception as e:
+            self.get_logger().error(f'Failed to parse AVP annotations: {e}')
+
     def all_systems_ready(self, dummy=True):
         if dummy:
             return True
@@ -181,7 +200,21 @@ class ParaSightHost(Node):
         self.get_logger().info('UI trigger received')
         if self.state == 'ready':
             self.trigger('start_parasight')
-            masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
+            
+            # Check if we have AVP annotations, otherwise use UI
+            if self.avp_annotations is not None:
+                self.get_logger().info('Using AVP annotations for segmentation')
+                # Convert pixel coordinates to the format expected by segment_using_points
+                femur_point = tuple(self.avp_annotations[0])  # [x, y]
+                tibia_point = tuple(self.avp_annotations[1])  # [x, y]
+                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
+                    self.last_rgb_image, femur_point, tibia_point, self.bones)
+                # Clear AVP annotations after use
+                self.avp_annotations = None
+            else:
+                self.get_logger().info('Using UI for segmentation')
+                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
+            
             self.annotated_points = annotated_points
             print(f"\n The annotated points are: {self.annotated_points}")
             # self.trigger('input_received')

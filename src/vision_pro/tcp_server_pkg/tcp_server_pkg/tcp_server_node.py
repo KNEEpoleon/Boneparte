@@ -3,9 +3,16 @@
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, String
 from surgical_robot_planner.srv import SelectPose
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 import socket
+import base64
+import cv2
+import json
+import threading
+import time
 
 class TcpServerNode(Node):
     def __init__(self):
@@ -15,9 +22,26 @@ class TcpServerNode(Node):
         # One-shot publisher
         self.start_pub = self.create_publisher(Empty, '/trigger_host_ui', 10)
         self.stop_pub = self.create_publisher(Empty, '/hard_reset_host', 10)
+        
+        # Publisher for AVP annotations
+        self.annotations_pub = self.create_publisher(String, '/avp_annotations', 10)
 
         # Service client
         self.select_pose_client = self.create_client(SelectPose, '/select_pose')
+
+        # Image subscription for annotation
+        self.image_subscription = self.create_subscription(
+            Image,
+            '/camera/color/image_rect_raw',
+            self.image_callback,
+            10)
+        self.bridge = CvBridge()
+        self.last_rgb_image = None
+
+        # Annotation response handling
+        self.annotation_response = None
+        self.annotation_lock = threading.Lock()
+        self.waiting_for_annotation = False
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -30,6 +54,15 @@ class TcpServerNode(Node):
         self.client_addr = None
 
         self.timer = self.create_timer(0.1, self.poll_socket)
+
+    def image_callback(self, msg):
+        """Store the latest RGB image for annotation"""
+        try:
+            rgb_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+            rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+            self.last_rgb_image = rgb_image
+        except Exception as e:
+            self.get_logger().error(f'Failed to process image: {e}')
 
     def poll_socket(self):
         if self.client_sock is None:
@@ -57,17 +90,126 @@ class TcpServerNode(Node):
             message = data.decode('utf-8').strip()
             if message:
                 self.get_logger().info(f'Received command: "{message}"')
-                self.handle_command(message)
+                
+                # Check if this is an annotation response
+                if message.startswith("ANNOTATIONS:"):
+                    self.handle_annotation_response(message)
+                else:
+                    self.handle_command(message)
 
                 try:
                     self.client_sock.sendall(b'acknowledged\n')
                 except Exception as e:
                     self.get_logger().error(f'Failed to send acknowledgment: {e}')
 
+    def handle_annotation_response(self, message: str):
+        """Handle annotation response from AVP"""
+        try:
+            # Extract JSON part after "ANNOTATIONS:"
+            json_str = message[12:]  # Remove "ANNOTATIONS:" prefix
+            annotations = json.loads(json_str)
+            
+            with self.annotation_lock:
+                self.annotation_response = annotations
+                self.waiting_for_annotation = False
+            
+            self.get_logger().info(f'Received annotations: {annotations}')
+        except Exception as e:
+            self.get_logger().error(f'Failed to parse annotation response: {e}')
+
+    def handle_annotate_command(self):
+        """Handle annotation command by sending image to AVP and waiting for response"""
+        try:
+            # Check if we have an image
+            if self.last_rgb_image is None:
+                raise Exception("No image available for annotation")
+            
+            # Convert image to PNG and encode as base64
+            self.get_logger().info('Converting image to PNG and base64...')
+            _, buffer = cv2.imencode('.png', self.last_rgb_image)
+            image_base64 = base64.b64encode(buffer).decode('utf-8')
+            self.get_logger().info(f'Base64 encoding complete, size: {len(image_base64)} chars')
+            
+            # Send image to AVP
+            image_message = f"IMAGE:{image_base64}\n"
+            self.get_logger().info(f'Preparing to send message, total size: {len(image_message)} chars')
+            
+            # Temporarily make socket blocking for large send
+            self.get_logger().info('Setting socket to blocking mode...')
+            original_blocking = self.client_sock.getblocking()
+            self.client_sock.setblocking(True)
+            try:
+                self.get_logger().info('Sending image data to AVP...')
+                self.client_sock.sendall(image_message.encode('utf-8'))
+                self.get_logger().info('Sent image to AVP for annotation')
+            finally:
+                # Restore original blocking state
+                self.get_logger().info('Restoring socket blocking state...')
+                self.client_sock.setblocking(original_blocking)
+            
+            # Set up waiting state
+            with self.annotation_lock:
+                self.annotation_response = None
+                self.waiting_for_annotation = True
+            
+            # Wait for annotation response (blocking)
+            self.wait_for_annotation_response()
+            
+            # Process the annotations and trigger the original flow
+            if self.annotation_response:
+                self.process_annotations_and_continue()
+            else:
+                raise Exception("No annotation response received")
+                
+        except Exception as e:
+            self.get_logger().error(f'Annotation command failed: {e}')
+            raise
+
+    def wait_for_annotation_response(self):
+        """Block until annotation response is received"""
+        timeout = 60  # 60 second timeout
+        start_time = time.time()
+        
+        while self.waiting_for_annotation:
+            if time.time() - start_time > timeout:
+                raise Exception("Timeout waiting for annotation response")
+            time.sleep(0.1)  # Small delay to prevent busy waiting
+
+    def process_annotations_and_continue(self):
+        """Process received annotations and continue with original pipeline"""
+        try:
+            # Convert normalized coordinates to pixel coordinates
+            # TODO: Confirm this is the correct image source
+            height, width = self.last_rgb_image.shape[:2]
+            
+            pixel_coords = []
+            for annotation in self.annotation_response:
+                x_norm = annotation['x']  # 0.0 to 1.0
+                y_norm = annotation['y']  # 0.0 to 1.0
+                
+                x_pixel = int(x_norm * width)
+                y_pixel = int(y_norm * height)
+                pixel_coords.append([x_pixel, y_pixel])
+            
+            self.get_logger().info(f'Converted annotations to pixel coordinates: {pixel_coords}')
+            
+            # Publish the annotations for ParaSight host to use
+            annotations_msg = String()
+            annotations_msg.data = json.dumps(pixel_coords)
+            self.annotations_pub.publish(annotations_msg)
+            self.get_logger().info('Published AVP annotations to ParaSight host')
+            
+            # Now trigger the original ParaSight flow
+            self.start_pub.publish(Empty())
+            self.get_logger().info('Started FSM /trigger_host_ui with AVP annotations')
+            
+        except Exception as e:
+            self.get_logger().error(f'Failed to process annotations: {e}')
+            raise
+
     def handle_command(self, command: str):
         if command == "annotate":
-            self.start_pub.publish(Empty())
-            self.get_logger().info('Started FSM /trigger_host_ui')
+            self.handle_annotate_command()
         elif command == "restart":
             self.stop_pub.publish(Empty())
             self.get_logger().info('Stopped FSM /hard_reset_host')
