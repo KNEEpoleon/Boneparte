@@ -106,7 +106,7 @@ public:
     tf2::Matrix3x3 rot(q);
 
     // A point 12cm above drill site along drill axis
-    tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.12);
+    tf2::Vector3 offset = rot * tf2::Vector3(0, 0, -0.15);
     tf2::Vector3 offset_2 = rot * tf2::Vector3(0, 0, -0.047);
 
     above_pose.position.x += offset.x();
