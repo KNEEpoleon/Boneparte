@@ -13,6 +13,7 @@ import cv2
 import json
 import threading
 import time
+import subprocess
 
 class TcpServerNode(Node):
     def __init__(self):
@@ -42,6 +43,7 @@ class TcpServerNode(Node):
         self.annotation_response = None
         self.annotation_lock = threading.Lock()
         self.waiting_for_annotation = False
+        self.annotation_start_time = None
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -76,12 +78,21 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Accepted TCP connection from {addr}')
             return
 
+        # Check for annotation timeout
+        if self.waiting_for_annotation:
+            if time.time() - self.annotation_start_time > 60:  # 60 second timeout
+                with self.annotation_lock:
+                    self.waiting_for_annotation = False
+                self.get_logger().error("Timeout waiting for annotation response")
+                return
+        
         try:
             data = self.client_sock.recv(1024)
         except BlockingIOError:
             return
 
         if not data:
+            print("\n\n\n", data, flush = True)
             self.get_logger().info('Client disconnected')
             self.client_sock.close()
             self.client_sock = None
@@ -89,12 +100,16 @@ class TcpServerNode(Node):
         else:
             message = data.decode('utf-8').strip()
             if message:
-                self.get_logger().info(f'Received command: "{message}"')
+                self.get_logger().info(f'Received raw data from AVP: "{message}"')
+                self.get_logger().info(f'Message length: {len(message)} characters')
+                self.get_logger().info(f'Message starts with ANNOTATIONS: {message.startswith("ANNOTATIONS:")}')
                 
                 # Check if this is an annotation response
                 if message.startswith("ANNOTATIONS:"):
+                    self.get_logger().info('Processing AVP annotation response...')
                     self.handle_annotation_response(message)
                 else:
+                    self.get_logger().info(f'Processing non-annotation command: "{message}"')
                     self.handle_command(message)
 
                 try:
@@ -105,17 +120,27 @@ class TcpServerNode(Node):
     def handle_annotation_response(self, message: str):
         """Handle annotation response from AVP"""
         try:
+            self.get_logger().info(f'Full annotation message: "{message}"')
+            
             # Extract JSON part after "ANNOTATIONS:"
             json_str = message[12:]  # Remove "ANNOTATIONS:" prefix
+            self.get_logger().info(f'Extracted JSON string: "{json_str}"')
+            
             annotations = json.loads(json_str)
+            self.get_logger().info(f'Parsed annotations successfully: {annotations}')
             
             with self.annotation_lock:
                 self.annotation_response = annotations
                 self.waiting_for_annotation = False
             
-            self.get_logger().info(f'Received annotations: {annotations}')
+            self.get_logger().info(f'AVP annotations stored and waiting flag cleared. Annotations: {annotations}')
+            
+            # Process the annotations immediately
+            self.process_annotations_and_continue()
+        except json.JSONDecodeError as e:
+            self.get_logger().error(f'JSON decode error: {e}. Raw JSON: "{json_str}"')
         except Exception as e:
-            self.get_logger().error(f'Failed to parse annotation response: {e}')
+            self.get_logger().error(f'Failed to parse annotation response: {e}. Full message: "{message}"')
 
     def handle_annotate_command(self):
         """Handle annotation command by sending image to AVP and waiting for response"""
@@ -151,29 +176,14 @@ class TcpServerNode(Node):
             with self.annotation_lock:
                 self.annotation_response = None
                 self.waiting_for_annotation = True
+                self.annotation_start_time = time.time()
             
-            # Wait for annotation response (blocking)
-            self.wait_for_annotation_response()
-            
-            # Process the annotations and trigger the original flow
-            if self.annotation_response:
-                self.process_annotations_and_continue()
-            else:
-                raise Exception("No annotation response received")
+            self.get_logger().info('Waiting for annotation response (non-blocking)...')
                 
         except Exception as e:
             self.get_logger().error(f'Annotation command failed: {e}')
             raise
 
-    def wait_for_annotation_response(self):
-        """Block until annotation response is received"""
-        timeout = 60  # 60 second timeout
-        start_time = time.time()
-        
-        while self.waiting_for_annotation:
-            if time.time() - start_time > timeout:
-                raise Exception("Timeout waiting for annotation response")
-            time.sleep(0.1)  # Small delay to prevent busy waiting
 
     def process_annotations_and_continue(self):
         """Process received annotations and continue with original pipeline"""
@@ -213,7 +223,8 @@ class TcpServerNode(Node):
         elif command == "restart":
             self.stop_pub.publish(Empty())
             self.get_logger().info('Stopped FSM /hard_reset_host')
-
+        elif command == "KILLALL":
+            self.handle_emergency_stop()
         elif command.startswith("drill_"):
             _, bone, hole = command.split('_')
             try:
@@ -258,6 +269,24 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Service responded: {response}')
         except Exception as e:
             self.get_logger().error(f'Service call failed: {e}')
+
+    def handle_emergency_stop(self):
+        """Handle emergency stop command - kill all Docker containers and processes"""
+        self.get_logger().error('EMERGENCY STOP ACTIVATED - Killing all containers and processes')
+        
+        try:
+            # Kill all running Docker containers
+            subprocess.run(['docker', 'kill', '$(docker ps -q)'], shell=True, check=False)
+            self.get_logger().info('Killed all running Docker containers')
+            
+            # Kill any remaining ROS2 processes
+            subprocess.run(['pkill', '-f', 'ros2'], check=False)
+            subprocess.run(['pkill', '-f', 'rclpy'], check=False)
+            
+            self.get_logger().info('Emergency stop completed - all processes terminated')
+            
+        except Exception as e:
+            self.get_logger().error(f'Error during emergency stop: {e}')
 
 def main(args=None):
     rclpy.init(args=args)
