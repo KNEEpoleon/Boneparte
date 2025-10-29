@@ -77,7 +77,7 @@ class ArucoCalibrationNode(Node):
         # Calibration state
         self.calibration_complete = False
         self.detection_count = 0
-        self.required_detections = 10  # Need 10 consistent detections
+        self.required_detections = 1  # Just need 1 detection for quick calibration
         self.accumulated_transforms = []
         
         self.get_logger().info('Waiting for ArUco marker detection...')
@@ -120,7 +120,7 @@ class ArucoCalibrationNode(Node):
                 cv2.drawFrameAxes(cv_image, self.camera_matrix, self.dist_coeffs,
                                 rvec[0], tvec[0], 0.1)
                 
-                self.get_logger().info(f'Detection {self.detection_count}/{self.required_detections}')
+                self.get_logger().info(f'ArUco marker detected! Computing calibration...')
                 
                 # Show image with detection (optional, comment out if headless)
                 cv2.imshow('ArUco Detection', cv_image)
