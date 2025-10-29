@@ -69,7 +69,7 @@ class ArucoCalibrationNode(Node):
         # Subscribe to RealSense color image
         self.image_sub = self.create_subscription(
             Image,
-            '/camera/color/image_raw',
+            '/camera/camera/color/image_rect_raw',
             self.image_callback,
             10
         )
@@ -101,15 +101,24 @@ class ArucoCalibrationNode(Node):
                 marker_corners = corners[idx]
                 
                 # Estimate pose of ArUco marker
-                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
-                    marker_corners,
-                    self.marker_size,
+                # For OpenCV 4.7+, use solvePnP instead of deprecated estimatePoseSingleMarkers
+                obj_points = np.array([
+                    [-self.marker_size/2, self.marker_size/2, 0],
+                    [self.marker_size/2, self.marker_size/2, 0],
+                    [self.marker_size/2, -self.marker_size/2, 0],
+                    [-self.marker_size/2, -self.marker_size/2, 0]
+                ], dtype=np.float32)
+                
+                success, rvec, tvec = cv2.solvePnP(
+                    obj_points,
+                    marker_corners.reshape(-1, 2),
                     self.camera_matrix,
-                    self.dist_coeffs
+                    self.dist_coeffs,
+                    flags=cv2.SOLVEPNP_IPPE_SQUARE
                 )
                 
                 # Convert to transform matrix
-                cam_to_aruco = self.pose_to_transform(rvec[0][0], tvec[0][0])
+                cam_to_aruco = self.pose_to_transform(rvec, tvec)
                 
                 # Accumulate detections
                 self.accumulated_transforms.append(cam_to_aruco)
@@ -118,7 +127,7 @@ class ArucoCalibrationNode(Node):
                 # Draw detection on image for visual feedback
                 cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
                 cv2.drawFrameAxes(cv_image, self.camera_matrix, self.dist_coeffs,
-                                rvec[0], tvec[0], 0.1)
+                                rvec, tvec, 0.1)
                 
                 self.get_logger().info(f'ArUco marker detected! Computing calibration...')
                 
@@ -164,12 +173,17 @@ class ArucoCalibrationNode(Node):
         self.get_logger().info('Averaged camera → aruco transform computed')
         
         # Get camera → robot_base from TF tree
+        # Wait a bit for TF tree to be fully populated
+        import time
+        time.sleep(1.0)
+        
         try:
+            # Use Time(0) to get the latest available transform
             transform_stamped = self.tf_buffer.lookup_transform(
                 'lbr_link_0',      # target frame (robot base)
                 'camera_frame',    # source frame
-                rclpy.time.Time(),
-                timeout=rclpy.duration.Duration(seconds=5.0)
+                rclpy.time.Time(seconds=0),  # Get latest available
+                timeout=rclpy.duration.Duration(seconds=10.0)
             )
             
             cam_to_base = self.transform_stamped_to_matrix(transform_stamped)
@@ -177,7 +191,9 @@ class ArucoCalibrationNode(Node):
             
         except TransformException as e:
             self.get_logger().error(f'Failed to get camera → robot_base transform: {e}')
-            self.get_logger().error('Make sure hand2eye_tf_publisher is running!')
+            self.get_logger().error('Make sure hand2eye_tf_publisher and robot state publisher are running!')
+            self.get_logger().error('Available frames in TF tree:')
+            self.get_logger().error(str(self.tf_buffer.all_frames_as_string()))
             return
         
         # Compute aruco → robot_base

@@ -27,16 +27,18 @@ private:
     transform.header.frame_id = "lbr_link_0";
     transform.child_frame_id = "aruco_marker";
 
-    // Placeholder transform (to be updated after physical measurement)
-    // TODO: Update after printing and mounting ArUco marker on robot base
-    // Rough estimate: ArUco marker is 10cm in front (-X direction) of lbr_link_0
-    transform.transform.translation.x = -0.10;  // -10 cm in X
-    transform.transform.translation.y = 0.0;
-    transform.transform.translation.z = 0.0;
+    // Calibrated transform from ArUco calibration node
+    // Translation
+    transform.transform.translation.x = -0.007416;
+    transform.transform.translation.y = 0.509019;
+    transform.transform.translation.z = 0.363366;
 
-    // Identity rotation (ArUco marker aligned with robot base frame)
+    // Rotation (quaternion)
     tf2::Quaternion q;
-    q.setRPY(0.0, 0.0, 0.0);  // No rotation
+    q.setX(0.786208);
+    q.setY(-0.252765);
+    q.setZ(-0.556702);
+    q.setW(0.089835);
     
     transform.transform.rotation.x = q.x();
     transform.transform.rotation.y = q.y();
