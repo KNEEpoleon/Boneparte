@@ -22,6 +22,8 @@
     <exec_depend>tf2_py</exec_depend>
     <exec_depend>pcl_msgs</exec_depend>
     <exec_depend>pcl_conversions</exec_depend>
+    <exec_depend>cv_bridge</exec_depend>
+    <exec_depend>sensor_msgs</exec_depend>
     <test_depend>ament_lint_auto</test_depend>
     <test_depend>ament_lint_common</test_depend>
 
