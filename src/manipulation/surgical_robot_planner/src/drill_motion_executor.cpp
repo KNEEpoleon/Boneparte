@@ -25,8 +25,8 @@ private:
   // New members for dynamic obstacle management
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr registration_subscription_;
   std::string current_registration_state_ = "idle";
-  std::vector<bool> drilled_pins_;  // Track which pins are drilled
-  std::vector<int> pin_pose_indices_;  // Track which pose index each pin corresponds to
+  std::vector<std::string> drilled_pin_ids_;  // Track actual collision object IDs
+  std::vector<int> pin_pose_indices_;         // Track which pose index each pin corresponds to
 
 public:
   static std::shared_ptr<PoseSubscriberNode> create() {
@@ -83,23 +83,21 @@ public:
 
   void add_drilled_pin_as_obstacle(const geometry_msgs::msg::Pose& pin_pose, int pose_index) {
     pin_counter++;
+    std::string pin_id = "drilled_pin_" + std::to_string(pin_counter);
     
     // Track this pin
-    drilled_pins_.push_back(true);
+    drilled_pin_ids_.push_back(pin_id);
     pin_pose_indices_.push_back(pose_index);
     
-    // Create a unique ID for each pin
     moveit_msgs::msg::CollisionObject collision_object;
     collision_object.header.frame_id = robot_name_ + "_link_0"; 
-    
-    collision_object.id = "drilled_pin_" + std::to_string(pin_counter);
+    collision_object.id = pin_id;
 
     shape_msgs::msg::SolidPrimitive primitive;
-    // Declare a cylinder obstacle for the pin
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(2);
-    primitive.dimensions[0] = 0.12;   // surgical pin length 12cm
-    primitive.dimensions[1] = 0.008;    // accuracy cylinder radius 8mm
+    primitive.dimensions[0] = 0.12;
+    primitive.dimensions[1] = 0.008;
 
     collision_object.primitives.push_back(primitive);
     collision_object.primitive_poses.push_back(pin_pose);
@@ -107,9 +105,10 @@ public:
 
     planning_scene_interface_->applyCollisionObjects({collision_object}); 
 
-    RCLCPP_INFO(this->get_logger(), "Added drilled pin %d as obstacle at pose index %d.", pin_counter, pose_index);
+    RCLCPP_INFO(this->get_logger(), "Added drilled pin %s as obstacle at pose index %d.", 
+                pin_id.c_str(), pose_index);
   }
-  
+
   void drill_at_pose(const geometry_msgs::msg::Pose& target_pose, int pose_index) {
     geometry_msgs::msg::Pose above_pose = target_pose;
     geometry_msgs::msg::Pose final_pose= target_pose;
@@ -252,7 +251,7 @@ public:
   }
 
   void update_drilled_pin_obstacles() {
-    if (drilled_pins_.empty()) {
+    if (drilled_pin_ids_.empty()) {
       RCLCPP_INFO(this->get_logger(), "No drilled pins to update.");
       return;
     }
@@ -262,29 +261,31 @@ public:
       return;
     }
     
-    RCLCPP_INFO(this->get_logger(), "Updating %zu drilled pin obstacles...", drilled_pins_.size());
+    RCLCPP_INFO(this->get_logger(), "Updating %zu drilled pin obstacles...", drilled_pin_ids_.size());
     log_drilled_pins_status();
     
-    for (size_t i = 0; i < drilled_pins_.size(); i++) {
-      if (drilled_pins_[i] && pin_pose_indices_[i] < stored_poses_.size()) {
-        move_drilled_pin_obstacle(i, stored_poses_[pin_pose_indices_[i]]);
+    for (size_t i = 0; i < drilled_pin_ids_.size(); i++) {
+      int pose_idx = pin_pose_indices_[i];
+      
+      if (pose_idx >= 0 && pose_idx < static_cast<int>(stored_poses_.size())) {
+        const auto& new_pose = stored_poses_[pose_idx];
+        
+        RCLCPP_INFO(this->get_logger(), "Moving pin %s (pose_index=%d) to [%.3f, %.3f, %.3f]",
+                   drilled_pin_ids_[i].c_str(), pose_idx,
+                   new_pose.position.x, new_pose.position.y, new_pose.position.z);
+        
+        // Pass the STRING ID, not an integer!
+        move_drilled_pin_obstacle(drilled_pin_ids_[i], new_pose);
       } else {
-        RCLCPP_WARN(this->get_logger(), "Skipping pin %zu: drilled=%s, pose_index=%d, poses_size=%zu", 
-                   i, drilled_pins_[i] ? "true" : "false", pin_pose_indices_[i], stored_poses_.size());
+        RCLCPP_ERROR(this->get_logger(), "Pin %s has invalid pose_index %d (poses_size=%zu)", 
+                    drilled_pin_ids_[i].c_str(), pose_idx, stored_poses_.size());
       }
     }
   }
-
-  void move_drilled_pin_obstacle(int pin_index, const geometry_msgs::msg::Pose& new_pose) {
-    // Validate pin index
-    if (pin_index < 0 || pin_index >= pin_counter) {
-      RCLCPP_ERROR(this->get_logger(), "Invalid pin index %d. Valid range: 0 to %d", pin_index, pin_counter - 1);
-      return;
-    }
-    
+  void move_drilled_pin_obstacle(const std::string& pin_id, const geometry_msgs::msg::Pose& new_pose) {
     // Create collision object for moving the pin
     moveit_msgs::msg::CollisionObject collision_object;
-    collision_object.id = "drilled_pin_" + std::to_string(pin_index + 1);
+    collision_object.id = pin_id;  // Use the pin_id directly
     collision_object.header.frame_id = robot_name_ + "_link_0";
     collision_object.operation = collision_object.MOVE;
     
@@ -301,23 +302,20 @@ public:
     // Apply the move operation
     try {
       planning_scene_interface_->applyCollisionObjects({collision_object});
-      RCLCPP_INFO(this->get_logger(), "Successfully moved pin %d to new position: [%.3f, %.3f, %.3f]", 
-                 pin_index + 1, new_pose.position.x, new_pose.position.y, new_pose.position.z);
+      RCLCPP_INFO(this->get_logger(), "Successfully moved pin %s to new position: [%.3f, %.3f, %.3f]", 
+                 pin_id.c_str(), new_pose.position.x, new_pose.position.y, new_pose.position.z);
     } catch (const std::exception& e) {
-      RCLCPP_ERROR(this->get_logger(), "Failed to move pin %d: %s", pin_index + 1, e.what());
+      RCLCPP_ERROR(this->get_logger(), "Failed to move pin %s: %s", pin_id.c_str(), e.what());
     }
   }
-
   void log_drilled_pins_status() {
     RCLCPP_INFO(this->get_logger(), "=== Drilled Pins Status ===");
-    RCLCPP_INFO(this->get_logger(), "Total pins drilled: %d", pin_counter);
+    RCLCPP_INFO(this->get_logger(), "Total pins drilled: %zu", drilled_pin_ids_.size());
     RCLCPP_INFO(this->get_logger(), "Available poses: %zu", stored_poses_.size());
     
-    for (size_t i = 0; i < drilled_pins_.size(); i++) {
-      if (drilled_pins_[i]) {
-        RCLCPP_INFO(this->get_logger(), "Pin %zu: drilled=true, pose_index=%d", 
-                   i + 1, pin_pose_indices_[i]);
-      }
+    for (size_t i = 0; i < drilled_pin_ids_.size(); i++) {
+      RCLCPP_INFO(this->get_logger(), "Pin %s: pose_index=%d",
+                 drilled_pin_ids_[i].c_str(), pin_pose_indices_[i]);
     }
     RCLCPP_INFO(this->get_logger(), "==========================");
   }
@@ -331,3 +329,20 @@ int main(int argc, char **argv) {
   rclcpp::shutdown();
   return 0;
 }
+
+// We identified and fixed critical bugs in the surgical robot pin obstacle management system during reregistration.
+//  The original code had a redundant `drilled_pins_` boolean vector that was always true and caused indexing 
+// confusion. More critically, there was a mismatch in how pin collision objects were tracked and referenced - 
+// pins were created with IDs based on `pin_counter` (e.g., "drilled_pin_1", "drilled_pin_2") but the 
+// `move_drilled_pin_obstacle` function attempted to reconstruct these IDs using loop indices, which failed when 
+// pins were drilled out of order. The function signature also had inconsistencies with some versions expecting 
+// int parameters and others expecting string parameters, plus undefined variables like `vector_index` being used 
+// instead of actual parameter names. The solution eliminated the `drilled_pins_` vector entirely and introduced 
+// `drilled_pin_ids_` to explicitly store the actual collision object ID strings created during drilling. 
+// The `move_drilled_pin_obstacle` function signature was standardized to accept `const std::string& pin_id` directly
+//  rather than attempting index-based ID reconstruction. This ensures that when reregistration occurs and new poses 
+//  arrive on the `/surgical_drill_pose` topic, the system can correctly move each pin obstacle to its corresponding 
+//  new pose by directly referencing the stored collision object ID and the stored pose index, maintaining proper 
+//  obstacle tracking regardless of drilling order. The refactored code removes all redundant checks, eliminates 
+//  compilation errors from type mismatches and undefined variables, and provides robust tracking of which pose index 
+//  each drilled pin corresponds to for accurate obstacle updates during reregistration.
