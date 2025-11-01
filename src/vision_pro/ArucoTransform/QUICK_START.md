@@ -22,23 +22,36 @@ open ArucoTransform.xcodeproj
 
 ### 3. Calibrate (5 min)
 ```bash
-# Start system
+# IMPORTANT: For calibration, robot needs to be positioned so camera sees marker
+# Option A: Use hardware mode and move robot
+ros2 launch lbr_bringup bringup.launch.py model:=med7 mode:=position &
+# Move robot so RealSense camera can see ArUco marker
+
+# Option B: Use mock mode if camera can be positioned separately
 ros2 launch lbr_bringup bringup.launch.py model:=med7 mode:=mock &
+
+# Start camera and TF
 ros2 launch parasight rs_launch.py &
 ros2 run cam2base hand2eye_tf_publisher &
 
-# Calibrate
+# Calibrate (one-time)
 ros2 run cam2base aruco_calibration_node
 # Point camera at marker → Copy transform values
 
 # Update aruco_tf_publisher.cpp with values
 colcon build --packages-select cam2base
 source install/setup.bash
+
+# After calibration: Marker is fixed, you can use mock mode for testing
 ```
 
 ### 4. Test (15 min)
 ```bash
 # Start full pipeline
+# NOTE: After calibration, mock mode is fine - marker is fixed in room
+ros2 launch lbr_bringup move_group.launch.py model:=med7 mode:=mock &
+ros2 launch parasight rs_launch.py &
+ros2 run cam2base hand2eye_tf_publisher &
 ros2 run cam2base aruco_tf_publisher &
 ros2 run cam2base aruco_drill_pose_publisher &
 ros2 launch tcp_server_pkg avp_server_launch.py &
@@ -52,7 +65,7 @@ ros2 topic pub --once /trigger_host_ui std_msgs/msg/Empty '{}'
 # 2. Enter server IP
 # 3. Connect
 # 4. Show drill sites
-# 5. Look at marker
+# 5. Look at marker (fixed in room, not on robot!)
 # 6. See red spheres! 🎉
 ```
 

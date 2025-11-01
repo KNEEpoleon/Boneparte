@@ -83,9 +83,16 @@ source install/setup.bash
 
 This establishes the `robot_base → aruco_marker` transform.
 
+**IMPORTANT**: The ArUco marker is a **fixed reference point** in the room. For calibration, you need the RealSense camera (attached to the robot) to see the marker. Choose one:
+
+**Option A: Hardware Mode (Recommended for Calibration)**
 ```bash
-# Terminal 1: Start robot (or mock)
-ros2 launch lbr_bringup bringup.launch.py model:=med7 mode:=mock
+# Terminal 1: Start robot in hardware mode
+ros2 launch lbr_bringup bringup.launch.py model:=med7 mode:=position
+
+# Move robot to position where RealSense camera can see ArUco marker
+# Use MoveIt or manual jogging to position camera
+# Ensure marker is well-lit and clearly visible
 
 # Terminal 2: Start RealSense camera
 ros2 launch parasight rs_launch.py
@@ -96,10 +103,30 @@ ros2 run cam2base hand2eye_tf_publisher
 # Terminal 4: Run calibration node
 ros2 run cam2base aruco_calibration_node
 
-# Point RealSense camera at ArUco marker
-# Hold steady for 1-2 seconds
+# Hold robot steady, marker should be visible in camera view
 # Calibration output will print transform values
 ```
+
+**Option B: Mock Mode (If Camera Can Be Positioned Separately)**
+```bash
+# Terminal 1: Start robot in mock mode
+ros2 launch lbr_bringup bringup.launch.py model:=med7 mode:=mock
+
+# Terminal 2: Start RealSense camera
+ros2 launch parasight rs_launch.py
+
+# Terminal 3: Start hand-eye TF publisher
+ros2 run cam2base hand2eye_tf_publisher
+
+# Terminal 4: Run calibration node
+ros2 run cam2base aruco_calibration_node
+
+# If camera is attached to robot: Manually position robot so camera sees marker
+# If camera is detached: Position camera manually to see marker
+# Note: Hand-eye calibration assumes camera is at its normal position on robot
+```
+
+**After Calibration**: The marker stays **fixed** in the room. Vision Pro will detect it regardless of robot state (mock/hardware).
 
 **Expected Output:**
 ```
@@ -154,6 +181,8 @@ ros2 run tf2_tools view_frames
 # Open frames.pdf to verify
 evince frames.pdf
 ```
+
+**Note**: After calibration, you can switch to mock mode for testing. The ArUco marker transform is **static** and doesn't change.
 
 ---
 
@@ -211,6 +240,8 @@ sleep 2
 # Terminal splits (use tmux or separate terminals)
 
 # Session 1: Robot & MoveIt
+# NOTE: You can use mock mode AFTER calibration is complete
+# The ArUco marker is fixed, so mock mode is fine for testing visualization
 ros2 launch lbr_bringup move_group.launch.py model:=med7 mode:=mock rviz:=true &
 sleep 5
 

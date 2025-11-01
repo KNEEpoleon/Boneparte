@@ -99,6 +99,9 @@ EOF
    - RealSense camera (for calibration)
    - Vision Pro (for localization)
 3. Ensure marker is flat and stable (no warping or movement)
+4. **CRITICAL**: The marker is a **fixed reference point** in the room. It does NOT move. After calibration, it stays in the same physical location.
+
+**Important**: For calibration, the robot needs to be positioned so the RealSense camera can see the marker. After calibration, you can use mock mode - the marker stays fixed.
 
 ### 3. Build Xcode Project
 
