@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 90;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,13 +11,11 @@
 		A1000002 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100002 /* AppModel.swift */; };
 		A1000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100003 /* ContentView.swift */; };
 		A1000004 /* ImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100004 /* ImmersiveView.swift */; };
-		A1000005 /* ArucoDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100005 /* ArucoDetector.swift */; };
 		A1000006 /* WorldAnchorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100006 /* WorldAnchorManager.swift */; };
 		A1000007 /* TCPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100007 /* TCPClient.swift */; };
 		A1000008 /* DrillSiteRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1100008 /* DrillSiteRenderer.swift */; };
 		A1000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1100009 /* Assets.xcassets */; };
 		A100000A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A110000A /* Preview Assets.xcassets */; };
-		A100000B /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = A110000B /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +23,6 @@
 		A1100002 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		A1100003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1100004 /* ImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveView.swift; sourceTree = "<group>"; };
-		A1100005 /* ArucoDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArucoDetector.swift; sourceTree = "<group>"; };
 		A1100006 /* WorldAnchorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldAnchorManager.swift; sourceTree = "<group>"; };
 		A1100007 /* TCPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPClient.swift; sourceTree = "<group>"; };
 		A1100008 /* DrillSiteRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrillSiteRenderer.swift; sourceTree = "<group>"; };
@@ -33,17 +30,13 @@
 		A110000A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A110000C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1200001 /* ArucoTransform.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArucoTransform.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1300001 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A1400001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
-				A100000B /* RealityKitContent in Frameworks */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -75,7 +68,6 @@
 		A1500003 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				A1300001 /* RealityKitContent */,
 			);
 			path = Packages;
 			sourceTree = "<group>";
@@ -91,7 +83,6 @@
 		A1500005 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				A1100005 /* ArucoDetector.swift */,
 				A1100006 /* WorldAnchorManager.swift */,
 				A1100007 /* TCPClient.swift */,
 				A1100008 /* DrillSiteRenderer.swift */,
@@ -120,11 +111,8 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			name = ArucoTransform;
 			packageProductDependencies = (
-				A110000B /* RealityKitContent */,
 			);
 			productName = ArucoTransform;
 			productReference = A1200001 /* ArucoTransform.app */;
@@ -138,7 +126,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					A1600001 = {
 						CreatedOnToolsVersion = 15.0;
@@ -146,7 +134,6 @@
 				};
 			};
 			buildConfigurationList = A2100001 /* Build configuration list for PBXProject "ArucoTransform" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -154,6 +141,9 @@
 				Base,
 			);
 			mainGroup = A1500001;
+			packageReferences = (
+			);
+			preferredProjectObjectVersion = 90;
 			productRefGroup = A1500004 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -166,35 +156,30 @@
 /* Begin PBXResourcesBuildPhase section */
 		A1900001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				A1000009 /* Assets.xcassets in Resources */,
 				A100000A /* Preview Assets.xcassets in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A1800001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				A1000001 /* ArucoTransformApp.swift in Sources */,
 				A1000002 /* AppModel.swift in Sources */,
 				A1000003 /* ContentView.swift in Sources */,
 				A1000004 /* ImmersiveView.swift in Sources */,
-				A1000005 /* ArucoDetector.swift in Sources */,
 				A1000006 /* WorldAnchorManager.swift in Sources */,
 				A1000007 /* TCPClient.swift in Sources */,
 				A1000008 /* DrillSiteRenderer.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		A2200001 /* Debug */ = {
+		A2200001 /* Debug configuration for PBXProject "ArucoTransform" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -229,6 +214,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = ZLW9L86VBD;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -257,7 +243,7 @@
 			};
 			name = Debug;
 		};
-		A2200002 /* Release */ = {
+		A2200002 /* Release configuration for PBXProject "ArucoTransform" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -292,6 +278,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = ZLW9L86VBD;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -313,7 +300,7 @@
 			};
 			name = Release;
 		};
-		A2300001 /* Debug */ = {
+		A2300001 /* Debug configuration for PBXNativeTarget "ArucoTransform" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -321,7 +308,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ArucoTransform/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ArucoTransform/Info.plist;
@@ -344,7 +330,7 @@
 			};
 			name = Debug;
 		};
-		A2300002 /* Release */ = {
+		A2300002 /* Release configuration for PBXNativeTarget "ArucoTransform" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -352,7 +338,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ArucoTransform/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ArucoTransform/Info.plist;
@@ -381,30 +366,20 @@
 		A1700001 /* Build configuration list for PBXNativeTarget "ArucoTransform" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A2300001 /* Debug */,
-				A2300002 /* Release */,
+				A2300001 /* Debug configuration for PBXNativeTarget "ArucoTransform" */,
+				A2300002 /* Release configuration for PBXNativeTarget "ArucoTransform" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		A2100001 /* Build configuration list for PBXProject "ArucoTransform" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A2200001 /* Debug */,
-				A2200002 /* Release */,
+				A2200001 /* Debug configuration for PBXProject "ArucoTransform" */,
+				A2200002 /* Release configuration for PBXProject "ArucoTransform" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A110000B /* RealityKitContent */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = RealityKitContent;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A2000001 /* Project object */;
 }
-
