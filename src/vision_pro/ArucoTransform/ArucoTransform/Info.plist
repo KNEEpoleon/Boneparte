@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>ArucoTransform needs camera access to detect ArUco markers for spatial localization.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>ArucoTransform needs local network access to connect to the ROS server for receiving drill site data.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_ros._tcp</string>
+	</array>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+</dict>
+</plist>
+
