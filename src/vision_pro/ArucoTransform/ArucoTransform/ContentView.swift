@@ -7,6 +7,7 @@
 
 import SwiftUI
 import RealityKit
+import RealityKitContent
 
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
@@ -14,7 +15,7 @@ struct ContentView: View {
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
     @State private var tcpClient: TCPClient?
-    @State private var serverIPInput = "192.168.1.100"
+    @State private var serverIPInput = "192.168.0.193"
     
     var body: some View {
         VStack(spacing: 20) {
@@ -31,9 +32,10 @@ struct ContentView: View {
                 
                 HStack {
                     Text("IP Address:")
-                    TextField("192.168.1.100", text: $serverIPInput)
+                    TextField("192.168.0.193", text: $serverIPInput)
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 200)
+                        .disabled(true)  // Static IP, not editable
                 }
                 
                 HStack {

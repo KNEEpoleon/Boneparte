@@ -33,7 +33,7 @@ class AppModel {
     var drillSites: [DrillSite] = []
     
     // Server configuration
-    var serverIP = "192.168.1.100"  // Default, user can change
+    var serverIP = "192.168.0.193"  // Static IP for ROS server
     var serverPort: UInt16 = 5001
 }
 
