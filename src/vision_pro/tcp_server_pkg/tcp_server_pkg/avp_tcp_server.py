@@ -37,7 +37,7 @@ class AVPTcpServer(Node):
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.server_sock.bind(('0.0.0.0', 5001))  # Port 5001 for AVP drill poses
+        self.server_sock.bind(('0.0.0.0', 5000))  # Port 5000 (same as SVD_ROS_Comms - known working)
         self.server_sock.listen(1)
         self.server_sock.setblocking(False)
         
@@ -47,7 +47,7 @@ class AVPTcpServer(Node):
         # Timer to poll socket and send data
         self.timer = self.create_timer(0.033, self.poll_socket)  # ~30 Hz
         
-        self.get_logger().info('TCP server listening on port 5001 for AVP connections')
+        self.get_logger().info('TCP server listening on port 5000 for AVP connections')
     
     def poses_callback(self, msg: PoseArray):
         """Store latest drill poses"""
