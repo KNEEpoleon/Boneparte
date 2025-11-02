@@ -7,7 +7,6 @@
 
 import Foundation
 import Network
-import simd
 
 class TCPClient: ObservableObject {
     private var connection: NWConnection?
@@ -28,10 +27,13 @@ class TCPClient: ObservableObject {
         let nwHost = NWEndpoint.Host(host)
         let nwPort = NWEndpoint.Port(rawValue: port)!
         
+        print("🔵 Attempting TCP connection to \(host):\(port)")
+        
         connection = NWConnection(host: nwHost, port: nwPort, using: .tcp)
         
         connection?.stateUpdateHandler = { [weak self] newState in
             DispatchQueue.main.async {
+                print("🔵 Connection state changed: \(newState)")
                 switch newState {
                 case .ready:
                     self?.onConnectionStateChanged?(true, "Connected to \(self?.host ?? ""):\(self?.port ?? 0)")
@@ -41,9 +43,15 @@ class TCPClient: ObservableObject {
                     print("❌ TCP connection failed: \(error)")
                 case .cancelled:
                     self?.onConnectionStateChanged?(false, "Connection cancelled")
-                    print("TCP connection cancelled")
-                default:
-                    break
+                    print("⚠️ TCP connection cancelled")
+                case .waiting(let error):
+                    print("⏳ TCP connection waiting: \(error)")
+                case .preparing:
+                    print("🔧 TCP connection preparing")
+                case .setup:
+                    print("🔧 TCP connection setup")
+                @unknown default:
+                    print("❓ Unknown connection state: \(newState)")
                 }
             }
         }
