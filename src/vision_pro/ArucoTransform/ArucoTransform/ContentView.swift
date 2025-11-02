@@ -40,7 +40,7 @@ struct ContentView: View {
                 
                 HStack {
                     Text("Port:")
-                    Text("5001")
+                    Text("5000")
                         .foregroundColor(.secondary)
                 }
                 
