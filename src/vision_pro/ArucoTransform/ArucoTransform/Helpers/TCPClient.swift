@@ -7,6 +7,7 @@
 
 import Foundation
 import Network
+import simd
 
 class TCPClient: ObservableObject {
     private var connection: NWConnection?
