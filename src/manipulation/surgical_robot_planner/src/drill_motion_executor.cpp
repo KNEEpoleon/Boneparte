@@ -10,6 +10,7 @@
 #include "shape_msgs/msg/solid_primitive.hpp"
 #include "surgical_robot_planner/srv/select_pose.hpp"
 #include <vector>
+#include <algorithm>
 
 class PoseSubscriberNode : public rclcpp::Node {
 private:
@@ -27,6 +28,7 @@ private:
   std::string current_registration_state_ = "idle";
   std::vector<std::string> drilled_pin_ids_;  // Track actual collision object IDs
   std::vector<int> pin_pose_indices_;         // Track which pose index each pin corresponds to
+  bool drilling_blocked_ = false;  // Block drilling during reregistration
 
 public:
   static std::shared_ptr<PoseSubscriberNode> create() {
@@ -64,10 +66,19 @@ public:
       return;
     }
     stored_poses_ = msg->poses;
-    RCLCPP_INFO(this->get_logger(), "Stored %zu poses. Ready for user selection via service.", stored_poses_.size());
+    RCLCPP_INFO(this->get_logger(), "Stored %zu poses. Frame: %s", stored_poses_.size(), msg->header.frame_id.c_str());
+    RCLCPP_INFO(this->get_logger(), "First pose: [%.3f, %.3f, %.3f]", 
+                stored_poses_[0].position.x, stored_poses_[0].position.y, stored_poses_[0].position.z);
   }
   
   void select_pose_callback(const std::shared_ptr<surgical_robot_planner::srv::SelectPose::Request> request,std::shared_ptr<surgical_robot_planner::srv::SelectPose::Response> response) {
+    if (drilling_blocked_) {
+      response->success = false;
+      response->message = "Drilling blocked during reregistration. Wait for 'complete' message.";
+      RCLCPP_ERROR(this->get_logger(), "Drilling blocked - reregistration in progress!");
+      return;
+    }
+    
     int index = request->index;
     if (index < 0 || static_cast<size_t>(index) >= stored_poses_.size()) {
       response->success = false;
@@ -241,27 +252,65 @@ public:
   void registration_callback(const std_msgs::msg::String::SharedPtr msg) {
     std::string new_state = msg->data;
     
-    if (new_state == "complete") {
-      RCLCPP_INFO(this->get_logger(), "Registration complete. Updating pin obstacles...");
-      update_drilled_pin_obstacles();
+    if (new_state == "reregistering") {
+      RCLCPP_INFO(this->get_logger(), "Reregistration started. Removing all drilled pin obstacles...");
+      drilling_blocked_ = true;
+      remove_all_drilled_pin_obstacles();
+    } else if (new_state == "complete") {
+      RCLCPP_INFO(this->get_logger(), "Registration complete. Re-adding pin obstacles at new poses...");
+      readd_drilled_pin_obstacles();
+      drilling_blocked_ = false;
+      RCLCPP_INFO(this->get_logger(), "Drilling unblocked. System ready.");
     }
     
     current_registration_state_ = new_state;
     RCLCPP_INFO(this->get_logger(), "Registration state: %s", new_state.c_str());
   }
 
-  void update_drilled_pin_obstacles() {
+  void remove_all_drilled_pin_obstacles() {
     if (drilled_pin_ids_.empty()) {
-      RCLCPP_INFO(this->get_logger(), "No drilled pins to update.");
+      RCLCPP_INFO(this->get_logger(), "No drilled pins to remove.");
+      return;
+    }
+    
+    RCLCPP_INFO(this->get_logger(), "Removing %zu drilled pin obstacles...", drilled_pin_ids_.size());
+    log_drilled_pins_status();
+    
+    for (size_t i = 0; i < drilled_pin_ids_.size(); i++) {
+      moveit_msgs::msg::CollisionObject remove_obj;
+      remove_obj.id = drilled_pin_ids_[i];
+      remove_obj.header.frame_id = robot_name_ + "_link_0";
+      remove_obj.operation = remove_obj.REMOVE;
+      
+      planning_scene_interface_->applyCollisionObjects({remove_obj});
+      RCLCPP_INFO(this->get_logger(), "Removed obstacle: %s", drilled_pin_ids_[i].c_str());
+    }
+    
+    RCLCPP_INFO(this->get_logger(), "All drilled pin obstacles removed. Waiting for new poses...");
+  }
+  
+  void readd_drilled_pin_obstacles() {
+    if (drilled_pin_ids_.empty()) {
+      RCLCPP_INFO(this->get_logger(), "No drilled pins to re-add.");
       return;
     }
     
     if (stored_poses_.empty()) {
-      RCLCPP_WARN(this->get_logger(), "No poses available for obstacle update.");
+      RCLCPP_ERROR(this->get_logger(), "No poses available! Cannot re-add obstacles.");
       return;
     }
     
-    RCLCPP_INFO(this->get_logger(), "Updating %zu drilled pin obstacles...", drilled_pin_ids_.size());
+    // Check size mismatch
+    int max_pose_idx = *std::max_element(pin_pose_indices_.begin(), pin_pose_indices_.end());
+    if (max_pose_idx >= static_cast<int>(stored_poses_.size())) {
+      RCLCPP_ERROR(this->get_logger(), 
+                   "ERROR: Pose array size mismatch! Have %zu poses but need at least %d poses for drilled pins.",
+                   stored_poses_.size(), max_pose_idx + 1);
+      RCLCPP_ERROR(this->get_logger(), "Cannot re-add obstacles. System in inconsistent state!");
+      return;
+    }
+    
+    RCLCPP_INFO(this->get_logger(), "Re-adding %zu drilled pin obstacles at new poses...", drilled_pin_ids_.size());
     log_drilled_pins_status();
     
     for (size_t i = 0; i < drilled_pin_ids_.size(); i++) {
@@ -270,17 +319,38 @@ public:
       if (pose_idx >= 0 && pose_idx < static_cast<int>(stored_poses_.size())) {
         const auto& new_pose = stored_poses_[pose_idx];
         
-        RCLCPP_INFO(this->get_logger(), "Moving pin %s (pose_index=%d) to [%.3f, %.3f, %.3f]",
-                   drilled_pin_ids_[i].c_str(), pose_idx,
-                   new_pose.position.x, new_pose.position.y, new_pose.position.z);
+        RCLCPP_INFO(this->get_logger(), "DEBUG: Re-adding pin %s at pose_index=%d", 
+                   drilled_pin_ids_[i].c_str(), pose_idx);
+        RCLCPP_INFO(this->get_logger(), "DEBUG: new_pose from stored_poses_[%d] = [%.3f, %.3f, %.3f]",
+                   pose_idx, new_pose.position.x, new_pose.position.y, new_pose.position.z);
+        RCLCPP_INFO(this->get_logger(), "DEBUG: Orientation: [%.3f, %.3f, %.3f, %.3f]",
+                   new_pose.orientation.x, new_pose.orientation.y, new_pose.orientation.z, new_pose.orientation.w);
         
-        // Pass the STRING ID, not an integer!
-        move_drilled_pin_obstacle(drilled_pin_ids_[i], new_pose);
+        // Create collision object
+        moveit_msgs::msg::CollisionObject collision_object;
+        collision_object.id = drilled_pin_ids_[i];
+        collision_object.header.frame_id = robot_name_ + "_link_0";
+        
+        shape_msgs::msg::SolidPrimitive primitive;
+        primitive.type = primitive.CYLINDER;
+        primitive.dimensions.resize(2);
+        primitive.dimensions[0] = 0.12;   // surgical pin length 12cm
+        primitive.dimensions[1] = 0.008;  // accuracy cylinder radius 8mm
+        
+        collision_object.primitives.push_back(primitive);
+        collision_object.primitive_poses.push_back(new_pose);
+        collision_object.operation = collision_object.ADD;
+        
+        planning_scene_interface_->applyCollisionObjects({collision_object});
+        RCLCPP_INFO(this->get_logger(), "Re-added pin %s at position: [%.3f, %.3f, %.3f]", 
+                   drilled_pin_ids_[i].c_str(), new_pose.position.x, new_pose.position.y, new_pose.position.z);
       } else {
         RCLCPP_ERROR(this->get_logger(), "Pin %s has invalid pose_index %d (poses_size=%zu)", 
                     drilled_pin_ids_[i].c_str(), pose_idx, stored_poses_.size());
       }
     }
+    
+    RCLCPP_INFO(this->get_logger(), "All drilled pins re-added successfully!");
   }
   void move_drilled_pin_obstacle(const std::string& pin_id, const geometry_msgs::msg::Pose& new_pose) {
     // Create collision object for moving the pin
