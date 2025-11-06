@@ -21,14 +21,13 @@ class DINOBoneExtractor():
     def __init__(self, checkpoint_path, dinov3_path, codebook_path, output_home, save_cluster_stats = True):
         self.checkpoint_path = checkpoint_path # shouldn't change
         self.dinov3_path = dinov3_path # shouldn't change
-        self.codebook_path = codebook_path # shouldn't change
         self.output_home = output_home # might not change
         self.output_dir = None
         self.save_visualizations = True # user configurable
-        self.save_cluster_stats = True # user configurable
+        self.save_cluster_stats = False #user figurable
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = self.load_dino_model()
-        self.codebook = self.load_bone_features(self.codebook_path)
+        self.codebook = self.load_bone_features(codebook_path)
         self.threshold = 0.7
         self.min_size = 100
 
@@ -36,18 +35,12 @@ class DINOBoneExtractor():
         """Load bone features from pickle file."""
         with open(pkl_path, 'rb') as f:
             return pickle.load(f)
-
-
-    def load_cluster_stats(self, pkl_path):
-        """Load cluster statistics from pickle file."""
-        with open(pkl_path, 'rb') as f:
-            return pickle.load(f)
     
     def make_output_dir(self, image_path):
+        """Make output folder for query image."""
         self.output_dir = os.path.join(self.output_home, os.path.splitext(os.path.basename(image_path))[0])
         if self.save_cluster_stats or self.save_visualizations:
             os.makedirs(self.output_dir, exist_ok=True)
-
 
     def load_dino_model(self):
         """Load the DINOv3 model."""
@@ -72,11 +65,19 @@ class DINOBoneExtractor():
 
 
     def get_centroid(self, image_path):
-        # simply runs a DINO v3 inference.
-        self.make_output_dir(image_path)
+        """
+        Computes the location of the bone centroid in the image plane.
 
+        Args:
+            - image_path: Path to the query image: maybe change in the future to accept a numpy array.
+        Returns:
+            - bone centroid in the pixel space IF it exists
+        """
+        self.make_output_dir(image_path)
+        
+        # Track overall timing
+        start_time = time.time()
         dino_pca_features, dino_features, image_resized, h_patch, w_patch, h_pixels, w_pixels = self.get_dino_features(image_path)
-           
         cluster_data = self._get_dino_clusters(dino_pca_features, h_patch, w_patch)
 
         cluster_statistics = self._extract_cluster_statistics(
@@ -87,13 +88,15 @@ class DINOBoneExtractor():
         )
 
         detected_bone = self.detect_bone(cluster_statistics, image_resized, image_path)
+        
+        total_time = time.time() - start_time
+        print(f"Total detection time: {total_time*1000:.1f} ms")
 
         if self.save_visualizations:    
             self._save_dino_features(dino_pca_features, "DINO_PCA_Features")
             self._save_dino_clusters(cluster_data['meanshift'], image_resized, "DINO_Clusters", h_pixels, w_pixels, h_patch, w_patch)
         
         if self.save_cluster_stats:
-            # Save cluster statistics as pickle
             with open(os.path.join(self.output_dir, "cluster_stats_meanshift.pkl"), 'wb') as f:
                 pickle.dump(cluster_statistics, f)
 
@@ -104,15 +107,16 @@ class DINOBoneExtractor():
         
         Args:
             image_path: Path to input image
-            save_cluster_stats: Whether to save cluster statistics as .pkl (default: True)
             
         Returns:
-            dict with keys:
-                - features: Raw features array (N_patches, 768)
-                - pca_features: PCA features (patch_h, patch_w, 3)
-                - image_size: (width, height) of processed image
-                - patch_size: (patch_w, patch_h)
-                - cluster_results: dict of cluster labels by method
+            Tuple of:
+                - features_pca_spatial: PCA features (h_patch, w_patch, 3)
+                - features_raw: Raw DINO features (n_patches, 768)
+                - image_resized: Processed PIL image
+                - h_patch: Height in patches
+                - w_patch: Width in patches
+                - h_pixels: Height in pixels
+                - w_pixels: Width in pixels
         """
         # Load and preprocess image
         image = Image.open(image_path).convert("RGB")
@@ -134,7 +138,7 @@ class DINOBoneExtractor():
             torch.cuda.synchronize()
         
         forward_time = time.time() - start_time
-        print(f"Forward pass: {forward_time*1000:.2f} ms")
+        print(f"DINO forward pass: {forward_time*1000:.1f} ms")
         
         features_cpu = features.squeeze(0).cpu()
         
@@ -146,8 +150,7 @@ class DINOBoneExtractor():
         
         # Compute PCA features
         pca = PCA(n_components=3, whiten=True)
-        features_pca = pca.fit_transform(features_cpu.numpy())
-        features_pca_spatial = features_pca.reshape(h_patch, w_patch, 3)
+        features_pca_spatial = pca.fit_transform(features_cpu.numpy()).reshape(h_patch, w_patch, 3)
         
         # Normalize PCA features
         for i in range(3):
@@ -170,7 +173,7 @@ class DINOBoneExtractor():
         
         cluster_time = time.time() - cluster_start
         n_clusters_found = len(np.unique(labels[labels >= 0]))
-        print(f"Meanshift: {cluster_time*1000:.2f} ms ({n_clusters_found} clusters)")
+        print(f"MeanShift clustering: {cluster_time*1000:.1f} ms ({n_clusters_found} clusters)")
         
         # Reshape labels back to spatial dimensions
         cluster_results['meanshift'] = labels.reshape(h_patch, w_patch)
@@ -345,61 +348,30 @@ class DINOBoneExtractor():
             min_size: Minimum cluster size to consider
             threshold: Minimum similarity threshold
         """
-        # Load codebook and clusters
-        print("Loading codebook...")
-        codebook = self.load_bone_features(self.codebook_path) if 'bone_cluster' in pickle.load(open(self.codebook_path, 'rb')) else pickle.load(open(self.codebook_path, 'rb'))
-        
+
         # Extract codebook embeddings
-        if 'embeddings' in codebook:
-            ref_features = codebook['embeddings']
+        if 'embeddings' in self.codebook:
+            ref_features = self.codebook['embeddings']
         else:
-            ref_features = codebook['bone_cluster']['features_raw']
-        
-        print(f"\nAnalyzing {len(cluster_statistics['clusters'])} clusters...")
+            ref_features = self.codebook['bone_cluster']['features_raw']
         
         # Compute similarities for all clusters
         scores = []
         for i, cluster in enumerate(cluster_statistics['clusters']):
-            # Skip small clusters
             if cluster['n_pixels'] < self.min_size:
                 scores.append((i, -1.0, 'too_small'))
                 continue
-            
-            # Compute similarity
             sim = self.compute_similarity(cluster['features_raw'], ref_features)
             reason = 'valid' if sim >= self.threshold else 'below_threshold'
             scores.append((i, sim, reason))
         
-        # Sort by similarity
         scores.sort(key=lambda x: x[1], reverse=True)
-        
-        # Print results
-        print("\n" + "="*60)
-        print("DETECTION RESULTS (sorted by similarity)")
-        print("="*60)
-        for i, (cluster_idx, sim, reason) in enumerate(scores[:5]):
-            cluster = cluster_statistics['clusters'][cluster_idx]
-            status = "✓" if reason == 'valid' else "✗"
-            print(f"{status} Rank {i+1}: Cluster {cluster_idx}")
-            print(f"   Similarity: {sim:.4f}")
-            print(f"   Size: {cluster['n_pixels']} pixels")
-            print(f"   Reason: {reason}")
-        
-        # Get best match
         best_idx, best_sim, best_reason = scores[0]
         best_cluster = cluster_statistics['clusters'][best_idx]
         
-        print("\n" + "="*60)
-        print("BONE DETECTION RESULTS")
-        print("="*60)
-        
         # Check if detection is reliable
         if best_sim < self.threshold:
-            print(f"✗ NO BONE DETECTED")
-            print(f"  Best candidate similarity: {best_sim:.4f}")
-            print(f"  Required threshold: {self.threshold:.4f}")
-            print(f"  Status: All clusters below confidence threshold")
-            print("="*60)
+            print(f"✗ No bone detected (best similarity: {best_sim:.3f} < threshold: {self.threshold})")
             
             # Save rejection status
             os.makedirs(self.output_dir, exist_ok=True)
@@ -414,34 +386,43 @@ class DINOBoneExtractor():
                 f.write(f"\nTop 3 candidates:\n")
                 for i, (idx, sim, reason) in enumerate(scores[:3]):
                     f.write(f"  {i+1}. Cluster {idx}: {sim:.4f}\n")
-            
-            print(f"\n✗ Rejection report saved to: {rejection_path}")
-            print("\n⚠️  WARNING: No reliable bone detection in this image")
-            return  # Exit without visualization
+            return None
         
         # Valid detection
-        print(f"✓ BONE DETECTED: Cluster {best_idx}")
-        print(f"  Confidence: {best_sim:.4f}")
-        print(f"  Size: {cluster_statistics['clusters'][best_idx]['n_pixels']} pixels")
-        print("="*60)
+        print(f"✓ Bone detected (similarity: {best_sim:.3f})")
         
         # Compute 2D bone centroid (median of bone cluster points)
         coords = cluster_statistics['clusters'][best_idx]['pixel_coords']  # Shape: (N, 2) with [row, col] format
         
-        # Compute median in pixel space
-        bone_centroid_row = np.median(coords[:, 0])
-        bone_centroid_col = np.median(coords[:, 1])
+        # Compute median in DINO-resized pixel space
+        bone_centroid_row_dino = np.median(coords[:, 0])
+        bone_centroid_col_dino = np.median(coords[:, 1])
         
-        # RealSense pixel coordinate convention: (u, v) = (col, row)
-        # u = horizontal axis (width), v = vertical axis (height)
-        bone_centroid_2d = (float(bone_centroid_col), float(bone_centroid_row))
-        
-        print(f"\n2D Bone Centroid (RealSense convention):")
-        print(f"  u (horizontal): {bone_centroid_2d[0]:.2f} pixels")
-        print(f"  v (vertical):   {bone_centroid_2d[1]:.2f} pixels")
-        
-        # Visualize detection
+        # Load original image to get original dimensions
         image = Image.open(image_path).convert('RGB')
+        w_original, h_original = image.size
+        
+        # Get DINO-resized dimensions
+        h_dino, w_dino = cluster_statistics['metadata']['image_shape']
+        
+        # Scale from DINO space to original image space
+        scale_u = w_original / w_dino
+        scale_v = h_original / h_dino
+        bone_centroid_col_original = bone_centroid_col_dino * scale_u
+        bone_centroid_row_original = bone_centroid_row_dino * scale_v
+        
+        # Convert to original image space (for depth map alignment)
+        bone_centroid_2d = (float(bone_centroid_col_original), float(bone_centroid_row_original))
+        bone_centroid_2d_dino = (float(bone_centroid_col_dino), float(bone_centroid_row_dino))
+        
+        # Calculate distance from image center (in original image space)
+        image_center_original = (w_original / 2.0, h_original / 2.0)
+        distance_from_center = float(np.linalg.norm(np.array(bone_centroid_2d) - np.array(image_center_original)))
+        
+        print(f"  Bone centroid: ({bone_centroid_2d[0]:.1f}, {bone_centroid_2d[1]:.1f}) px in {w_original}×{h_original} image")
+        print(f"  Distance from center: {distance_from_center:.1f} px")
+        
+        # Visualize detection (using DINO space for visualization)
         
         # Resize to match DINOv3 processed size
         h_target, w_target = cluster_statistics['metadata']['image_shape']
@@ -497,14 +478,14 @@ class DINOBoneExtractor():
             shrinkB=0
         )
         
-        # Draw the arrow
+        # Draw the arrow (using DINO space coordinates for visualization)
         ax.annotate('', 
-                    xy=(bone_centroid_2d[0], bone_centroid_2d[1]),  # End point (bone centroid)
+                    xy=(bone_centroid_2d_dino[0], bone_centroid_2d_dino[1]),  # End point (bone centroid)
                     xytext=(image_center_u, image_center_v),  # Start point (image center)
                     arrowprops=arrow_props)
         
         # Mark the bone centroid with a small marker
-        ax.plot(bone_centroid_2d[0], bone_centroid_2d[1], 
+        ax.plot(bone_centroid_2d_dino[0], bone_centroid_2d_dino[1], 
                 'c*', markersize=15, markeredgecolor='white', markeredgewidth=1.5)
         
         status_text = "DETECTED" if best_sim >= self.threshold else "LOW CONFIDENCE"
@@ -516,42 +497,26 @@ class DINOBoneExtractor():
         # Save results
         os.makedirs(self.output_dir, exist_ok=True)
         output_name = os.path.splitext(os.path.basename(image_path))[0]
-        viz_path = os.path.join(self.output_dir, f"{output_name}_detection.png")
-        plt.savefig(viz_path, dpi=150, bbox_inches='tight')
-        print(f"\n✓ Visualization saved to: {viz_path}")
+        
+        if self.save_visualizations:
+            viz_path = os.path.join(self.output_dir, f"{output_name}_detection.png")
+            plt.savefig(viz_path, dpi=150, bbox_inches='tight')
         
         # Save detected bone
         detected_bone = {
-            'detected_cluster': cluster_statistics['clusters'][best_idx],
-            'confidence': float(best_sim),
+            'centroid': {'u': bone_centroid_2d[0], 'v': bone_centroid_2d[1]},
+            'distance_from_center_px': distance_from_center,
+            'similarity': float(best_sim),
             'source_image': os.path.basename(image_path),
-            'codebook_version': codebook.get('version', 'unknown'),
-            'all_scores': [(int(idx), float(sim)) for idx, sim, _ in scores],
-            'distance_from_image_center': float(np.linalg.norm(np.array([image_center_u, image_center_v]) - np.array(bone_centroid_2d))),
-            '2d_bone_centroid': {
-                'u': bone_centroid_2d[0],  # Horizontal (column) in pixels
-                'v': bone_centroid_2d[1],  # Vertical (row) in pixels
-                'convention': 'RealSense (u=horizontal, v=vertical)',
-                'image_size': {'width': w_target, 'height': h_target}
-            }
+            'codebook_version': self.codebook.get('version', 'unknown')
         }
         
-        print(f" The 2D bone centroid is {bone_centroid_2d}, image plane centroid is {image_center_u}, {image_center_v}, length of displacement is: {np.linalg.norm(np.array([image_center_u, image_center_v]) - np.array(bone_centroid_2d))}")
         detected_path = os.path.join(self.output_dir, f"{output_name}_detected_bone.pkl")
         with open(detected_path, 'wb') as f:
             pickle.dump(detected_bone, f)
-        print(f"✓ Detection data saved to: {detected_path}")
         
-        plt.show()
+        # plt.show()  # Commented out - causes warning in non-interactive environments
         return detected_bone
-
-    @property
-    def load_codebook():
-        pass
-
-    @staticmethod
-    def load_cluster_features():
-        pass
 
     @staticmethod
     def visualize_feature_clusters():

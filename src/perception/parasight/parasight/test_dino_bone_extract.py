@@ -1,7 +1,7 @@
 from dino_bone_extract import DINOBoneExtractor
 
 def test_dino_bone_extract():
-    image_path = "/home/kneepolean/sreeharsha/bone_data/jeans/bottom_0pin_1_Color.png"
+    image_path = "/home/kneepolean/sreeharsha/bone_data/jeans/top_0pin_3_Color.png"
     checkpoint_path = "/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
     output_dir = "/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration"
     dinov3_path = "/home/kneepolean/sreeharsha/dinov3"
