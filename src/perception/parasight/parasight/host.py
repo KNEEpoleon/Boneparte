@@ -22,8 +22,6 @@ from parasight.utils import *
 
 import time
 
-# from parasight_interfaces.srv import StartTracking, StopTracking
-# from parasight_interfaces.msg import TrackedPoints
 from std_srvs.srv import Empty as EmptySrv
 from functools import partial
 
@@ -34,22 +32,27 @@ from visualization_msgs.msg import Marker
 
 
 class ParaSightHost(Node):
-    states = ['ready', 'user_input', 'lock_in']
+    states = ['start', 'await_surgeon_input', 'bring_manipulator', 'auto_reposition', 'segment_and_register', 'update_rviz', 'ready_to_drill', 'drill', 'finished']
 
     def __init__(self):
         super().__init__('parasight_host')
         
         # Create state machine
-        self.machine = Machine(model=self, states=ParaSightHost.states, initial='ready',
-                               after_state_change='publish_state')
-
-        # Transitions
-        self.machine.add_transition(trigger='start_parasight', source='ready', dest='user_input')
-        # self.machine.add_transition(trigger='ready_to_drill', source='user_input', dest='lock_in')
-        self.machine.add_transition(trigger='drill_complete', source='user_input', dest='ready')
-
-        self.machine.add_transition(trigger='hard_reset', source='*', dest='waiting')
-
+        self.machine = Machine(model=self, states=ParaSightHost.states, initial='start',
+                               after_state_change='await_surgeon_input')
+        
+        # Add state transitions
+        self.machine.add_transition(trigger='proceed_mission', source='await_surgeon_input', dest='bring_manipulator')
+        self.machine.add_transition(trigger='complete_bring_manipulator', source='bring_manipulator', dest='auto_reposition')
+        self.machine.add_transition(trigger='complete_auto_reposition', source='auto_reposition', dest='await_surgeon_input')
+        self.machine.add_transition(trigger='annotate', source='await_surgeon_input', dest='segment_and_register')
+        self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='update_rviz')
+        self.machine.add_transition(trigger='complete_map_update', source='update_rviz', dest='ready_to_drill')
+        self.machine.add_transition(trigger='reset_mission', source='ready_to_drill', dest='await_surgeon_input')
+        self.machine.add_transition(trigger='received_mission_pin', source='ready_to_drill', dest='drill')
+        self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
+        self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
+        
         # State Data
         self.last_rgb_image = None
         self.last_depth_image = None
@@ -66,7 +69,6 @@ class ParaSightHost(Node):
         self.cx = 422.978515625
         self.cy = 242.1155242919922
 
-
         # Set up tf listener
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
@@ -76,23 +78,17 @@ class ParaSightHost(Node):
         self.camera_link_frame = 'camera_link'
         self.camera_frame = 'camera_depth_optical_frame'
 
-
         # Trigger Subscribers
         self.ui_trigger_subscription = self.create_subscription(
             Empty,
-            '/trigger_host_ui', # Calls Segment Using UI
+            '/trigger_host_ui',
             self.ui_trigger_callback,
             10)
-        # self.hard_reset_subscription = self.create_subscription(
-        #     Empty,
-        #     '/hard_reset_host',
-        #     self.hard_reset_callback,
-        #     10)
-        ## Sreeharsha
+        
         self.hard_reset_subscription = self.create_subscription(
             Empty,
             '/hard_reset_host',
-            self.custom_callback_to_reset_FSM,
+            self.hard_reset_callback,
             10)
         
         # Data Subscribers
@@ -111,29 +107,11 @@ class ParaSightHost(Node):
             '/camera/depth/color/points',
             self.pcd_callback,
             10)
-        # self.tracked_points_subscription = self.create_subscription(
-        #     TrackedPoints,
-        #     '/tracked_points',
-        #     self.tracked_points_callback,
-        #     10)
-        # self.reg_request_subscription = self.create_subscription(
-        #     Int32,
-        #     '/trigger_reg',
-        #     self.reg_request_callback,
-        #     10)
-        # self.log_request_subscription = self.create_subscription(
-        #     Empty,
-        #     '/log_request',
-        #     self.log_request_callback,
-        #     10)
         
         # Publishers
-        self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10) # of the femur and tibia
+        self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
-
-        # self.registered_femur = self.create_publisher(PointCloud2, '/processed_femur_camera_frame', 10)
-        # self.registered_tibia = self.create_publisher(PointCloud2, '/processed_tibia_camera_frame', 10)
 
         # Parameters
         self.declare_parameter('selected_bones', 'both')
@@ -155,58 +133,120 @@ class ParaSightHost(Node):
         print(f"Made the SAM object")
         self.bridge = CvBridge()
 
-    def custom_callback_to_reset_FSM(self, rand_arg=True):
-        self.state == 'ready'
-
-    def all_systems_ready(self, dummy=True):
-        if dummy:
-            return True
-            
-        try:
-            # Check tf transform
-            self.tf_buffer.lookup_transform('world', 'camera_color_optical_frame', rclpy.time.Time())
-            
-            # Check required nodes
-            node_names = [node.split('/')[-1] for node in self.get_node_names()]
-            if 'io_node' not in node_names or 'registration_node' not in node_names:
-                return False
-                
-            return True
-            
-        except TransformException:
-            return False
-
-    def publish_state(self):
+    # ============================================================================
+    # STATE MACHINE CALLBACK
+    # ============================================================================
+    
+    def await_surgeon_input(self):
+        """Called after every state change to log current state."""
         self.get_logger().info(f'Current state: {self.state}')
 
-    def ui_trigger_callback(self, msg):
-        print(f"\n! The self state is: {self.state}")
-
-        self.get_logger().info('UI trigger received')
-        if self.state == 'ready':
-            self.trigger('start_parasight')
-            masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
-            self.annotated_points = annotated_points
-            print(f"\n The annotated points are: {self.annotated_points}")
-            # self.trigger('input_received')
-            # self.trigger('ready_to_drill')
-            self.register_and_publish(annotated_points)
-            self.trigger('drill_complete')
-
-        else:
-            self.get_logger().warn('UI trigger received but not in ready state')
-
-    # def after_stop_tracking(self, future, reset=True):
-    #     try:
-    #         # Check if the service call was successful
-    #         future.result()  # This will raise an exception if the service failed
-    #         self.get_logger().info("Tracking successfully stopped, proceeding with reset." if reset else "Tracking successfully paused.")
-    #     except Exception as e:
-    #         self.get_logger().error(f"Failed to stop tracking: {e}")
+    # ============================================================================
+    # STATE ENTRY HANDLERS
+    # ============================================================================
+    
+    def on_enter_start(self):
+        """Entry handler for start state."""
+        self.get_logger().info('System initialized and ready to begin surgery workflow')
+    
+    def on_enter_await_surgeon_input(self):
+        """Entry handler for await_surgeon_input state."""
+        self.get_logger().info('Awaiting surgeon input - ready for commands')
+    
+    def on_enter_bring_manipulator(self):
+        """Entry handler for bring_manipulator state."""
+        self.get_logger().info('Bringing manipulator from distant home to closer home location')
+        # TODO: Implement manipulator bring command
+        # This should move manipulator from far home position to near home position
+        pass
+    
+    def on_enter_auto_reposition(self):
+        """Entry handler for auto_reposition state."""
+        self.get_logger().info('Entering auto_reposition - calling DINO bone extractor')
+        # TODO: Call get_centroid from DINOBoneExtractor
+        # This should analyze RGB image and return bone centroid for camera repositioning
+        pass
+    
+    def on_enter_segment_and_register(self):
+        """Entry handler for segment_and_register state."""
+        self.get_logger().info('Entering segment_and_register - using SAM to segment bones')
+        # Segmentation and registration is implemented via segment_with_ui
+        masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(
+            self.last_rgb_image, self.bones
+        )
+        self.annotated_points = annotated_points
+        self.get_logger().info(f'Annotated points: {self.annotated_points}')
         
-    #     # Now, trigger the state machine reset
-    #     if reset:
-    #         self.trigger('hard_reset')
+        # Perform registration
+        self.register_and_publish(annotated_points)
+        
+        # Transition to next state
+        self.trigger('complete_segment_and_register')
+    
+    def on_enter_update_rviz(self):
+        """Entry handler for update_rviz state."""
+        self.get_logger().info('Updating RViz visualization')
+        # TODO: Implement RViz update functionality
+        # This should update visualization markers and displays
+        # For now, automatically transition to next state
+        self.trigger('complete_map_update')
+    
+    def on_enter_ready_to_drill(self):
+        """Entry handler for ready_to_drill state."""
+        self.get_logger().info('Plan registered - ready to receive drill command from surgeon')
+    
+    def on_enter_drill(self):
+        """Entry handler for drill state."""
+        self.get_logger().info('Executing drill command')
+        # TODO: Implement actual drilling command to manipulator
+        # This should send drilling commands based on received pin number
+        pass
+    
+    def on_enter_finished(self):
+        """Entry handler for finished state."""
+        self.get_logger().info('Surgery workflow completed')
+
+    # ============================================================================
+    # CALLBACK METHODS
+    # ============================================================================
+
+    def hard_reset_callback(self, msg):
+        """Reset the state machine to await_surgeon_input state."""
+        self.get_logger().info('Hard reset requested - returning to await_surgeon_input')
+        self.to_await_surgeon_input()
+
+    def ui_trigger_callback(self, msg):
+        """Handle UI trigger to start segmentation process."""
+        self.get_logger().info(f'UI trigger received in state: {self.state}')
+        
+        if self.state == 'await_surgeon_input':
+            self.trigger('annotate')
+        else:
+            self.get_logger().warn(f'UI trigger received but not in await_surgeon_input state (current: {self.state})')
+
+    # ============================================================================
+    # DATA CALLBACK METHODS
+    # ============================================================================
+
+    def rgb_image_callback(self, msg):
+        """Callback for RGB image data."""
+        rgb_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+        rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+        self.last_rgb_image = rgb_image
+
+    def depth_image_callback(self, msg):
+        """Callback for depth image data."""
+        depth_image = self.bridge.imgmsg_to_cv2(msg, "16UC1") / 1000.0
+        self.last_depth_image = depth_image
+    
+    def pcd_callback(self, msg):
+        """Callback for point cloud data."""
+        cloud = from_msg(msg)
+        self.last_cloud = cloud
+
+    # ============================================================================
+    # PARAMETER METHODS
+    # ============================================================================
 
     def update_bones(self, selected_bones):
         """Update self.bones based on the /selected_bones parameter."""
@@ -221,37 +261,28 @@ class ParaSightHost(Node):
             self.bones = []
         self.get_logger().info(f"Updated bones to: {self.bones}")
     
-    def parameter_change_callback(self, params): # huh 
+    def parameter_change_callback(self, params):
+        """Handle parameter changes."""
         for param in params:
             if param.name == 'selected_bones':
                 self.update_bones(param.value)
         return SetParametersResult(successful=True)
 
-    def rgb_image_callback(self, msg):
-        rgb_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
-        rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-        self.last_rgb_image = rgb_image
+    # ============================================================================
+    # UTILITY METHODS
+    # ============================================================================
 
-    def depth_image_callback(self, msg):
-        depth_image = self.bridge.imgmsg_to_cv2(msg, "16UC1") / 1000.0
-        self.last_depth_image = depth_image
-
-    def add_depth(self,points):
+    def add_depth(self, points):
+        """Add depth information to 2D points."""
         new_points = []
         for point in points:
-            x,y = point
-            depth = average_depth(self.last_depth_image,y,x)
-            new_points.append([x,y,depth])
+            x, y = point
+            depth = average_depth(self.last_depth_image, y, x)
+            new_points.append([x, y, depth])
         return new_points
     
-    def pcd_callback(self, msg):
-        cloud = from_msg(msg)
-        self.last_cloud = cloud
-
     def pose_direction(self, annotated_points):
-        # Dynamically compute theta
-        # If Femur is on the left, theta should be 0
-        # If Femur is on the right, theta should be -pi
+        """Dynamically compute theta based on bone positions."""
         femur_point_x = annotated_points[0][0]
         tibia_point_x = annotated_points[1][0]
         if femur_point_x > tibia_point_x:
@@ -259,21 +290,29 @@ class ParaSightHost(Node):
         else:
             return -np.pi
 
+    # ============================================================================
+    # REGISTRATION AND PUBLISHING METHODS (IMPLEMENTED)
+    # ============================================================================
 
     def register_and_publish(self, points):
-        # self.pause_tracking() # Pause tracking while registering to improve performance
-        masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(self.last_rgb_image, points[0], points[1], self.bones)
-        self.annotated_points = annotated_points # cache
+        """Segment, register, and publish bone point clouds and drill poses."""
+        masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
+            self.last_rgb_image, points[0], points[1], self.bones
+        )
+        self.annotated_points = annotated_points
         annotated_points = self.add_depth(annotated_points)
         registered_clouds = []
         transforms = {}
+        
         for i, bone in enumerate(self.bones):
             t0 = time.time()
             mask = masks[i]
             mask_points = all_mask_points[i]
             source = self.sources[bone]
             mask_points = self.add_depth(mask_points)
-            transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone) # aligns source to target
+            transform, fitness = self.regpipe.register(
+                mask, source, self.last_cloud, annotated_points, mask_points, bone=bone
+            )
             t1 = time.time()
             self.get_logger().info(f'Registration time for {bone}: {t1 - t0}')
             source_cloud = source.voxel_down_sample(voxel_size=0.003)
@@ -281,75 +320,31 @@ class ParaSightHost(Node):
             source_cloud.paint_uniform_color(self.colors[bone])
             registered_clouds.append(source_cloud)
             transforms[bone] = transform
-            # print(f"\n\nFor bone {bone} we have transform: \n{transform}")
 
         self.publish_point_cloud(registered_clouds)
 
         theta = self.pose_direction(annotated_points)
-        drill_pose_array = self.compute_plan(transforms,theta=theta)
-        # drill_pose_array = self.calibration_offset(drill_pose_array,0.004,-0.0005,0.0)
-        # drill_pose_array.header.frame_id = self.base_frame # Sreeharsha
+        drill_pose_array = self.compute_plan(transforms, theta=theta)
         drill_pose_array.header.frame_id = self.camera_frame
         drill_pose_array.header.stamp = self.get_clock().now().to_msg()
         self.pose_array_publisher.publish(drill_pose_array)
-        # self.last_drill_pose_array = drill_pose_array
-        # self.spam_counter = 3
-
-        # DEPRECATED
-        # self.last_drill_pose = drill_pose_array.poses[0]
-        # self.publish_fitness_marker(self.last_drill_pose.position, fitness)
-        # self.resume_tracking()
-
-    # def publish_fitness_marker(self, position, fitness):
-    #     marker = Marker()
-    #     marker.header.frame_id = self.base_frame
-    #     marker.header.stamp = self.get_clock().now().to_msg()
-    #     marker.ns = "fitness_marker"
-    #     marker.id = 0
-    #     marker.type = Marker.TEXT_VIEW_FACING
-    #     marker.action = Marker.ADD
-    #     marker.pose.position.x = position.x
-    #     marker.pose.position.y = position.y
-    #     marker.pose.position.z = position.z + 0.1  # Offset slightly above the first pose
-    #     marker.pose.orientation.w = 1.0
-    #     marker.scale.z = 0.05  # Text size
-    #     marker.color.r = 1.0
-    #     marker.color.g = 1.0
-    #     marker.color.b = 1.0
-    #     marker.color.a = 1.0
-    #     marker.text = f"{fitness:.2f}"  # Format the fitness value
-    #     self.marker_publisher.publish(marker)
-
-    # def reg_request_callback(self, msg):
-    #     if msg.data == 0:
-    #         if self.annotated_points is not None:
-    #             print('Re-Registering...')
-    #             self.register_and_publish(self.annotated_points)
-    #         else:
-    #             self.get_logger().warn('No annotated points set. Register with UI first')
-    #     elif msg.data == 1:
-    #         print('Re-Registering with UI...')
-    #         masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
-    #         self.annotated_points = annotated_points
-    #         self.register_and_publish(annotated_points)
 
     def publish_point_cloud(self, clouds):
-        # Combine all clouds into one
+        """Combine and publish point clouds."""
         print(f"How many clouds are there: {len(clouds)}")
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
-            print(f"\nin host py we have a cloud!")
+            print(f"in host py we have a cloud!")
             combined_cloud += c
-        cloud_msg = to_msg(combined_cloud,frame_id=self.camera_frame)
+        cloud_msg = to_msg(combined_cloud, frame_id=self.camera_frame)
         self.pcd_publisher.publish(cloud_msg)
 
-    def compute_plan(self, transforms,theta=-np.pi/2):
-        """Computes the surgical drill point by transforming the default point with the given transform."""
-
+    def compute_plan(self, transforms, theta=-np.pi/2):
+        """Compute surgical drill points by transforming plan points with registration transforms."""
         drill_pose_array = PoseArray()
 
         parts = load_plan_points(self.plan_path, self.plan)
-        self.get_logger().info(f"\n\n Updated parts plan to: {parts}")
+        self.get_logger().info(f"Updated parts plan to: {parts}")
         
         for bone, holes in parts.items():
             if bone not in self.bones:
@@ -359,40 +354,17 @@ class ParaSightHost(Node):
             for hole_name, hole in holes.items():
                 p1, p2, p3 = hole
 
-                '''
-                # Toggle theta between 0 and -π/2 for femur curvature hole
-                curr_theta = theta
-                if bone == 'femur' and hole_name == 'hole3':
-                    curr_theta = np.pi if theta == 0 else 0
-                elif bone == 'tibia':
-                    curr_theta = theta * -1
-                '''
-
-
-                curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
-                # if bone == 'femur' and hole_name == 'hole3':
-                #     curr_theta = (3*np.pi)/2
-                #     # curr_theta = -np.pi/2
-
-                # if bone == 'femur' and hole_name == 'hole2':
-                #     curr_theta = np.pi
-
-
+                curr_theta = 0
                 if bone == 'femur' and hole_name == 'hole2':
                     curr_theta = -np.pi/2
                 elif bone == "femur" and hole_name == 'hole3':
                     curr_theta = -np.pi/2
-                # elif bone == "tibia" and hole_name == 'hole2':
-                #     curr_theta = np.pi/2
 
                 mesh = o3d.geometry.TriangleMesh()
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
                 mesh.compute_vertex_normals()
-                normal =  np.asarray(mesh.vertex_normals)[0]
-                # if bone == "femur" and (hole_name == "hole2" or hole_name == "hole1") :
-                #     actual_normal = normal
-                # else:
+                normal = np.asarray(mesh.vertex_normals)[0]
                 actual_normal = -normal
                 z_axis = np.array([0, 0, 1])
                 rotation_axis = np.cross(z_axis, actual_normal)
@@ -427,25 +399,10 @@ class ParaSightHost(Node):
                 pose.orientation.z = quat[2]
                 pose.orientation.w = quat[3]
 
-                # base_transform = self.tf_buffer.lookup_transform(self.base_frame, self.camera_frame, rclpy.time.Time())
-                # pose = do_transform_pose(pose, base_transform)
-                self.get_logger().info(f"\n\n Bone: {bone} \nholename: {hole_name} \nhole: {hole} \nPose: {pose}")
+                self.get_logger().info(f"Bone: {bone} | hole: {hole_name} | Pose: {pose}")
                 drill_pose_array.poses.append(pose)
-        # self.get_logger().info(f"\n\n DRILL pose arrayt: {parts}")
+        
         return drill_pose_array
-
-    # def calibration_offset(self,pose_array,x_off,y_off,z_off):
-    #     for pose in pose_array.poses:
-    #         pose.position.x += x_off
-    #         pose.position.y += y_off
-    #         pose.position.z += z_off
-    #     return pose_array
-
-    # def log_request_callback(self, msg):
-    #     self.get_logger().info('Log requested')
-    #     base_to_tool = self.tf_buffer.lookup_transform(self.base_frame, self.tool_frame, rclpy.time.Time())
-    #     self.get_logger().info(f'Base to tool: {base_to_tool}')
-    #     self.get_logger().info(f'Drill pose: {self.last_drill_pose}') # Target in World Frame
 
 
 def main(args=None):
