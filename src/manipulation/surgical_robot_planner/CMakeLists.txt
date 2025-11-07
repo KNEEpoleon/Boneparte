@@ -26,6 +26,7 @@ rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typ
 # Add executable
 add_executable(move_to_pose src/move_to_pose.cpp)
 add_executable(drill_motion_executor src/drill_motion_executor.cpp)
+add_executable(obstacle_manager src/obstacle_manager.cpp)
 
 ament_target_dependencies(move_to_pose
   geometry_msgs
@@ -42,8 +43,14 @@ ament_target_dependencies(drill_motion_executor
 target_include_directories(drill_motion_executor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp>
 )
+ament_target_dependencies(obstacle_manager 
+  geometry_msgs
+  std_msgs
+  moveit_ros_planning_interface
+  rclcpp
+)
 # Install all binaries
-install(TARGETS move_to_pose drill_motion_executor
+install(TARGETS move_to_pose drill_motion_executor obstacle_manager
   DESTINATION lib/${PROJECT_NAME}
 )
 
