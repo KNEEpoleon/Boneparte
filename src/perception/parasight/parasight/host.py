@@ -82,7 +82,6 @@ class ParaSightHost(Node):
         self.ui_trigger_subscription = self.create_subscription(
             Empty,
             '/trigger_host_ui',
-            '/trigger_host_ui',
             self.ui_trigger_callback,
             10)
         
@@ -90,7 +89,6 @@ class ParaSightHost(Node):
         self.hard_reset_subscription = self.create_subscription(
             Empty,
             '/hard_reset_host',
-            self.hard_reset_callback,
             self.hard_reset_callback,
             10)
         
@@ -210,14 +208,10 @@ class ParaSightHost(Node):
             x, y = point
             depth = average_depth(self.last_depth_image, y, x)
             new_points.append([x, y, depth])
-            x, y = point
-            depth = average_depth(self.last_depth_image, y, x)
-            new_points.append([x, y, depth])
         return new_points
     
     
     def pose_direction(self, annotated_points):
-        """Dynamically compute theta based on bone positions."""
         """Dynamically compute theta based on bone positions."""
         femur_point_x = annotated_points[0][0]
         tibia_point_x = annotated_points[1][0]
@@ -248,9 +242,7 @@ class ParaSightHost(Node):
             transform, fitness = self.regpipe.register(
                 mask, source, self.last_cloud, annotated_points, mask_points, bone=bone
             )
-            transform, fitness = self.regpipe.register(
-                mask, source, self.last_cloud, annotated_points, mask_points, bone=bone
-            )
+
             t1 = time.time()
             self.get_logger().info(f'Registration time for {bone}: {t1 - t0}')
             source_cloud = source.voxel_down_sample(voxel_size=0.003)
@@ -263,21 +255,17 @@ class ParaSightHost(Node):
 
         theta = self.pose_direction(annotated_points)
         drill_pose_array = self.compute_plan(transforms, theta=theta)
-        drill_pose_array = self.compute_plan(transforms, theta=theta)
         drill_pose_array.header.frame_id = self.camera_frame
         drill_pose_array.header.stamp = self.get_clock().now().to_msg()
         self.pose_array_publisher.publish(drill_pose_array)
 
     def publish_point_cloud(self, clouds):
         """Combine and publish point clouds."""
-        """Combine and publish point clouds."""
         print(f"How many clouds are there: {len(clouds)}")
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
             print(f"in host py we have a cloud!")
-            print(f"in host py we have a cloud!")
             combined_cloud += c
-        cloud_msg = to_msg(combined_cloud, frame_id=self.camera_frame)
         cloud_msg = to_msg(combined_cloud, frame_id=self.camera_frame)
         self.pcd_publisher.publish(cloud_msg)
 
@@ -286,7 +274,6 @@ class ParaSightHost(Node):
         drill_pose_array = PoseArray()
 
         parts = load_plan_points(self.plan_path, self.plan)
-        self.get_logger().info(f"Updated parts plan to: {parts}")
         self.get_logger().info(f"Updated parts plan to: {parts}")
         
         for bone, holes in parts.items():
@@ -298,7 +285,6 @@ class ParaSightHost(Node):
                 p1, p2, p3 = hole
 
                 curr_theta = 0
-                curr_theta = 0
                 if bone == 'femur' and hole_name == 'hole2':
                     curr_theta = -np.pi/2
                 elif bone == "femur" and hole_name == 'hole3':
@@ -308,7 +294,6 @@ class ParaSightHost(Node):
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
                 mesh.compute_vertex_normals()
-                normal = np.asarray(mesh.vertex_normals)[0]
                 normal = np.asarray(mesh.vertex_normals)[0]
                 actual_normal = -normal
                 z_axis = np.array([0, 0, 1])
@@ -344,7 +329,6 @@ class ParaSightHost(Node):
                 pose.orientation.z = quat[2]
                 pose.orientation.w = quat[3]
 
-                self.get_logger().info(f"Bone: {bone} | hole: {hole_name} | Pose: {pose}")
                 self.get_logger().info(f"Bone: {bone} | hole: {hole_name} | Pose: {pose}")
                 drill_pose_array.poses.append(pose)
         
