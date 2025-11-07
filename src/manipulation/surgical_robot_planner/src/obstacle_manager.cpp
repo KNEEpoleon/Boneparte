@@ -136,7 +136,8 @@ private:
     moveit_msgs::msg::CollisionObject collision_object;
     collision_object.id = pin_id;
     collision_object.header.frame_id = robot_name_ + "_link_0";
-    collision_object.operation = collision_object.MOVE;
+    // Note(Daksh): DONT USE .MOVE, MoveIT hates me for some reason
+    collision_object.operation = collision_object.ADD;
     
     // Create primitive (same dimensions as original pin)
     shape_msgs::msg::SolidPrimitive primitive;
