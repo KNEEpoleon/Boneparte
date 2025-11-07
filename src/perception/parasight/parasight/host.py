@@ -111,7 +111,6 @@ class ParaSightHost(Node):
         
         # Publishers
         self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
-        self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
@@ -135,24 +134,40 @@ class ParaSightHost(Node):
         print(f"Made the SAM object")
         self.bridge = CvBridge()
 
+    # ============================================================================
+    # STATE MACHINE CALLBACKS
+    # ============================================================================
+
     def after_state_change(self):
         """Called automatically after every state transition."""
         self.get_logger().info(f'═══ State changed to: {self.state} ═══')
 
-    def parameter_change_callback(self, params):
-        """Handle parameter changes."""
-        for param in params:
-            if param.name == 'selected_bones':
-                self.update_bones(param.value)
-        return SetParametersResult(successful=True)
+    # ============================================================================
+    # STATE ENTRY/EXIT CALLBACKS
+    # ============================================================================
 
-    def hard_reset_callback(self, msg):
-        """Reset the state machine to initial state."""
-        self.get_logger().warn('Hard reset triggered - returning to start state')
-        self.to_start()
+    def on_enter_start(self):
+        """Entry handler for start state."""
+        self.get_logger().info('System starting up...')
+        # TODO: Implement startup logic
+
+    def on_enter_await_surgeon_input(self):
+        """Entry handler for await_surgeon_input state."""
+        self.get_logger().info('Awaiting surgeon input...')
+        # TODO: Implement await logic
+
+    def on_enter_bring_manipulator(self):
+        """Entry handler for bring_manipulator state."""
+        self.get_logger().info('Bringing manipulator to position...')
+        # TODO: Implement manipulator positioning logic
+
+    def on_enter_auto_reposition(self):
+        """Entry handler for auto_reposition state."""
+        self.get_logger().info('Auto-repositioning...')
+        # TODO: Implement auto-reposition logic
 
     def on_enter_segment_and_register(self):
-        """Entry handler for segment_and_register state."""
+        """Entry handler for segment_and_register state - FULLY IMPLEMENTED."""
         self.get_logger().info('Entering segment_and_register - using SAM to segment bones')
         # Segmentation and registration is implemented via segment_with_ui
         masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(
@@ -167,12 +182,43 @@ class ParaSightHost(Node):
         # Transition to next state
         self.trigger('complete_segment_and_register')
 
+    def on_enter_update_rviz(self):
+        """Entry handler for update_rviz state."""
+        self.get_logger().info('Updating RViz visualization...')
+        # TODO: Implement RViz update logic
+
+    def on_enter_ready_to_drill(self):
+        """Entry handler for ready_to_drill state."""
+        self.get_logger().info('Ready to drill - awaiting mission pin...')
+        # TODO: Implement ready_to_drill logic
+
+    def on_enter_drill(self):
+        """Entry handler for drill state."""
+        self.get_logger().info('Drilling in progress...')
+        # TODO: Implement drilling logic
+
+    def on_enter_finished(self):
+        """Entry handler for finished state."""
+        self.get_logger().info('Mission complete!')
+        # TODO: Implement cleanup/finish logic
+
+    # ============================================================================
+    # ROS CALLBACK METHODS
+    # ============================================================================
+
+    def parameter_change_callback(self, params):
+        """Handle parameter changes."""
+        for param in params:
+            if param.name == 'selected_bones':
+                self.update_bones(param.value)
+        return SetParametersResult(successful=True)
+
+    def hard_reset_callback(self, msg):
+        """Reset the state machine to initial state."""
+        self.get_logger().warn('Hard reset triggered - returning to start state')
+        self.to_start()
+
     def ui_trigger_callback(self, msg):
-        """Handle UI trigger to start segmentation process."""
-        self.get_logger().info(f'UI trigger received in state: {self.state}')
-        
-        if self.state == 'await_surgeon_input':
-            self.trigger('annotate')
         """Handle UI trigger to start segmentation process."""
         self.get_logger().info(f'UI trigger received in state: {self.state}')
         
@@ -186,23 +232,40 @@ class ParaSightHost(Node):
     # ============================================================================
 
     def rgb_image_callback(self, msg):
-        """Callback for RGB image data."""
+        """Callback for RGB image data - FULLY IMPLEMENTED."""
         rgb_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
         rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
         self.last_rgb_image = rgb_image
 
     def depth_image_callback(self, msg):
-        """Callback for depth image data."""
+        """Callback for depth image data - FULLY IMPLEMENTED."""
         depth_image = self.bridge.imgmsg_to_cv2(msg, "16UC1") / 1000.0
         self.last_depth_image = depth_image
     
     def pcd_callback(self, msg):
-        """Callback for point cloud data."""
+        """Callback for point cloud data - FULLY IMPLEMENTED."""
         cloud = from_msg(msg)
         self.last_cloud = cloud
 
+    # ============================================================================
+    # UTILITY METHODS
+    # ============================================================================
+
+    def update_bones(self, selected_bones):
+        """Update self.bones based on the /selected_bones parameter - FULLY IMPLEMENTED."""
+        if selected_bones == 'femur':
+            self.bones = ['femur']
+        elif selected_bones == 'tibia':
+            self.bones = ['tibia']
+        elif selected_bones == 'both':
+            self.bones = ['femur', 'tibia']
+        else:
+            self.get_logger().warn(f"Unknown /selected_bones value: {selected_bones}, defaulting to empty list")
+            self.bones = []
+        self.get_logger().info(f"Updated bones to: {self.bones}")
+
     def add_depth(self, points):
-        """Add depth information to 2D points."""
+        """Add depth information to 2D points - FULLY IMPLEMENTED."""
         new_points = []
         for point in points:
             x, y = point
@@ -210,9 +273,8 @@ class ParaSightHost(Node):
             new_points.append([x, y, depth])
         return new_points
     
-    
     def pose_direction(self, annotated_points):
-        """Dynamically compute theta based on bone positions."""
+        """Dynamically compute theta based on bone positions - FULLY IMPLEMENTED."""
         femur_point_x = annotated_points[0][0]
         tibia_point_x = annotated_points[1][0]
         if femur_point_x > tibia_point_x:
@@ -220,9 +282,12 @@ class ParaSightHost(Node):
         else:
             return -np.pi
 
+    # ============================================================================
+    # REGISTRATION AND PUBLISHING METHODS
+    # ============================================================================
 
     def register_and_publish(self, points):
-        """Segment, register, and publish bone point clouds and drill poses."""
+        """Segment, register, and publish bone point clouds and drill poses - FULLY IMPLEMENTED."""
         masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
             self.last_rgb_image, points[0], points[1], self.bones
         )
@@ -231,7 +296,6 @@ class ParaSightHost(Node):
         annotated_points = self.add_depth(annotated_points)
         registered_clouds = []
         transforms = {}
-        
         
         for i, bone in enumerate(self.bones):
             t0 = time.time()
@@ -260,7 +324,7 @@ class ParaSightHost(Node):
         self.pose_array_publisher.publish(drill_pose_array)
 
     def publish_point_cloud(self, clouds):
-        """Combine and publish point clouds."""
+        """Combine and publish point clouds - FULLY IMPLEMENTED."""
         print(f"How many clouds are there: {len(clouds)}")
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
@@ -270,7 +334,7 @@ class ParaSightHost(Node):
         self.pcd_publisher.publish(cloud_msg)
 
     def compute_plan(self, transforms, theta=-np.pi/2):
-        """Compute surgical drill points by transforming plan points with registration transforms."""
+        """Compute surgical drill points by transforming plan points with registration transforms - FULLY IMPLEMENTED."""
         drill_pose_array = PoseArray()
 
         parts = load_plan_points(self.plan_path, self.plan)
@@ -332,11 +396,15 @@ class ParaSightHost(Node):
                 self.get_logger().info(f"Bone: {bone} | hole: {hole_name} | Pose: {pose}")
                 drill_pose_array.poses.append(pose)
         
-        
         return drill_pose_array
 
 
+# ============================================================================
+# MAIN ENTRY POINT
+# ============================================================================
+
 def main(args=None):
+    """Main entry point for the ParaSight host node."""
     rclpy.init(args=args)
     node = ParaSightHost()
     
