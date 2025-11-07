@@ -14,8 +14,9 @@ struct ContentView: View {
     @Environment(\.openImmersiveSpace) var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
-    @State private var tcpClient: TCPClient?
-    @State private var serverIPInput = "192.168.0.193"
+    // ISSUE #3: Use @StateObject with immediate initialization (like SVD_ROS_Comms)
+    // ISSUE #2: Hardcode IP directly in initialization (no appModel override)
+    @StateObject private var tcpClient = ArucoTCPClient(host: "192.168.0.193", port: 5000)
     
     var body: some View {
         VStack(spacing: 20) {
@@ -30,39 +31,35 @@ struct ContentView: View {
                 Text("ROS Server Connection")
                     .font(.headline)
                 
+                // ISSUE #4: Display static IP/Port (removed TextField)
                 HStack {
-                    Text("IP Address:")
-                    TextField("192.168.0.193", text: $serverIPInput)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 200)
-                        .disabled(true)  // Static IP, not editable
-                }
-                
-                HStack {
-                    Text("Port:")
-                    Text("5000")
+                    Text("Server:")
+                    Text("192.168.0.193:5000")
                         .foregroundColor(.secondary)
+                        .fontWeight(.medium)
                 }
                 
                 Button(action: {
-                    if appModel.isConnected {
-                        disconnectFromServer()
+                    if tcpClient.isConnected {
+                        tcpClient.disconnect()
+                        appModel.isConnected = false
+                        appModel.drillSites = []
                     } else {
-                        connectToServer()
+                        tcpClient.connect()
                     }
                 }) {
                     HStack {
-                        Image(systemName: appModel.isConnected ? "wifi.circle.fill" : "wifi.slash")
-                        Text(appModel.isConnected ? "Disconnect" : "Connect")
+                        Image(systemName: tcpClient.isConnected ? "wifi.circle.fill" : "wifi.slash")
+                        Text(tcpClient.isConnected ? "Disconnect" : "Connect")
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(appModel.isConnected ? .red : .blue)
+                .tint(tcpClient.isConnected ? .red : .blue)
                 
-                Text(appModel.connectionStatus)
+                Text(tcpClient.statusMessage)
                     .font(.caption)
-                    .foregroundColor(appModel.isConnected ? .green : .secondary)
+                    .foregroundColor(tcpClient.statusColor)
             }
             .padding()
             .background(Color.secondary.opacity(0.1))
@@ -75,7 +72,7 @@ struct ContentView: View {
                 Text("Drill Site Visualization")
                     .font(.headline)
                 
-                if !appModel.isConnected {
+                if !tcpClient.isConnected {
                     Text("Please connect to ROS server first")
                         .foregroundColor(.secondary)
                         .font(.caption)
@@ -100,7 +97,7 @@ struct ContentView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(appModel.isTransformEnabled ? .orange : .green)
-                .disabled(!appModel.isConnected)
+                .disabled(!tcpClient.isConnected)
                 
                 if appModel.immersiveSpaceState == .open {
                     if appModel.arucoTransformEstablished {
@@ -136,7 +133,7 @@ struct ContentView: View {
             
             // Status footer
             VStack(spacing: 5) {
-                if appModel.isConnected && appModel.isTransformEnabled {
+                if tcpClient.isConnected && appModel.isTransformEnabled {
                     Text("System Active")
                         .font(.caption)
                         .foregroundColor(.green)
@@ -150,29 +147,12 @@ struct ContentView: View {
         .padding(30)
         .frame(width: 400, height: 550)
         .onAppear {
-            serverIPInput = appModel.serverIP
+            // Setup drill pose callback
+            tcpClient.onDrillPosesReceived = { drillSites in
+                appModel.drillSites = drillSites
+                appModel.isConnected = true
+            }
         }
-    }
-    
-    private func connectToServer() {
-        appModel.serverIP = serverIPInput
-        tcpClient = TCPClient(host: appModel.serverIP, port: appModel.serverPort)
-        tcpClient?.onDrillPosesReceived = { drillSites in
-            appModel.drillSites = drillSites
-        }
-        tcpClient?.onConnectionStateChanged = { isConnected, status in
-            appModel.isConnected = isConnected
-            appModel.connectionStatus = status
-        }
-        tcpClient?.connect()
-    }
-    
-    private func disconnectFromServer() {
-        tcpClient?.disconnect()
-        tcpClient = nil
-        appModel.isConnected = false
-        appModel.connectionStatus = "Disconnected"
-        appModel.drillSites = []
     }
 }
 
