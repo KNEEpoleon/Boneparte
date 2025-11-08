@@ -12,6 +12,7 @@
 class PoseSubscriberNode : public rclcpp::Node {
 private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr drill_command_publisher_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr manipulator_command_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pin_drilled_publisher_;
   std::string robot_name_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
@@ -44,6 +45,7 @@ public:
         "/registration", 10,
         std::bind(&PoseSubscriberNode::registration_callback, this, std::placeholders::_1));
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
+    manipulator_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/manipulator_command", 10);
     pin_drilled_publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/pin_drilled", 10);
     select_pose_service_ = this->create_service<surgical_robot_planner::srv::SelectPose>("/select_pose",
       std::bind(&PoseSubscriberNode::select_pose_callback, this, std::placeholders::_1, std::placeholders::_2));
@@ -166,7 +168,10 @@ public:
         // Notify obstacle manager that a pin was drilled
         pin_drilled_publisher_->publish(target_pose);
         RCLCPP_INFO(this->get_logger(), "Published drilled pin pose to /pin_drilled.");
-        return_to_home_pose();
+        // Return to home, then move to away
+        if (return_to_home_pose()) {
+          move_to_away_pose();
+        }
       } else {
         RCLCPP_ERROR(this->get_logger(), "Drilling motion execution failed with error code: %d", execution_result.val);
         return_to_home_pose();
@@ -201,24 +206,39 @@ public:
     }
   }
 
-  void return_to_home_pose() {
-    RCLCPP_INFO(this->get_logger(), "Attempting to return to home pose due to error...");
+  bool return_to_home_pose() {
+    RCLCPP_INFO(this->get_logger(), "Moving to home pose...");
     
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setNamedTarget("Boneparte_home");  // target from SRDF
     move_group_interface_->setPlannerId("PTP");
     move_group_interface_->setMaxVelocityScalingFactor(1);
 
-        
     moveit::planning_interface::MoveGroupInterface::Plan home_plan;
     auto plan_result = move_group_interface_->plan(home_plan);
     if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
-      RCLCPP_INFO(this->get_logger(), "Moving to home pose for recovery...");
-      move_group_interface_->execute(home_plan);
+      RCLCPP_INFO(this->get_logger(), "Planning successful. Executing movement to home pose...");
+      auto execution_result = move_group_interface_->execute(home_plan);
+      if (execution_result == moveit::core::MoveItErrorCode::SUCCESS) {
+        RCLCPP_INFO(this->get_logger(), "Successfully moved to home pose.");
+        return true;
+      } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to execute movement to home pose with error code: %d", execution_result.val);
+        return false;
+      }
     } else {
       RCLCPP_ERROR(this->get_logger(), "CRITICAL: Failed to plan return to home pose with error code: %d", plan_result.val);
       RCLCPP_ERROR(this->get_logger(), "Manual recovery may be required.");
+      return false;
     }
+  }
+
+  void move_to_away_pose() {
+    RCLCPP_INFO(this->get_logger(), "Commanding manipulator to move to away pose...");
+    auto away_msg = std_msgs::msg::String();
+    away_msg.data = "go_away";
+    manipulator_command_publisher_->publish(away_msg);
+    RCLCPP_INFO(this->get_logger(), "Published 'go_away' command to /manipulator_command.");
   }
 };
 
