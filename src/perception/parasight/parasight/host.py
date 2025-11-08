@@ -78,18 +78,36 @@ class ParaSightHost(Node):
         self.camera_link_frame = 'camera_link'
         self.camera_frame = 'camera_depth_optical_frame'
 
-        # Trigger Subscribers
+        # Trigger Subscribers (for state transitions)
         self.ui_trigger_subscription = self.create_subscription(
             Empty,
             '/trigger_host_ui',
             self.ui_trigger_callback,
             10)
         
-        
         self.hard_reset_subscription = self.create_subscription(
             Empty,
             '/hard_reset_host',
             self.hard_reset_callback,
+            10)
+        
+        # Surgeon command subscribers (for await_surgeon_input state)
+        self.proceed_mission_subscription = self.create_subscription(
+            Empty,
+            '/proceed_mission',
+            self.proceed_mission_callback,
+            10)
+        
+        self.annotate_subscription = self.create_subscription(
+            Empty,
+            '/annotate',
+            self.annotate_callback,
+            10)
+        
+        self.complete_mission_subscription = self.create_subscription(
+            Empty,
+            '/complete_mission',
+            self.complete_mission_callback,
             10)
         
         # Data Subscribers
@@ -112,7 +130,8 @@ class ParaSightHost(Node):
         # Publishers
         self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
-        self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
+        self.bone_centroid_publisher = self.create_publisher(PoseStamped, '/bone_centroid_camera_frame', 10)
+        # self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
         # Parameters
         self.declare_parameter('selected_bones', 'both')
@@ -152,9 +171,20 @@ class ParaSightHost(Node):
         # TODO: Implement startup logic
 
     def on_enter_await_surgeon_input(self):
-        """Entry handler for await_surgeon_input state."""
-        self.get_logger().info('Awaiting surgeon input...')
-        # TODO: Implement await logic
+        """Entry handler for await_surgeon_input state - FULLY IMPLEMENTED.
+        
+        This state waits for surgeon commands via the following topics:
+        - /proceed_mission → brings manipulator to position
+        - /annotate → starts bone segmentation and registration
+        - /complete_mission → finishes the surgery workflow
+        """
+        self.get_logger().info('═══ Awaiting surgeon input ═══')
+        self.get_logger().info('Listening for commands on:')
+        self.get_logger().info('  - /proceed_mission (bring manipulator)')
+        self.get_logger().info('  - /annotate (segment & register)')
+        self.get_logger().info('  - /complete_mission (finish surgery)')
+        self.get_logger().info('  - /hard_reset_host (reset system)')
+        # Note: All transitions are handled by ROS callbacks in the ROS CALLBACK METHODS section
 
     def on_enter_bring_manipulator(self):
         """Entry handler for bring_manipulator state."""
@@ -226,6 +256,36 @@ class ParaSightHost(Node):
             self.trigger('annotate')
         else:
             self.get_logger().warn(f'UI trigger received but not in await_surgeon_input state (current: {self.state})')
+
+    def proceed_mission_callback(self, msg):
+        """Handle proceed_mission command - transitions to bring_manipulator."""
+        self.get_logger().info(f'Proceed mission command received in state: {self.state}')
+        
+        if self.state == 'await_surgeon_input':
+            self.get_logger().info('Triggering proceed_mission transition...')
+            self.trigger('proceed_mission')
+        else:
+            self.get_logger().warn(f'Proceed mission command received but not in await_surgeon_input state (current: {self.state})')
+
+    def annotate_callback(self, msg):
+        """Handle annotate command - transitions to segment_and_register."""
+        self.get_logger().info(f'Annotate command received in state: {self.state}')
+        
+        if self.state == 'await_surgeon_input':
+            self.get_logger().info('Triggering annotate transition...')
+            self.trigger('annotate')
+        else:
+            self.get_logger().warn(f'Annotate command received but not in await_surgeon_input state (current: {self.state})')
+
+    def complete_mission_callback(self, msg):
+        """Handle complete_mission command - transitions to finished."""
+        self.get_logger().info(f'Complete mission command received in state: {self.state}')
+        
+        if self.state == 'await_surgeon_input':
+            self.get_logger().info('Triggering complete_mission transition...')
+            self.trigger('complete_mission')
+        else:
+            self.get_logger().warn(f'Complete mission command received but not in await_surgeon_input state (current: {self.state})')
 
     # ============================================================================
     # DATA CALLBACK METHODS
