@@ -81,8 +81,28 @@ private:
                 msg->x, msg->y, msg->z);
     
     try {
-      // Get current end-effector pose in base frame
-      geometry_msgs::msg::PoseStamped current_ee_pose = move_group_interface_->getCurrentPose(robot_name_ + "_link_ee");
+      // Get current end-effector pose in base frame using TF
+      geometry_msgs::msg::TransformStamped ee_transform;
+      std::string ee_link = move_group_interface_->getEndEffectorLink();
+      
+      try {
+        ee_transform = tf_buffer_->lookupTransform(
+            base_frame_, ee_link,
+            rclcpp::Time(0), 
+            rclcpp::Duration::from_seconds(1.0));
+      } catch (const tf2::TransformException &ex) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to get current end-effector pose: %s", ex.what());
+        publish_error("TF lookup failed for end-effector");
+        return;
+      }
+      
+      // Convert TransformStamped to PoseStamped
+      geometry_msgs::msg::PoseStamped current_ee_pose;
+      current_ee_pose.header = ee_transform.header;
+      current_ee_pose.pose.position.x = ee_transform.transform.translation.x;
+      current_ee_pose.pose.position.y = ee_transform.transform.translation.y;
+      current_ee_pose.pose.position.z = ee_transform.transform.translation.z;
+      current_ee_pose.pose.orientation = ee_transform.transform.rotation;
       
       // Get transform from camera frame to base frame
       geometry_msgs::msg::TransformStamped camera_to_base;
@@ -130,7 +150,7 @@ private:
       // Plan and execute movement
       move_group_interface_->setStartStateToCurrentState();
       move_group_interface_->setPoseTarget(target_pose, robot_name_ + "_link_ee");
-      move_group_interface_->setPlannerId("LIN");
+      move_group_interface_->setPlannerId("PTP");  // Use PTP instead of LIN for more flexibility
       move_group_interface_->setMaxVelocityScalingFactor(0.5);
 
       moveit::planning_interface::MoveGroupInterface::Plan recovery_plan;
@@ -149,8 +169,12 @@ private:
           publish_error("execution_failed");
         }
       } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to plan error recovery movement with error code: %d", 
-                     plan_result.val);
+        RCLCPP_ERROR(this->get_logger(), "Failed to plan error recovery movement with error code: %d (%s)", 
+                     plan_result.val, 
+                     plan_result.val == -31 ? "NO_IK_SOLUTION - Target pose may be out of reach or in collision" : "");
+        RCLCPP_ERROR(this->get_logger(), "Failed target pose: position=[%.4f, %.4f, %.4f], orientation=[%.4f, %.4f, %.4f, %.4f]",
+                     target_pose.position.x, target_pose.position.y, target_pose.position.z,
+                     target_pose.orientation.x, target_pose.orientation.y, target_pose.orientation.z, target_pose.orientation.w);
         publish_error("planning_failed");
       }
       
@@ -191,7 +215,8 @@ private:
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setNamedTarget("Boneparte_away");
     move_group_interface_->setPlannerId("PTP");
-    move_group_interface_->setMaxVelocityScalingFactor(1.0);
+    move_group_interface_->setMaxVelocityScalingFactor(0.5);
+    move_group_interface_->setMaxAccelerationScalingFactor(0.2);
 
     moveit::planning_interface::MoveGroupInterface::Plan away_plan;
     auto plan_result = move_group_interface_->plan(away_plan);
