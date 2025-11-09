@@ -78,6 +78,7 @@ class ArucoTCPClient: ObservableObject {
     }
     
     func disconnect() {
+        print("🔴 Disconnecting from TCP server")
         connection?.cancel()
         connection = nil
         DispatchQueue.main.async {
@@ -108,10 +109,12 @@ class ArucoTCPClient: ObservableObject {
             if isComplete {
                 print("🔌 Connection closed by server")
                 DispatchQueue.main.async {
-                    self?.statusMessage = "Server closed connection"
+                    self?.statusMessage = "Disconnected"
                     self?.statusColor = .red
                     self?.isConnected = false
                 }
+                self?.connection?.cancel()
+                self?.connection = nil
             } else if error == nil {
                 // Continue receiving
                 self?.receive()

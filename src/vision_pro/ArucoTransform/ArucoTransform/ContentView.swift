@@ -16,7 +16,7 @@ struct ContentView: View {
     
     // ISSUE #3: Use @StateObject with immediate initialization (like SVD_ROS_Comms)
     // ISSUE #2: Hardcode IP directly in initialization (no appModel override)
-    @StateObject private var tcpClient = ArucoTCPClient(host: "192.168.0.193", port: 5000)
+    @StateObject private var tcpClient = ArucoTCPClient(host: "192.168.0.193", port: 5000)  // ROS2 PC server
     
     var body: some View {
         VStack(spacing: 20) {
@@ -82,22 +82,26 @@ struct ContentView: View {
                     Task {
                         if appModel.immersiveSpaceState == .open {
                             await dismissImmersiveSpace()
+                            appModel.immersiveSpaceState = .closed
                             appModel.isTransformEnabled = false
+                            appModel.arucoTransformEstablished = false
                         } else {
+                            appModel.immersiveSpaceState = .inTransition
                             await openImmersiveSpace(id: appModel.immersiveSpaceID)
+                            appModel.immersiveSpaceState = .open
                             appModel.isTransformEnabled = true
                         }
                     }
                 }) {
                     HStack {
-                        Image(systemName: appModel.isTransformEnabled ? "eye.fill" : "eye.slash")
-                        Text(appModel.isTransformEnabled ? "Hide Drill Sites" : "Show Drill Sites")
+                        Image(systemName: appModel.immersiveSpaceState == .open ? "eye.fill" : "eye.slash")
+                        Text(appModel.immersiveSpaceState == .open ? "Hide Drill Sites" : "Show Drill Sites")
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(appModel.isTransformEnabled ? .orange : .green)
-                .disabled(!tcpClient.isConnected)
+                .tint(appModel.immersiveSpaceState == .open ? .orange : .green)
+                .disabled(!tcpClient.isConnected || appModel.immersiveSpaceState == .inTransition)
                 
                 if appModel.immersiveSpaceState == .open {
                     if appModel.arucoTransformEstablished {
@@ -148,7 +152,7 @@ struct ContentView: View {
         .frame(width: 400, height: 550)
         .onAppear {
             // Setup drill pose callback
-            tcpClient.onDrillPosesReceived = { drillSites in
+            tcpClient.onDrillPosesReceived = { (drillSites: [DrillSite]) in
                 appModel.drillSites = drillSites
                 appModel.isConnected = true
             }
