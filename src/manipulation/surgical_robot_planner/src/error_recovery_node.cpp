@@ -29,11 +29,9 @@ public:
     robot_name_ = this->get_parameter("robot_name").as_string();
     camera_frame_ = this->get_parameter("camera_frame").as_string();
     base_frame_ = this->get_parameter("base_frame").as_string();
-    
-    initialize();
   }
 
-private:
+public:
   void initialize() {
     // Initialize TF buffer and listener (for error recovery)
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
@@ -62,6 +60,8 @@ private:
     RCLCPP_INFO(this->get_logger(), "ErrorRecoveryNode initialized for robot: %s", robot_name_.c_str());
     RCLCPP_INFO(this->get_logger(), "Camera frame: %s, Base frame: %s", camera_frame_.c_str(), base_frame_.c_str());
   }
+
+private:
 
   void command_callback(const std_msgs::msg::String::SharedPtr msg) {
     std::string command = msg->data;
@@ -220,6 +220,7 @@ private:
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<ErrorRecoveryNode>();
+  node->initialize();  // Initialize after shared_ptr is created
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;
