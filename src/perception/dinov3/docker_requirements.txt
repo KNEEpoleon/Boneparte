@@ -1,0 +1,60 @@
+# Docker Requirements for DINOv3 Bone Segmentation
+
+## Base Image
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+
+## System Dependencies
+apt-get update && apt-get install -y \
+    git \
+    wget \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1
+
+## Python Dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.23.0
+scipy>=1.10.0
+scikit-learn>=1.2.0
+Pillow>=9.0.0
+matplotlib>=3.5.0
+
+## Additional Files Needed in Container
+# 1. Copy DINOv3 repository to container
+COPY dinov3/ /workspace/dinov3/
+
+# 2. Copy checkpoint file
+COPY checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth /workspace/checkpoints/
+
+# 3. Copy your script
+COPY run_bone_segmentation.py /workspace/
+
+## Example Dockerfile Structure
+"""
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+
+RUN apt-get update && apt-get install -y \
+    git wget libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+WORKDIR /workspace
+COPY dinov3/ /workspace/dinov3/
+COPY checkpoints/ /workspace/checkpoints/
+COPY run_bone_segmentation.py /workspace/
+
+ENV PYTHONPATH=/workspace:$PYTHONPATH
+"""
+
+## Example Docker Run Command
+# docker run --gpus all -v /path/to/images:/data myimage \
+#   python run_bone_segmentation.py \
+#   --checkpoint-path /workspace/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth \
+#   --image-path /data/bone_image.png \
+#   --output-dir /data/output
+
