@@ -14,7 +14,7 @@ from rclpy.node import Node
 import tf2_ros
 from tf2_ros import TransformException
 
-from geometry_msgs.msg import PoseArray, PoseStamped
+from geometry_msgs.msg import PoseArray, Pose
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 
@@ -85,7 +85,7 @@ class ArucoDrillPosePublisher(Node):
                 transformed_ori = rotation * ori
                 
                 # Create transformed pose
-                transformed_pose = PoseStamped().pose
+                transformed_pose = Pose()
                 transformed_pose.position.x = transformed_pos[0]
                 transformed_pose.position.y = transformed_pos[1]
                 transformed_pose.position.z = transformed_pos[2]
