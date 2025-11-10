@@ -105,6 +105,10 @@ RUN apt-get install -y libgl1-mesa-glx libxrender1 libxext6 libxtst6
 COPY src/perception/segment-anything-2/ /ros_ws/src/perception/segment-anything-2/
 RUN cd /ros_ws/src/perception/segment-anything-2 && pip install -e ".[demo]"
 
+# Copy and install DINOv3
+COPY src/perception/dinov3/ /ros_ws/src/perception/dinov3/
+RUN cd /ros_ws/src/perception/dinov3 && pip install -e .
+
 # Copy the source code for CoTracker
 # COPY src/perception/co-tracker/ /ros_ws/src/perception/co-tracker/
 # RUN cd /ros_ws/src/perception/co-tracker && pip install -e .

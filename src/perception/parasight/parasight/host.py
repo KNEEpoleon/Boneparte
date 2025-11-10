@@ -6,8 +6,8 @@ from cv_bridge import CvBridge
 from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import Image, PointCloud2
-from geometry_msgs.msg import PoseArray, Point, Pose, PoseStamped, PointStamped
-from std_msgs.msg import Empty
+from geometry_msgs.msg import PoseArray, Point, Pose, PoseStamped, PointStamped, Vector3
+from std_msgs.msg import Empty, String
 from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
@@ -15,10 +15,14 @@ from tf2_geometry_msgs import do_transform_pose, do_transform_point
 from std_msgs.msg import Int32
 from transitions import Machine
 import open3d as o3d
+import os
+
 
 from parasight.segment_ui import SegmentAnythingUI
 from parasight.registration import RegistrationPipeline
+from parasight.dino_bone_extract import DINOBoneExtractor
 from parasight.utils import *
+
 
 import time
 
@@ -42,6 +46,7 @@ class ParaSightHost(Node):
                                after_state_change='after_state_change')
         
         # Add state transitions
+        self.machine.add_transition(trigger='initialize', source='start', dest='await_surgeon_input')
         self.machine.add_transition(trigger='proceed_mission', source='await_surgeon_input', dest='bring_manipulator')
         self.machine.add_transition(trigger='complete_bring_manipulator', source='bring_manipulator', dest='auto_reposition')
         self.machine.add_transition(trigger='complete_auto_reposition', source='auto_reposition', dest='await_surgeon_input')
@@ -49,7 +54,7 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='update_rviz')
         self.machine.add_transition(trigger='complete_map_update', source='update_rviz', dest='ready_to_drill')
         self.machine.add_transition(trigger='reset_mission', source='ready_to_drill', dest='await_surgeon_input')
-        self.machine.add_transition(trigger='received_mission_pin', source='ready_to_drill', dest='drill')
+        self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
         self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
         
@@ -110,6 +115,18 @@ class ParaSightHost(Node):
             self.complete_mission_callback,
             10)
         
+        self.reset_mission_subscription = self.create_subscription(
+            Empty,
+            '/reset_mission',
+            self.reset_mission_callback,
+            10)
+        
+        self.start_drill_subscription = self.create_subscription(
+            Empty,
+            '/start_drill',
+            self.start_drill_callback,
+            10)
+        
         # Data Subscribers
         self.rgb_image_subscription = self.create_subscription(
             Image,
@@ -131,6 +148,8 @@ class ParaSightHost(Node):
         self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.bone_centroid_publisher = self.create_publisher(PoseStamped, '/bone_centroid_camera_frame', 10)
+        self.manipulator_command_publisher = self.create_publisher(String, '/manipulator_command', 10)
+        self.reposition_vector_publisher = self.create_publisher(Vector3, '/error_recovery_direction', 10)
         # self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
         # Parameters
@@ -152,6 +171,16 @@ class ParaSightHost(Node):
         self.segmentation_ui = SegmentAnythingUI()
         print(f"Made the SAM object")
         self.bridge = CvBridge()
+        
+        checkpoint_path = "/ros_ws/src/perception/dinov3/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
+        output_dir = "/ros_ws/src/perception/dinov3/testing_boneparte_integration"
+        dinov3_path = "/ros_ws/src/perception/dinov3"
+        codebook_path = "/ros_ws/src/perception/dinov3/bone_codebook.pkl"
+        self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, output_home=output_dir)
+    
+
+        # Initialize state machine after everything is set up
+        self.initialize()
 
     # ============================================================================
     # STATE MACHINE CALLBACKS
@@ -165,10 +194,10 @@ class ParaSightHost(Node):
     # STATE ENTRY/EXIT CALLBACKS
     # ============================================================================
 
-    def on_enter_start(self):
-        """Entry handler for start state."""
-        self.get_logger().info('System starting up...')
-        # TODO: Implement startup logic
+    # def on_enter_start(self):
+    #     """Entry handler for start state."""
+    #     self.get_logger().info('System starting up...')
+    #     # Note: Transition to await_surgeon_input happens automatically in __init__
 
     def on_enter_await_surgeon_input(self):
         """Entry handler for await_surgeon_input state - FULLY IMPLEMENTED.
@@ -179,22 +208,42 @@ class ParaSightHost(Node):
         - /complete_mission → finishes the surgery workflow
         """
         self.get_logger().info('═══ Awaiting surgeon input ═══')
-        self.get_logger().info('Listening for commands on:')
-        self.get_logger().info('  - /proceed_mission (bring manipulator)')
-        self.get_logger().info('  - /annotate (segment & register)')
-        self.get_logger().info('  - /complete_mission (finish surgery)')
-        self.get_logger().info('  - /hard_reset_host (reset system)')
         # Note: All transitions are handled by ROS callbacks in the ROS CALLBACK METHODS section
 
     def on_enter_bring_manipulator(self):
         """Entry handler for bring_manipulator state."""
         self.get_logger().info('Bringing manipulator to position...')
         # TODO: Implement manipulator positioning logic
+        # For now, auto-complete for testing
+        # self.get_logger().info('Auto-completing bring_manipulator (not implemented yet)')
+        msg = String()
+        msg.data = 'bring_home'
+        self.manipulator_command_publisher.publish(msg)
+        
+        self.complete_bring_manipulator()
 
     def on_enter_auto_reposition(self):
         """Entry handler for auto_reposition state."""
         self.get_logger().info('Auto-repositioning...')
         # TODO: Implement auto-reposition logic
+        # For now, auto-complete for testing
+        if self.last_rgb_image is not None:
+            os.makedirs("/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration", exist_ok=True)
+            cv2.imwrite("/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration/rgb_frame.png", 
+                        self.last_rgb_image)
+
+        detected_bone_msg = self.bone_extractor.get_centroid("/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration/rgb_frame.png")
+        centroid = detected_bone_msg['centroid']
+        displacement_vector = detected_bone_msg['distance_from_center_px']
+        self.get_logger().info(f"Centroid: {centroid}")
+        self.get_logger().info(f"Displacement vector: {displacement_vector}")
+        msg = Vector3()
+        msg.x = 0.1#displacement_vector[0]
+        msg.y = 0.1#displacement_vector[1]
+        msg.z = 0.1#displacement_vector[2]
+        self.reposition_vector_publisher.publish(msg)
+
+        self.complete_auto_reposition()
 
     def on_enter_segment_and_register(self):
         """Entry handler for segment_and_register state - FULLY IMPLEMENTED."""
@@ -216,16 +265,21 @@ class ParaSightHost(Node):
         """Entry handler for update_rviz state."""
         self.get_logger().info('Updating RViz visualization...')
         # TODO: Implement RViz update logic
+        # For now, auto-complete for testing
+        self.get_logger().info('Auto-completing update_rviz (not implemented yet)')
+        self.complete_map_update()
 
     def on_enter_ready_to_drill(self):
         """Entry handler for ready_to_drill state."""
         self.get_logger().info('Ready to drill - awaiting mission pin...')
-        # TODO: Implement ready_to_drill logic
 
     def on_enter_drill(self):
         """Entry handler for drill state."""
         self.get_logger().info('Drilling in progress...')
         # TODO: Implement drilling logic
+        # For now, auto-complete for testing
+        self.get_logger().info('Auto-completing drill (not implemented yet)')
+        self.complete_drill()
 
     def on_enter_finished(self):
         """Entry handler for finished state."""
@@ -286,6 +340,26 @@ class ParaSightHost(Node):
             self.trigger('complete_mission')
         else:
             self.get_logger().warn(f'Complete mission command received but not in await_surgeon_input state (current: {self.state})')
+
+    def reset_mission_callback(self, msg):
+        """Handle reset_mission command - transitions from ready_to_drill to await_surgeon_input."""
+        self.get_logger().info(f'Reset mission command received in state: {self.state}')
+        
+        if self.state == 'ready_to_drill':
+            self.get_logger().info('Triggering reset_mission transition...')
+            self.trigger('reset_mission')
+        else:
+            self.get_logger().warn(f'Reset mission command received but not in ready_to_drill state (current: {self.state})')
+
+    def start_drill_callback(self, msg):
+        """Handle start_drill command - transitions from ready_to_drill to drill."""
+        self.get_logger().info(f'Start drill command received in state: {self.state}')
+        
+        if self.state == 'ready_to_drill':
+            self.get_logger().info('Triggering start_drill transition...')
+            self.trigger('start_drill')
+        else:
+            self.get_logger().warn(f'Start drill command received but not in ready_to_drill state (current: {self.state})')
 
     # ============================================================================
     # DATA CALLBACK METHODS
@@ -382,6 +456,7 @@ class ParaSightHost(Node):
         drill_pose_array.header.frame_id = self.camera_frame
         drill_pose_array.header.stamp = self.get_clock().now().to_msg()
         self.pose_array_publisher.publish(drill_pose_array)
+
 
     def publish_point_cloud(self, clouds):
         """Combine and publish point clouds - FULLY IMPLEMENTED."""

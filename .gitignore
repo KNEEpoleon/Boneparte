@@ -3,3 +3,5 @@ log/
 install/
 .vscode/
 __pycache__/
+src/perception/dinov3/testing_boneparte_integration/
+src/perception/dinov3/checkpoints/

@@ -7,6 +7,8 @@ def test_dino_bone_extract():
     dinov3_path = "/home/kneepolean/sreeharsha/dinov3"
     codebook_path = "/home/kneepolean/sreeharsha/bone_data/bone_codebook.pkl"
     extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, output_home=output_dir)
+    
+    
     centroid = extractor.get_centroid(image_path)
     print(centroid)
 
