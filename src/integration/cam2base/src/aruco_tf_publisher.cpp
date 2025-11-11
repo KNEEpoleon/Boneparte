@@ -27,18 +27,19 @@ private:
     transform.header.frame_id = "lbr_link_0";
     transform.child_frame_id = "aruco_marker";
 
-    // Calibrated transform from ArUco calibration node
-    // Translation
-    transform.transform.translation.x = -0.007416;
-    transform.transform.translation.y = 0.509019;
-    transform.transform.translation.z = 0.363366;
+    // transform.transform.translation.x = 0.563;   // 56.3 cm
+    // transform.transform.translation.y = 0.460;   // 46.0 cm
+    // transform.transform.translation.z = -0.088;  // -8.8 cm
 
-    // Rotation (quaternion)
+    transform.transform.translation.x = -0.088;   // 56.3 cm
+    transform.transform.translation.y = 0.460;   // 46.0 cm
+    transform.transform.translation.z = 0.563;  // -8.8 cm
+
     tf2::Quaternion q;
-    q.setX(0.786208);
-    q.setY(-0.252765);
-    q.setZ(-0.556702);
-    q.setW(0.089835);
+    q.setX(-0.500000);
+    q.setY(0.500000);
+    q.setZ(0.500000);
+    q.setW(-0.500000);
     
     transform.transform.rotation.x = q.x();
     transform.transform.rotation.y = q.y();

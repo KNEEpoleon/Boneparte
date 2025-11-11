@@ -3,3 +3,5 @@ log/
 install/
 .vscode/
 __pycache__/
+src/perception/dinov3/
+src/test_aruco_axes.py
