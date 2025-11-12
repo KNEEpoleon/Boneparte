@@ -209,6 +209,9 @@ class TcpServerNode(Node):
             self.annotations_pub.publish(annotations_msg)
             self.get_logger().info('Published AVP annotations to ParaSight host')
             
+            # NOTE(parth) calling another annotation window before annotations received from avp
+            time.sleep(0.2)
+            
             # Now trigger the original ParaSight flow
             self.start_pub.publish(Empty())
             self.get_logger().info('Started FSM /trigger_host_ui with AVP annotations')
