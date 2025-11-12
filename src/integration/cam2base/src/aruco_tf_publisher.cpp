@@ -31,15 +31,15 @@ private:
     // transform.transform.translation.y = 0.460;   // 46.0 cm
     // transform.transform.translation.z = -0.088;  // -8.8 cm
 
-    transform.transform.translation.x = -0.088;   // 56.3 cm
-    transform.transform.translation.y = 0.460;   // 46.0 cm
-    transform.transform.translation.z = 0.563;  // -8.8 cm
+    transform.transform.translation.x = -0.085;   
+    transform.transform.translation.y = 0.466;
+    transform.transform.translation.z = 0.603;  
 
     tf2::Quaternion q;
-    q.setX(-0.500000);
-    q.setY(0.500000);
-    q.setZ(0.500000);
-    q.setW(-0.500000);
+    q.setX(-0.707107);
+    q.setY(0.707107);
+    q.setZ(0.0);
+    q.setW(0.0);
     
     transform.transform.rotation.x = q.x();
     transform.transform.rotation.y = q.y();
