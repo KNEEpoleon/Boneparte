@@ -275,7 +275,7 @@ class SegmentAnythingUI:
             self.bones = bones
         self.femur_point = femur_point
         self.tibia_point = tibia_point
-        self.generate_mask(display=True)
+        self.generate_mask(display=False)
         self.mask_generated = True
         result = (self.masks, [femur_point, tibia_point], self.mask_points)
         self.reset()
