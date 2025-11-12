@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# check the p12 p2 p3 vectors, how the normal is computed
 import cv2
 import rclpy
 from cv_bridge import CvBridge
@@ -141,6 +142,9 @@ class ParaSightHost(Node):
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
+        # self.registered_femur = self.create_publisher(PointCloud2, '/processed_femur_camera_frame', 10)
+        # self.registered_tibia = self.create_publisher(PointCloud2, '/processed_tibia_camera_frame', 10)
+
         # Parameters
         self.declare_parameter('selected_bones', 'both')
         self.update_bones(self.get_parameter('selected_bones').value)
@@ -152,7 +156,7 @@ class ParaSightHost(Node):
         tibia_cloud = o3d.io.read_point_cloud(package_dir + "/resource/tibia_shell.ply")
         self.sources = {'femur': femur_cloud, 'tibia': tibia_cloud}
         self.colors = {'femur': [1, 0, 0], 'tibia': [0, 0, 1]}
-        self.plan_path = package_dir + "/resource/plan_config_v2.yaml"
+        self.plan_path = package_dir + "/resource/plan_boneparte.yaml"
         self.plan = "plan1"
 
         # Interfaces
@@ -364,6 +368,7 @@ class ParaSightHost(Node):
 
     def publish_point_cloud(self, clouds):
         # Combine all clouds into one
+        print(f"How many clouds are there: {len(clouds)}")
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
             print(f"\nin host py we have a cloud!")
@@ -387,20 +392,40 @@ class ParaSightHost(Node):
             for hole_name, hole in holes.items():
                 p1, p2, p3 = hole
 
+                '''
                 # Toggle theta between 0 and -π/2 for femur curvature hole
                 curr_theta = theta
                 if bone == 'femur' and hole_name == 'hole3':
                     curr_theta = np.pi if theta == 0 else 0
                 elif bone == 'tibia':
                     curr_theta = theta * -1
+                '''
+
 
                 curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
+                # if bone == 'femur' and hole_name == 'hole3':
+                #     curr_theta = (3*np.pi)/2
+                #     # curr_theta = -np.pi/2
+
+                # if bone == 'femur' and hole_name == 'hole2':
+                #     curr_theta = np.pi
+
+
+                if bone == 'femur' and hole_name == 'hole2':
+                    curr_theta = -np.pi/2
+                elif bone == "femur" and hole_name == 'hole3':
+                    curr_theta = -np.pi/2
+                # elif bone == "tibia" and hole_name == 'hole2':
+                #     curr_theta = np.pi/2
 
                 mesh = o3d.geometry.TriangleMesh()
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
                 mesh.compute_vertex_normals()
                 normal =  np.asarray(mesh.vertex_normals)[0]
+                # if bone == "femur" and (hole_name == "hole2" or hole_name == "hole1") :
+                #     actual_normal = normal
+                # else:
                 actual_normal = -normal
                 z_axis = np.array([0, 0, 1])
                 rotation_axis = np.cross(z_axis, actual_normal)

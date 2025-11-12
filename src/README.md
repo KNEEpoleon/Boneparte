@@ -38,12 +38,12 @@ ros2 service call /select_pose surgical_robot_planner/srv/SelectPose "{index: 0}
 ## TO BUILD THE DOCKER CONTAINER
 > CREATE docker image
 ```bash
-./docker/boneparte build
+./docker/boneparte.sh build
 ```
 
 > BUILD and RUN the docker container from an image
 ```bash
-./docker/boneparte run
+./docker/boneparte.sh run
 ```
 
 > ATTACH a docker shell
