@@ -224,7 +224,7 @@ class DINOBoneExtractor():
             }
             lean_data['clusters'].append(lean_cluster)
         
-        json_path = os.path.join(self.output_dir, "image_clusters_statistics.json")
+        json_path = os.path.join(self.output_dir, "image_features.json")
         with open(json_path, 'w') as f:
             json.dump(lean_data, f, indent=2)
 
@@ -501,29 +501,31 @@ class DINOBoneExtractor():
         
         # Save detected bone
         detected_bone = {
-            'detected_cluster': {
-                'features_raw': {
-                    'median': best_cluster['features_raw']['median'].tolist()
-                },
-                'n_pixels': best_cluster['n_pixels'],
-                'pixel_coords': best_cluster['pixel_coords'].tolist(),
-                'spatial': {
-                    'centroid': best_cluster['spatial']['centroid']
-                }
-            },
+            # 'detected_cluster': {
+            #     'features_raw': {
+            #         'median': best_cluster['features_raw']['median'].tolist()
+            #     },
+            #     'n_pixels': best_cluster['n_pixels'],
+            #     'pixel_coords': best_cluster['pixel_coords'].tolist(),
+            #     'spatial': {
+            #         'centroid': best_cluster['spatial']['centroid']
+            #     }
+            # },
             'confidence': float(best_sim),
             'source_image': os.path.basename(image_path),
             'all_scores': [(int(idx), float(sim)) for idx, sim, _ in scores],
-            'distance_from_image_center': distance_from_center,
-            '2d_bone_centroid': {
-                'u': bone_centroid_2d[0],
-                'v': bone_centroid_2d[1],
-                'convention': 'RealSense (u=horizontal, v=vertical)',
-                'image_size': {'width': w_original, 'height': h_original}
+            'cluster_centroid':{
+                'euclidean_distance': distance_from_center,
+                'vector': [bone_centroid_2d[0] - image_center_u, bone_centroid_2d[1] - image_center_v],
+                'pixel_coords': bone_centroid_2d
+            },
+            'image_size': {
+                'width': w_original,
+                'height': h_original
             }
         }
         
-        detected_path = os.path.join(self.output_dir, f"detected_bone_features.json")
+        detected_path = os.path.join(self.output_dir, f"bone_features.json")
         with open(detected_path, 'w') as f:
             json.dump(detected_bone, f, indent=2)
         

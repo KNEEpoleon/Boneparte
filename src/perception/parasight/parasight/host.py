@@ -25,6 +25,7 @@ from parasight.utils import *
 
 
 import time
+from datetime import datetime
 
 from std_srvs.srv import Empty as EmptySrv
 from functools import partial
@@ -173,10 +174,11 @@ class ParaSightHost(Node):
         self.bridge = CvBridge()
         
         checkpoint_path = "/ros_ws/src/perception/dinov3/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
-        output_dir = "/ros_ws/src/perception/dinov3/testing_boneparte_integration"
+        self.output_dir = "/ros_ws/src/perception/auto_reposition/"
         dinov3_path = "/ros_ws/src/perception/dinov3"
-        codebook_path = "/ros_ws/src/perception/dinov3/bone_codebook.pkl"
-        self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, output_home=output_dir)
+        codebook_path = "/ros_ws/src/perception/auto_reposition/fvd_bone_codebook.json"
+
+        self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, output_home=self.output_dir)
     
 
         # Initialize state machine after everything is set up
@@ -228,19 +230,20 @@ class ParaSightHost(Node):
         # TODO: Implement auto-reposition logic
         # For now, auto-complete for testing
         if self.last_rgb_image is not None:
-            os.makedirs("/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration", exist_ok=True)
-            cv2.imwrite("/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration/rgb_frame.png", 
-                        self.last_rgb_image)
+            os.makedirs(self.output_dir, exist_ok=True)
+            # Get the current date and time
+            now = datetime.now()
+            # Format it into a concise string
+            query_id = "query_" + now.strftime("%m-%d_%H:%M:%S") + ".png"
+            cv2.imwrite(os.path.join(self.output_dir, query_id), self.last_rgb_image)
 
-        detected_bone_msg = self.bone_extractor.get_centroid("/home/kneepolean/sreeharsha/bone_data/testing_boneparte_integration/rgb_frame.png")
-        centroid = detected_bone_msg['centroid']
-        displacement_vector = detected_bone_msg['distance_from_center_px']
-        self.get_logger().info(f"Centroid: {centroid}")
+        detected_bone_msg = self.bone_extractor.get_centroid(os.path.join(self.output_dir, query_id))
+        displacement_vector = detected_bone_msg['cluster_centroid']['vector']
         self.get_logger().info(f"Displacement vector: {displacement_vector}")
         msg = Vector3()
-        msg.x = 0.1#displacement_vector[0]
-        msg.y = 0.1#displacement_vector[1]
-        msg.z = 0.1#displacement_vector[2]
+        msg.x = displacement_vector[0]
+        msg.y = displacement_vector[1]
+        msg.z = 0.1
         self.reposition_vector_publisher.publish(msg)
 
         self.complete_auto_reposition()

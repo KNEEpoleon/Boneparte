@@ -7,7 +7,7 @@ def test_dino_bone_extract():
     # dinov3_path = "/home/kneepolean/sreeharsha/dinov3"
     # codebook_path = "/home/kneepolean/sreeharsha/bone_data/extracted_features_dataset/fvd_bone_codebook.json"
     
-    image_path = "/ros_ws/src/perception/auto_reposition/center_0pin_1_Color/center_0pin_1_Color.png"
+    image_path = "/ros_ws/src/perception/auto_reposition/query_1/query_1.png"
     checkpoint_path = "/ros_ws/src/perception/dinov3/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
     output_dir = "/ros_ws/src/perception/auto_reposition/"
     dinov3_path = "/ros_ws/src/perception/dinov3"
@@ -23,7 +23,7 @@ def test_dino_bone_extract():
     centroid = extractor.get_centroid(image_path)
     print(f"\nFinal result:")
     print(centroid.keys())
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
 if __name__ == "__main__":
     test_dino_bone_extract()
