@@ -17,10 +17,9 @@ private:
   std::string robot_name_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr registration_subscription_;
   rclcpp::Service<surgical_robot_planner::srv::SelectPose>::SharedPtr select_pose_service_;
   std::vector<geometry_msgs::msg::Pose> stored_poses_;
-  std::atomic<bool> registration_complete_{false};
+  std::atomic<bool> poses_received_{false};
 
 public:
   static std::shared_ptr<PoseSubscriberNode> create() {
@@ -41,9 +40,6 @@ public:
 
     subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>("/surgical_drill_pose", 10,
         std::bind(&PoseSubscriberNode::pose_callback, this, std::placeholders::_1));
-    registration_subscription_ = this->create_subscription<std_msgs::msg::String>(
-        "/registration", 10,
-        std::bind(&PoseSubscriberNode::registration_callback, this, std::placeholders::_1));
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
     manipulator_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/manipulator_command", 10);
     pin_drilled_publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/pin_drilled", 10);
@@ -56,18 +52,8 @@ public:
       return;
     }
     stored_poses_ = msg->poses;
+    poses_received_ = true;  // Mark that we've received valid poses
     RCLCPP_INFO(this->get_logger(), "Stored %zu poses. Ready for user selection via service.", stored_poses_.size());
-  }
-  
-  void registration_callback(const std_msgs::msg::String::SharedPtr msg) {
-    std::string state = msg->data;
-    if (state == "complete") {
-      registration_complete_ = true;
-      RCLCPP_INFO(this->get_logger(), "Registration complete. Drilling enabled.");
-    } else {
-      registration_complete_ = false;
-      RCLCPP_INFO(this->get_logger(), "Registration state: %s. Drilling disabled.", state.c_str());
-    }
   }
   
   void select_pose_callback(const std::shared_ptr<surgical_robot_planner::srv::SelectPose::Request> request,std::shared_ptr<surgical_robot_planner::srv::SelectPose::Response> response) {
@@ -79,10 +65,10 @@ public:
       return;
     }
     
-    if (!registration_complete_) {
+    if (!poses_received_) {
       response->success = false;
-      response->message = "Registration not complete. Please wait for registration to complete before drilling.";
-      RCLCPP_WARN(this->get_logger(), "Drilling blocked: Registration not complete. Current state: waiting for 'complete'.");
+      response->message = "No poses received yet. Please complete registration first to generate drill poses.";
+      RCLCPP_WARN(this->get_logger(), "Drilling blocked: No poses received yet. Waiting for /surgical_drill_pose.");
       return;
     }
     

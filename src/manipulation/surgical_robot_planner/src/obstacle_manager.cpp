@@ -15,7 +15,6 @@ private:
   // Subscriptions
   rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr pin_drilled_subscription_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr pose_array_subscription_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr registration_subscription_;
   
   // State
   std::vector<geometry_msgs::msg::Pose> stored_poses_;
@@ -43,11 +42,6 @@ private:
     pose_array_subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/surgical_drill_pose", 10,
         std::bind(&ObstacleManagerNode::pose_array_callback, this, std::placeholders::_1));
-    
-    // Subscribe to registration state
-    registration_subscription_ = this->create_subscription<std_msgs::msg::String>(
-        "/registration", 10,
-        std::bind(&ObstacleManagerNode::registration_callback, this, std::placeholders::_1));
     
     RCLCPP_INFO(this->get_logger(), "ObstacleManager initialized for robot: %s", robot_name_.c_str());
   }
@@ -90,17 +84,13 @@ private:
     }
     stored_poses_ = msg->poses;
     RCLCPP_INFO(this->get_logger(), "Stored %zu poses.", stored_poses_.size());
-  }
-  
-  void registration_callback(const std_msgs::msg::String::SharedPtr msg) {
-    std::string new_state = msg->data;
     
-    if (new_state == "complete") {
-      RCLCPP_INFO(this->get_logger(), "Registration complete. Updating pin obstacles...");
+    // Update drilled pin obstacles when new poses arrive
+    if (!drilled_pin_ids_.empty()) {
+      RCLCPP_INFO(this->get_logger(), "New poses received. Automatically updating %zu drilled pin obstacle(s)...", 
+                  drilled_pin_ids_.size());
       update_drilled_pin_obstacles();
     }
-    
-    RCLCPP_INFO(this->get_logger(), "Registration state: %s", new_state.c_str());
   }
   
   void update_drilled_pin_obstacles() {
