@@ -1,7 +1,7 @@
     
 import os
 import time
-import pickle
+import json
 
 import numpy as np
 import torch
@@ -12,6 +12,8 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import MeanShift, estimate_bandwidth
 import matplotlib
 matplotlib.use('Agg')
+import warnings
+warnings.filterwarnings('ignore', message='Unable to import Axes3D')
 import matplotlib.pyplot as plt
 
 class DINOBoneExtractor():
@@ -24,17 +26,20 @@ class DINOBoneExtractor():
         self.output_home = output_home # might not change
         self.output_dir = None
         self.save_visualizations = True # user configurable
-        self.save_cluster_stats = False #user figurable
+        self.save_cluster_stats = True #user figurable
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = self.load_dino_model()
         self.codebook = self.load_bone_features(codebook_path)
         self.threshold = 0.7
         self.min_size = 100
 
-    def load_bone_features(self, pkl_path):
-        """Load bone features from pickle file."""
-        with open(pkl_path, 'rb') as f:
-            return pickle.load(f)
+    def load_bone_features(self, json_path):
+        """Load bone features from JSON file."""
+        with open(json_path, 'r') as f:
+            codebook = json.load(f)
+        # Convert embedding list back to numpy array
+        codebook['embedding'] = np.array(codebook['embedding'])
+        return codebook
     
     def make_output_dir(self, image_path):
         """Make output folder for query image."""
@@ -97,8 +102,7 @@ class DINOBoneExtractor():
             self._save_dino_clusters(cluster_data['meanshift'], image_resized, "DINO_Clusters", h_pixels, w_pixels, h_patch, w_patch)
         
         if self.save_cluster_stats:
-            with open(os.path.join(self.output_dir, "cluster_stats_meanshift.pkl"), 'wb') as f:
-                pickle.dump(cluster_statistics, f)
+            self._save_cluster_stats_json(cluster_statistics)
 
         return detected_bone
 
@@ -200,6 +204,29 @@ class DINOBoneExtractor():
         plt.savefig(os.path.join(self.output_dir, f"{output_name}.png"), dpi=300, bbox_inches='tight')
         plt.close()
     
+    def _save_cluster_stats_json(self, cluster_statistics):
+        """Save cluster statistics to JSON file with lean format."""
+        lean_data = {
+            'metadata': cluster_statistics['metadata'],
+            'clusters': []
+        }
+        
+        for cluster in cluster_statistics['clusters']:
+            lean_cluster = {
+                'features_raw': {
+                    'median': cluster['features_raw']['median'].tolist()
+                },
+                'n_pixels': cluster['n_pixels'],
+                'pixel_coords': cluster['pixel_coords'].tolist(),
+                'spatial': {
+                    'centroid': cluster['spatial']['centroid']
+                }
+            }
+            lean_data['clusters'].append(lean_cluster)
+        
+        json_path = os.path.join(self.output_dir, "image_clusters_statistics.json")
+        with open(json_path, 'w') as f:
+            json.dump(lean_data, f, indent=2)
 
     def _resize_to_divisible(self, img, patch_size=16, max_size=768):
         """Resize image to be divisible by patch size."""
@@ -220,25 +247,24 @@ class DINOBoneExtractor():
  
 
     def _extract_cluster_statistics(self, cluster_labels_spatial, features_raw, features_pca_spatial, h_patch, w_patch, h_pixels, w_pixels):
-        """Extract statistics for each cluster in the requested nested structure.
+        """Extract statistics for each cluster with lean structure.
         
         Args:
             cluster_labels_spatial: Cluster labels (h_patch, w_patch)
             features_raw: Raw DINOv3 features (N_patches, 768)
-            features_pca_spatial: PCA features (h_patch, w_patch, 3)
+            features_pca_spatial: PCA features (h_patch, w_patch, 3) - unused but kept for API compatibility
             h_patch: Height in patches
             w_patch: Width in patches
             h_pixels: Height in pixels
             w_pixels: Width in pixels
             
         Returns:
-            Dictionary with nested structure containing metadata and clusters
+            Dictionary with lean structure containing only essential data
         """
         unique_labels = np.unique(cluster_labels_spatial)
         unique_labels = unique_labels[unique_labels >= 0]  # Remove noise label if present
         
         clusters_list = []
-        features_pca_flat = features_pca_spatial.reshape(-1, 3)
         
         # Calculate scaling factors
         scale_y = h_pixels / h_patch
@@ -262,47 +288,23 @@ class DINOBoneExtractor():
             # Get features for this cluster (use patch-space mask)
             mask_flat = mask.flatten()
             cluster_features_raw = features_raw[mask_flat]
-            cluster_features_pca = features_pca_flat[mask_flat]
             
-            # Compute robust statistics on raw features
+            # Compute only the median feature (lean structure)
             features_median = np.median(cluster_features_raw, axis=0)
-            features_p25 = np.percentile(cluster_features_raw, 25, axis=0)
-            features_p75 = np.percentile(cluster_features_raw, 75, axis=0)
-            
-            # Trimmed mean (10-90 percentile)
-            p10 = np.percentile(cluster_features_raw, 10, axis=0)
-            p90 = np.percentile(cluster_features_raw, 90, axis=0)
-            mask_trimmed = np.all((cluster_features_raw >= p10) & (cluster_features_raw <= p90), axis=1)
-            features_trimmed_mean = np.mean(cluster_features_raw[mask_trimmed], axis=0) if np.any(mask_trimmed) else features_median
-            
-            # PCA statistics (for visualization)
-            pca_median = np.median(cluster_features_pca, axis=0)
-            pca_mean = np.mean(cluster_features_pca, axis=0)
             
             # Spatial statistics (now in pixel space)
             y_coords, x_coords = pixel_coords[:, 0], pixel_coords[:, 1]
             centroid = (float(np.mean(x_coords)), float(np.mean(y_coords)))
-            bbox = (int(np.min(x_coords)), int(np.min(y_coords)), 
-                    int(np.max(x_coords)), int(np.max(y_coords)))
             
-            # Build nested structure
+            # Build lean structure (matching run_bone_segmentation_json.py)
             cluster_data = {
-                'id': int(label),
                 'n_pixels': n_pixels,
                 'pixel_coords': pixel_coords,  # (N, 2) array of (y, x)
                 'features_raw': {
                     'median': features_median,
-                    'p25': features_p25,
-                    'p75': features_p75,
-                    'mean_trimmed': features_trimmed_mean,
-                },
-                'features_pca': {
-                    'median': pca_median,
-                    'mean': pca_mean,
                 },
                 'spatial': {
                     'centroid': centroid,
-                    'bbox': bbox,
                 }
             }
             clusters_list.append(cluster_data)
@@ -312,7 +314,6 @@ class DINOBoneExtractor():
         
         # Build final structure
         cluster_data = {
-            'method': 'meanshift',
             'clusters': clusters_list,
             'metadata': {
                 'patch_shape': (h_patch, w_patch),
@@ -325,19 +326,17 @@ class DINOBoneExtractor():
         return cluster_data 
             
 
-    def compute_similarity(self, query_features, ref_features):
-        """Compute cosine similarity between query and reference features.
+    def compute_similarity(self, query_median, ref_median):
+        """Compute cosine similarity between query and reference median features.
         
         Args:
-            query_features: Query cluster's features_raw dict
-            ref_features: Reference features dict (from codebook or bone_features)
+            query_median: Query cluster's median feature vector
+            ref_median: Reference median feature vector (from codebook)
             
         Returns:
             Similarity score (0-1)
         """
-        q = query_features['median']
-        r = ref_features['median']
-        return np.dot(q, r) / (np.linalg.norm(q) * np.linalg.norm(r))
+        return np.dot(query_median, ref_median) / (np.linalg.norm(query_median) * np.linalg.norm(ref_median))
         
 
     def detect_bone(self, cluster_statistics, image_resized, image_path):
@@ -350,10 +349,7 @@ class DINOBoneExtractor():
         """
 
         # Extract codebook embeddings
-        if 'embeddings' in self.codebook:
-            ref_features = self.codebook['embeddings']
-        else:
-            ref_features = self.codebook['bone_cluster']['features_raw']
+        ref_median = self.codebook['embedding']
         
         # Compute similarities for all clusters
         scores = []
@@ -361,7 +357,8 @@ class DINOBoneExtractor():
             if cluster['n_pixels'] < self.min_size:
                 scores.append((i, -1.0, 'too_small'))
                 continue
-            sim = self.compute_similarity(cluster['features_raw'], ref_features)
+            query_median = cluster['features_raw']['median']
+            sim = self.compute_similarity(query_median, ref_median)
             reason = 'valid' if sim >= self.threshold else 'below_threshold'
             scores.append((i, sim, reason))
         
@@ -504,24 +501,41 @@ class DINOBoneExtractor():
         
         # Save detected bone
         detected_bone = {
-            'centroid': {'u': bone_centroid_2d[0], 'v': bone_centroid_2d[1]},
-            'distance_from_center_px': distance_from_center,
-            'similarity': float(best_sim),
+            'detected_cluster': {
+                'features_raw': {
+                    'median': best_cluster['features_raw']['median'].tolist()
+                },
+                'n_pixels': best_cluster['n_pixels'],
+                'pixel_coords': best_cluster['pixel_coords'].tolist(),
+                'spatial': {
+                    'centroid': best_cluster['spatial']['centroid']
+                }
+            },
+            'confidence': float(best_sim),
             'source_image': os.path.basename(image_path),
-            'codebook_version': self.codebook.get('version', 'unknown')
+            'all_scores': [(int(idx), float(sim)) for idx, sim, _ in scores],
+            'distance_from_image_center': distance_from_center,
+            '2d_bone_centroid': {
+                'u': bone_centroid_2d[0],
+                'v': bone_centroid_2d[1],
+                'convention': 'RealSense (u=horizontal, v=vertical)',
+                'image_size': {'width': w_original, 'height': h_original}
+            }
         }
         
-        detected_path = os.path.join(self.output_dir, f"{output_name}_detected_bone.pkl")
-        with open(detected_path, 'wb') as f:
-            pickle.dump(detected_bone, f)
+        detected_path = os.path.join(self.output_dir, f"detected_bone_features.json")
+        with open(detected_path, 'w') as f:
+            json.dump(detected_bone, f, indent=2)
         
         # plt.show()  # Commented out - causes warning in non-interactive environments
         return detected_bone
 
-    @staticmethod
-    def visualize_feature_clusters():
-        pass
+    # @staticmethod
+    # def visualize_feature_clusters():
+    #     """Placeholder for future feature cluster visualization."""
+    #     pass
 
-    @staticmethod
-    def visualize_camera_flow():
-        pass
+    # @staticmethod
+    # def visualize_camera_flow():
+    #     """Placeholder for future camera flow visualization."""
+    #     pass
