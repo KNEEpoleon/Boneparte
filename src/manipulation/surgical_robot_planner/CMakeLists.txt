@@ -22,7 +22,8 @@ find_package(tf2_geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SelectPose.srv"
-  DEPENDENCIES builtin_interfaces
+  "msg/PinDrilled.msg"
+  DEPENDENCIES builtin_interfaces geometry_msgs
 )
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
@@ -47,11 +48,15 @@ ament_target_dependencies(drill_motion_executor
 target_include_directories(drill_motion_executor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp>
 )
+target_link_libraries(obstacle_manager "${cpp_typesupport_target}")
 ament_target_dependencies(obstacle_manager 
   geometry_msgs
   std_msgs
   moveit_ros_planning_interface
   rclcpp
+)
+target_include_directories(obstacle_manager PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp>
 )
 ament_target_dependencies(error_recovery_node 
   geometry_msgs

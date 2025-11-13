@@ -5,6 +5,7 @@
 #include "moveit_msgs/msg/collision_object.hpp"
 #include "shape_msgs/msg/solid_primitive.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "surgical_robot_planner/msg/pin_drilled.hpp"
 #include <vector>
 
 class ObstacleManagerNode : public rclcpp::Node {
@@ -13,12 +14,13 @@ private:
   std::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_;
   
   // Subscriptions
-  rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr pin_drilled_subscription_;
+  rclcpp::Subscription<surgical_robot_planner::msg::PinDrilled>::SharedPtr pin_drilled_subscription_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr pose_array_subscription_;
   
   // State
   std::vector<geometry_msgs::msg::Pose> stored_poses_;
   std::vector<std::string> drilled_pin_ids_;
+  std::vector<int> drilled_pin_indices_;  // Track original pose index for each drilled pin
   int pin_counter_ = 0;
 
 public:
@@ -33,9 +35,8 @@ private:
   void initialize() {
     planning_scene_interface_ = std::make_shared<moveit::planning_interface::PlanningSceneInterface>(robot_name_);
     
-    // Subscribe to pin_drilled topic
-    pin_drilled_subscription_ = this->create_subscription<geometry_msgs::msg::Pose>(
-        "/pin_drilled", 10,
+    pin_drilled_subscription_ = this->create_subscription<surgical_robot_planner::msg::PinDrilled>(
+        "/pin_drilled_info", 10,
         std::bind(&ObstacleManagerNode::pin_drilled_callback, this, std::placeholders::_1));
     
     // Subscribe to surgical_drill_pose for updated poses
@@ -46,16 +47,17 @@ private:
     RCLCPP_INFO(this->get_logger(), "ObstacleManager initialized for robot: %s", robot_name_.c_str());
   }
   
-  void pin_drilled_callback(const geometry_msgs::msg::Pose::SharedPtr msg) {
-    add_drilled_pin_as_obstacle(*msg);
+  void pin_drilled_callback(const surgical_robot_planner::msg::PinDrilled::SharedPtr msg) {
+    add_drilled_pin_as_obstacle(msg->pose, msg->pose_index);
   }
   
-  void add_drilled_pin_as_obstacle(const geometry_msgs::msg::Pose& pin_pose) {
+  void add_drilled_pin_as_obstacle(const geometry_msgs::msg::Pose& pin_pose, int pose_index) {
     pin_counter_++;
     std::string pin_id = "drilled_pin_" + std::to_string(pin_counter_);
     
-    // Track this pin (order matters - first drilled = index 0, second = index 1, etc.)
+    // Track this pin's ID and its original pose index
     drilled_pin_ids_.push_back(pin_id);
+    drilled_pin_indices_.push_back(pose_index);
     
     moveit_msgs::msg::CollisionObject collision_object;
     collision_object.header.frame_id = robot_name_ + "_link_0"; 
@@ -73,8 +75,8 @@ private:
 
     planning_scene_interface_->applyCollisionObjects({collision_object}); 
 
-    RCLCPP_INFO(this->get_logger(), "Added drilled pin %s as obstacle (total pins: %zu).", 
-                pin_id.c_str(), drilled_pin_ids_.size());
+    RCLCPP_INFO(this->get_logger(), "Added drilled pin %s as obstacle at pose index %d (total pins: %zu).", 
+                pin_id.c_str(), pose_index, drilled_pin_ids_.size());
   }
   
   void pose_array_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
@@ -107,17 +109,19 @@ private:
     RCLCPP_INFO(this->get_logger(), "Updating %zu drilled pin obstacles...", drilled_pin_ids_.size());
     
     for (size_t i = 0; i < drilled_pin_ids_.size(); i++) {
-      if (i < stored_poses_.size()) {
-        const auto& new_pose = stored_poses_[i];
+      int original_pose_index = drilled_pin_indices_[i];
+      
+      if (original_pose_index >= 0 && original_pose_index < static_cast<int>(stored_poses_.size())) {
+        const auto& new_pose = stored_poses_[original_pose_index];
         
-        RCLCPP_INFO(this->get_logger(), "Moving pin %s (index=%zu) to [%.3f, %.3f, %.3f]",
-                   drilled_pin_ids_[i].c_str(), i,
+        RCLCPP_INFO(this->get_logger(), "Moving pin %s (originally at pose_index=%d) to [%.3f, %.3f, %.3f]",
+                   drilled_pin_ids_[i].c_str(), original_pose_index,
                    new_pose.position.x, new_pose.position.y, new_pose.position.z);
         
         move_drilled_pin_obstacle(drilled_pin_ids_[i], new_pose);
       } else {
-        RCLCPP_ERROR(this->get_logger(), "Pin %s has invalid index %zu (poses_size=%zu)", 
-                    drilled_pin_ids_[i].c_str(), i, stored_poses_.size());
+        RCLCPP_ERROR(this->get_logger(), "Pin %s has invalid pose_index %d (poses_size=%zu)", 
+                    drilled_pin_ids_[i].c_str(), original_pose_index, stored_poses_.size());
       }
     }
   }

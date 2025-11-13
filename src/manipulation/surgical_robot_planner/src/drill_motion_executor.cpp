@@ -6,6 +6,7 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "surgical_robot_planner/srv/select_pose.hpp"
+#include "surgical_robot_planner/msg/pin_drilled.hpp"
 #include <vector>
 #include <atomic>
 
@@ -13,7 +14,7 @@ class PoseSubscriberNode : public rclcpp::Node {
 private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr drill_command_publisher_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr manipulator_command_publisher_;
-  rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pin_drilled_publisher_;
+  rclcpp::Publisher<surgical_robot_planner::msg::PinDrilled>::SharedPtr pin_drilled_publisher_;
   std::string robot_name_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_;
@@ -42,7 +43,7 @@ public:
         std::bind(&PoseSubscriberNode::pose_callback, this, std::placeholders::_1));
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
     manipulator_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/manipulator_command", 10);
-    pin_drilled_publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/pin_drilled", 10);
+    pin_drilled_publisher_ = this->create_publisher<surgical_robot_planner::msg::PinDrilled>("/pin_drilled_info", 10);
     select_pose_service_ = this->create_service<surgical_robot_planner::srv::SelectPose>("/select_pose",
       std::bind(&PoseSubscriberNode::select_pose_callback, this, std::placeholders::_1, std::placeholders::_2));
   }
@@ -73,12 +74,12 @@ public:
     }
     
     RCLCPP_INFO(this->get_logger(), "User selected pose index %d.", index);
-    drill_at_pose(stored_poses_[index]);
+    drill_at_pose(stored_poses_[index], index);
     response->success = true;
     response->message = "Calling drill at selected pose.";
   }
 
-  void drill_at_pose(const geometry_msgs::msg::Pose& target_pose) {
+  void drill_at_pose(const geometry_msgs::msg::Pose& target_pose, int pose_index) {
     geometry_msgs::msg::Pose above_pose = target_pose;
     geometry_msgs::msg::Pose final_pose= target_pose;
 
@@ -152,8 +153,11 @@ public:
         // Plan and execute return to pre-drill position
         return_to_pre_drill_position(above_pose);
         // Notify obstacle manager that a pin was drilled
-        pin_drilled_publisher_->publish(target_pose);
-        RCLCPP_INFO(this->get_logger(), "Published drilled pin pose to /pin_drilled.");
+        auto pin_drilled_msg = surgical_robot_planner::msg::PinDrilled();
+        pin_drilled_msg.pose = target_pose;
+        pin_drilled_msg.pose_index = pose_index;
+        pin_drilled_publisher_->publish(pin_drilled_msg);
+        RCLCPP_INFO(this->get_logger(), "Published drilled pin (index %d) to /pin_drilled_info.", pose_index);
         // Return to home, then move to away
         if (return_to_home_pose()) {
           move_to_away_pose();
