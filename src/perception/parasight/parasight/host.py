@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# check the p12 p2 p3 vectors, how the normal is computed
 import cv2
 import rclpy
 from cv_bridge import CvBridge
@@ -6,7 +7,7 @@ from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import Image, PointCloud2
 from geometry_msgs.msg import PoseArray, Point, Pose, PoseStamped, PointStamped
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, String
 from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
@@ -59,6 +60,9 @@ class ParaSightHost(Node):
         self.last_drill_pose_array = None
         self.last_drill_pose = None
         
+        # AVP annotations
+        self.avp_annotations = None
+        
         # D405 Intrinsics
         self.fx = 425.19189453125
         self.fy = 424.6562805175781
@@ -92,6 +96,13 @@ class ParaSightHost(Node):
             Empty,
             '/hard_reset_host',
             self.custom_callback_to_reset_FSM,
+            10)
+        
+        # AVP annotations subscription
+        self.avp_annotations_subscription = self.create_subscription(
+            String,
+            '/avp_annotations',
+            self.avp_annotations_callback,
             10)
         
         # Data Subscribers
@@ -131,6 +142,9 @@ class ParaSightHost(Node):
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
+        # self.registered_femur = self.create_publisher(PointCloud2, '/processed_femur_camera_frame', 10)
+        # self.registered_tibia = self.create_publisher(PointCloud2, '/processed_tibia_camera_frame', 10)
+
         # Parameters
         self.declare_parameter('selected_bones', 'both')
         self.update_bones(self.get_parameter('selected_bones').value)
@@ -142,7 +156,7 @@ class ParaSightHost(Node):
         tibia_cloud = o3d.io.read_point_cloud(package_dir + "/resource/tibia_shell.ply")
         self.sources = {'femur': femur_cloud, 'tibia': tibia_cloud}
         self.colors = {'femur': [1, 0, 0], 'tibia': [0, 0, 1]}
-        self.plan_path = package_dir + "/resource/plan_config_v2.yaml"
+        self.plan_path = package_dir + "/resource/plan_boneparte.yaml"
         self.plan = "plan1"
 
         # Interfaces
@@ -153,6 +167,15 @@ class ParaSightHost(Node):
 
     def custom_callback_to_reset_FSM(self, rand_arg=True):
         self.state == 'ready'
+
+    def avp_annotations_callback(self, msg):
+        """Store AVP annotations for use in segmentation"""
+        try:
+            import json
+            self.avp_annotations = json.loads(msg.data)
+            self.get_logger().info(f'Received AVP annotations: {self.avp_annotations}')
+        except Exception as e:
+            self.get_logger().error(f'Failed to parse AVP annotations: {e}')
 
     def all_systems_ready(self, dummy=True):
         if dummy:
@@ -181,7 +204,21 @@ class ParaSightHost(Node):
         self.get_logger().info('UI trigger received')
         if self.state == 'ready':
             self.trigger('start_parasight')
-            masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
+            
+            # Check if we have AVP annotations, otherwise use UI
+            if self.avp_annotations is not None:
+                self.get_logger().info('Using AVP annotations for segmentation')
+                # Convert pixel coordinates to the format expected by segment_using_points
+                femur_point = tuple(self.avp_annotations[0])  # [x, y]
+                tibia_point = tuple(self.avp_annotations[1])  # [x, y]
+                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
+                    self.last_rgb_image, femur_point, tibia_point, self.bones)
+                # Clear AVP annotations after use
+                self.avp_annotations = None
+            else:
+                self.get_logger().info('Using UI for segmentation')
+                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
+            
             self.annotated_points = annotated_points
             print(f"\n The annotated points are: {self.annotated_points}")
             # self.trigger('input_received')
@@ -271,7 +308,7 @@ class ParaSightHost(Node):
             mask_points = self.add_depth(mask_points)
             transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone) # aligns source to target
             t1 = time.time()
-            self.get_logger().info(f'Registration time for {bone}: {t1 - t0}')
+            self.get_logger().info(f'\n\nRegistration time for {bone}: {t1 - t0}, \nfitness: {fitness}')
             source_cloud = source.voxel_down_sample(voxel_size=0.003)
             source_cloud.transform(transform)
             source_cloud.paint_uniform_color(self.colors[bone])
@@ -331,6 +368,7 @@ class ParaSightHost(Node):
 
     def publish_point_cloud(self, clouds):
         # Combine all clouds into one
+        print(f"How many clouds are there: {len(clouds)}")
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
             print(f"\nin host py we have a cloud!")
@@ -354,20 +392,40 @@ class ParaSightHost(Node):
             for hole_name, hole in holes.items():
                 p1, p2, p3 = hole
 
+                '''
                 # Toggle theta between 0 and -π/2 for femur curvature hole
                 curr_theta = theta
                 if bone == 'femur' and hole_name == 'hole3':
                     curr_theta = np.pi if theta == 0 else 0
                 elif bone == 'tibia':
                     curr_theta = theta * -1
+                '''
+
 
                 curr_theta = 0 # Sreeharsha - is this responsible for the camera changing orientation!!
+                # if bone == 'femur' and hole_name == 'hole3':
+                #     curr_theta = (3*np.pi)/2
+                #     # curr_theta = -np.pi/2
+
+                # if bone == 'femur' and hole_name == 'hole2':
+                #     curr_theta = np.pi
+
+
+                if bone == 'femur' and hole_name == 'hole2':
+                    curr_theta = -np.pi/2
+                elif bone == "femur" and hole_name == 'hole3':
+                    curr_theta = -np.pi/2
+                # elif bone == "tibia" and hole_name == 'hole2':
+                #     curr_theta = np.pi/2
 
                 mesh = o3d.geometry.TriangleMesh()
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
                 mesh.compute_vertex_normals()
                 normal =  np.asarray(mesh.vertex_normals)[0]
+                # if bone == "femur" and (hole_name == "hole2" or hole_name == "hole1") :
+                #     actual_normal = normal
+                # else:
                 actual_normal = -normal
                 z_axis = np.array([0, 0, 1])
                 rotation_axis = np.cross(z_axis, actual_normal)
