@@ -73,6 +73,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		185A29A22EC4331100E99EA3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1880A8AC2DAF76E80043950A = {
 			isa = PBXGroup;
 			children = (
@@ -80,6 +87,7 @@
 				1880A8B72DAF76E80043950A /* SVD_ROS_Comms */,
 				1880A8B82DAF76E80043950A /* Packages */,
 				1880A8D02DAF76E90043950A /* SVD_ROS_CommsTests */,
+				185A29A22EC4331100E99EA3 /* Frameworks */,
 				1880A8B62DAF76E80043950A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -178,6 +186,9 @@
 			);
 			mainGroup = 1880A8AC2DAF76E80043950A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				185A29A12EC432E800E99EA3 /* XCLocalSwiftPackageReference "Packages/RealityKitContent" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1880A8B62DAF76E80043950A /* Products */;
 			projectDirPath = "";
@@ -475,6 +486,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		185A29A12EC432E800E99EA3 /* XCLocalSwiftPackageReference "Packages/RealityKitContent" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/RealityKitContent;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		1880A8BA2DAF76E80043950A /* RealityKitContent */ = {

@@ -8,6 +8,9 @@
 import Foundation
 import Network
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 class TCPClient: ObservableObject {
     private var connection: NWConnection?
@@ -120,7 +123,6 @@ class TCPClient: ObservableObject {
     private func handleImageData(_ response: String) {
         let imageDataString = String(response.dropFirst(6)) // Remove "IMAGE:" prefix
         
-        // Validate base64 string length (should be reasonable)
         guard imageDataString.count > 100 else {
             print("Error: Base64 image data too short (\(imageDataString.count) characters)")
             DispatchQueue.main.async {
@@ -129,14 +131,28 @@ class TCPClient: ObservableObject {
             return
         }
         
-        if let imageData = Data(base64Encoded: imageDataString) {
+        if let imageData = Data(base64Encoded: imageDataString, options: .ignoreUnknownCharacters) {
+            #if canImport(UIKit)
+            if let uiImage = UIImage(data: imageData) {
+                print("Image received: \(uiImage.size.width)x\(uiImage.size.height), \(imageData.count) bytes")
+                DispatchQueue.main.async {
+                    self.receivedImage = imageData
+                    self.imageTransmissionStatus = "Image received successfully (\(imageData.count) bytes)"
+                }
+            } else {
+                print("Error: Failed to create UIImage from data")
+                DispatchQueue.main.async {
+                    self.imageTransmissionStatus = "Error: Invalid image format"
+                }
+            }
+            #else
             DispatchQueue.main.async {
                 self.receivedImage = imageData
                 self.imageTransmissionStatus = "Image received successfully (\(imageData.count) bytes)"
-                print("Image decoded successfully: \(imageData.count) bytes")
             }
+            #endif
         } else {
-            print("Error: Failed to decode base64 image data (length: \(imageDataString.count))")
+            print("Error: Failed to decode base64 image data")
             DispatchQueue.main.async {
                 self.imageTransmissionStatus = "Error: Failed to decode image data"
             }
@@ -157,14 +173,7 @@ class TCPClient: ObservableObject {
             let annotationString = String(data: annotationData, encoding: .utf8) ?? ""
             let message = "ANNOTATIONS:\(annotationString)\n"
             
-            // Debug: Print what we're sending
-            print("=== DEBUG: Sending annotations ===")
-            print("Number of annotations: \(annotations.count)")
-            print("Annotation data: \(annotations)")
-            print("JSON string: \(annotationString)")
-            print("Full message: \(message)")
-            print("Message length: \(message.count) characters")
-            print("================================")
+            print("Sending \(annotations.count) annotations")
             
             let data = Data(message.utf8)
             connection.send(content: data, completion: .contentProcessed({ [weak self] error in
@@ -175,7 +184,7 @@ class TCPClient: ObservableObject {
                     } else {
                         self?.statusMessage = "Annotations sent successfully"
                         self?.statusColor = .green
-                        self?.receivedImage = nil // Clear image after sending annotations
+                        self?.receivedImage = nil
                     }
                 }
             }))

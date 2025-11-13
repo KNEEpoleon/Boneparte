@@ -111,20 +111,15 @@ struct ImageView: View {
         
         let annotation = AnnotationPoint(x: normalizedX, y: normalizedY)
         annotations.append(annotation)
-        
-        print("Added annotation at normalized coordinates: (\(normalizedX), \(normalizedY))")
     }
 }
 
 #Preview {
-    // Create a sample image for preview
     let sampleImage = UIImage(systemName: "photo")?.pngData() ?? Data()
     
     return ImageView(
         imageData: sampleImage,
-        onAnnotationsComplete: { annotations in
-            print("Preview: \(annotations.count) annotations")
-        }
+        onAnnotationsComplete: { _ in }
     )
     .background(Color.black)
 }
