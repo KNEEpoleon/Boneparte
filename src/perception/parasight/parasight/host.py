@@ -255,9 +255,16 @@ class ParaSightHost(Node):
         """Called by TCP server when AVP accepts segmentation"""
         if self.waiting_for_segmentation_approval and self.pending_segmentation_data:
             self.get_logger().info('Segmentation approved by AVP, proceeding with registration')
-            self.annotated_points = self.pending_segmentation_data['annotated_points']
+            # Use the already-computed segmentation data instead of re-segmenting
+            masks = self.pending_segmentation_data['masks']
+            annotated_points = self.pending_segmentation_data['annotated_points']
+            all_mask_points = self.pending_segmentation_data['all_mask_points']
+            
+            self.annotated_points = annotated_points
             print(f"\n The annotated points are: {self.annotated_points}")
-            self.register_and_publish(self.annotated_points)
+            
+            # Proceed with registration using the stored masks
+            self.register_and_publish_with_masks(masks, annotated_points, all_mask_points)
             self.trigger('drill_complete')
             self.waiting_for_segmentation_approval = False
             self.pending_segmentation_data = None
@@ -364,9 +371,39 @@ class ParaSightHost(Node):
             return -np.pi
 
 
+    def register_and_publish_with_masks(self, masks, annotated_points, all_mask_points):
+        """Registration and publishing using pre-computed masks (for AVP workflow)"""
+        # Cache annotated points
+        self.annotated_points = annotated_points
+        annotated_points = self.add_depth(annotated_points)
+        registered_clouds = []
+        transforms = {}
+        for i, bone in enumerate(self.bones):
+            t0 = time.time()
+            mask = masks[i]
+            mask_points = all_mask_points[i]
+            source = self.sources[bone]
+            mask_points = self.add_depth(mask_points)
+            transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone)
+            t1 = time.time()
+            self.get_logger().info(f'\n\nRegistration time for {bone}: {t1 - t0}, \nfitness: {fitness}')
+            source_cloud = source.voxel_down_sample(voxel_size=0.003)
+            source_cloud.transform(transform)
+            source_cloud.paint_uniform_color(self.colors[bone])
+            registered_clouds.append(source_cloud)
+            transforms[bone] = transform
+
+        self.publish_point_cloud(registered_clouds)
+
+        theta = self.pose_direction(annotated_points)
+        drill_pose_array = self.compute_plan(transforms, theta=theta)
+        drill_pose_array.header.frame_id = self.camera_frame
+        drill_pose_array.header.stamp = self.get_clock().now().to_msg()
+        self.pose_array_publisher.publish(drill_pose_array)
+
     def register_and_publish(self, points):
         # self.pause_tracking() # Pause tracking while registering to improve performance
-        masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(self.last_rgb_image, points[0], points[1], self.bones)
+        masks, annotated_points, all_mask_points, _ = self.segmentation_ui.segment_using_points(self.last_rgb_image, points[0], points[1], self.bones)
         self.annotated_points = annotated_points # cache
         annotated_points = self.add_depth(annotated_points)
         registered_clouds = []
