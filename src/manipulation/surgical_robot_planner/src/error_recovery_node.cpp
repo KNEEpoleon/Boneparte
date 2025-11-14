@@ -17,7 +17,6 @@ private:
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr command_subscription_;
   rclcpp::Subscription<geometry_msgs::msg::Vector3>::SharedPtr direction_subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr error_publisher_;
 
@@ -44,11 +43,6 @@ public:
     move_group_interface_->setPlanningPipelineId("pilz_industrial_motion_planner");
     move_group_interface_->setPlanningTime(5.0);
 
-    // Subscribe to string commands (bring_home, go_away)
-    command_subscription_ = this->create_subscription<std_msgs::msg::String>(
-        "/manipulator_command", 10,
-        std::bind(&ErrorRecoveryNode::command_callback, this, std::placeholders::_1));
-    
     // Subscribe to error recovery direction from perception
     direction_subscription_ = this->create_subscription<geometry_msgs::msg::Vector3>(
         "/error_recovery_direction", 10,
@@ -62,19 +56,6 @@ public:
   }
 
 private:
-
-  void command_callback(const std_msgs::msg::String::SharedPtr msg) {
-    std::string command = msg->data;
-    RCLCPP_INFO(this->get_logger(), "Received command: %s", command.c_str());
-
-    if (command == "bring_home") {
-      move_to_home();
-    } else if (command == "go_away") {
-      move_to_away();
-    } else {
-      RCLCPP_WARN(this->get_logger(), "Unknown command: %s. Valid commands are 'bring_home' and 'go_away'.", command.c_str());
-    }
-  }
 
   void direction_callback(const geometry_msgs::msg::Vector3::SharedPtr msg) {
     RCLCPP_INFO(this->get_logger(), "Received error recovery direction: [%.4f, %.4f, %.4f]", 
@@ -184,56 +165,6 @@ private:
     }
   }
 
-  void move_to_home() {
-    RCLCPP_INFO(this->get_logger(), "Moving manipulator to home pose (away -> home)...");
-    
-    move_group_interface_->setStartStateToCurrentState();
-    move_group_interface_->setNamedTarget("Boneparte_home");
-    move_group_interface_->setPlannerId("PTP");
-    move_group_interface_->setMaxVelocityScalingFactor(1.0);
-
-    moveit::planning_interface::MoveGroupInterface::Plan home_plan;
-    auto plan_result = move_group_interface_->plan(home_plan);
-    
-    if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
-      RCLCPP_INFO(this->get_logger(), "Planning successful. Executing movement to home pose...");
-      auto execution_result = move_group_interface_->execute(home_plan);
-      
-      if (execution_result == moveit::core::MoveItErrorCode::SUCCESS) {
-        RCLCPP_INFO(this->get_logger(), "Successfully moved to home pose.");
-      } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to execute movement to home pose with error code: %d", execution_result.val);
-      }
-    } else {
-      RCLCPP_ERROR(this->get_logger(), "Failed to plan movement to home pose with error code: %d", plan_result.val);
-    }
-  }
-
-  void move_to_away() {
-    RCLCPP_INFO(this->get_logger(), "Moving manipulator to away pose (home -> away)...");
-    
-    move_group_interface_->setStartStateToCurrentState();
-    move_group_interface_->setNamedTarget("Boneparte_away");
-    move_group_interface_->setPlannerId("PTP");
-    move_group_interface_->setMaxVelocityScalingFactor(0.5);
-    move_group_interface_->setMaxAccelerationScalingFactor(0.2);
-
-    moveit::planning_interface::MoveGroupInterface::Plan away_plan;
-    auto plan_result = move_group_interface_->plan(away_plan);
-    
-    if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
-      RCLCPP_INFO(this->get_logger(), "Planning successful. Executing movement to away pose...");
-      auto execution_result = move_group_interface_->execute(away_plan);
-      
-      if (execution_result == moveit::core::MoveItErrorCode::SUCCESS) {
-        RCLCPP_INFO(this->get_logger(), "Successfully moved to away pose.");
-      } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to execute movement to away pose with error code: %d", execution_result.val);
-      }
-    } else {
-      RCLCPP_ERROR(this->get_logger(), "Failed to plan movement to away pose with error code: %d", plan_result.val);
-    }
-  }
 
   void publish_error(const std::string& error_msg) {
     auto error_status = std_msgs::msg::String();

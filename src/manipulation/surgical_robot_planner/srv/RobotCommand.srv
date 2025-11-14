@@ -1,0 +1,8 @@
+# Service for commanding robot to move to named poses
+# Valid commands: "home", "away"
+
+string command
+---
+bool success
+string message
+

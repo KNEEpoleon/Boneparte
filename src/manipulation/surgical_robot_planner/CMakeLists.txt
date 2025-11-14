@@ -22,6 +22,7 @@ find_package(tf2_geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SelectPose.srv"
+  "srv/RobotCommand.srv"
   "msg/PinDrilled.msg"
   DEPENDENCIES builtin_interfaces geometry_msgs
 )
