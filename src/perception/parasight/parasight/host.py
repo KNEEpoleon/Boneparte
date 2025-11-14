@@ -62,6 +62,15 @@ class ParaSightHost(Node):
         
         # AVP annotations
         self.avp_annotations = None
+        self.waiting_for_segmentation_approval = False
+        self.pending_segmentation_data = None
+        
+        # Publisher for segmented image
+        self.segmented_image_pub = self.create_publisher(Image, '/segmented_image', 10)
+        
+        # Services for segmentation approval
+        self.approve_seg_service = self.create_service(EmptySrv, '/approve_segmentation', self.approve_segmentation_service)
+        self.reject_seg_service = self.create_service(EmptySrv, '/reject_segmentation', self.reject_segmentation_service)
         
         # D405 Intrinsics
         self.fx = 425.19189453125
@@ -211,23 +220,85 @@ class ParaSightHost(Node):
                 # Convert pixel coordinates to the format expected by segment_using_points
                 femur_point = tuple(self.avp_annotations[0])  # [x, y]
                 tibia_point = tuple(self.avp_annotations[1])  # [x, y]
-                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
+                result = self.segmentation_ui.segment_using_points(
                     self.last_rgb_image, femur_point, tibia_point, self.bones)
+                masks, annotated_points, all_mask_points, segmented_image = result
+                
+                # Store segmentation data and wait for AVP approval
+                self.pending_segmentation_data = {
+                    'masks': masks,
+                    'annotated_points': annotated_points,
+                    'all_mask_points': all_mask_points,
+                    'segmented_image': segmented_image
+                }
+                self.waiting_for_segmentation_approval = True
+                
+                # Send segmented image to AVP via TCP server
+                self.get_logger().info('Segmentation complete, publishing segmented image')
+                self.publish_segmented_image(segmented_image)
+                
                 # Clear AVP annotations after use
                 self.avp_annotations = None
             else:
                 self.get_logger().info('Using UI for segmentation')
                 masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
-            
-            self.annotated_points = annotated_points
-            print(f"\n The annotated points are: {self.annotated_points}")
-            # self.trigger('input_received')
-            # self.trigger('ready_to_drill')
-            self.register_and_publish(annotated_points)
-            self.trigger('drill_complete')
+                self.annotated_points = annotated_points
+                print(f"\n The annotated points are: {self.annotated_points}")
+                # For UI mode, proceed immediately
+                self.register_and_publish(annotated_points)
+                self.trigger('drill_complete')
 
         else:
             self.get_logger().warn('UI trigger received but not in ready state')
+    
+    def approve_segmentation(self):
+        """Called by TCP server when AVP accepts segmentation"""
+        if self.waiting_for_segmentation_approval and self.pending_segmentation_data:
+            self.get_logger().info('Segmentation approved by AVP, proceeding with registration')
+            self.annotated_points = self.pending_segmentation_data['annotated_points']
+            print(f"\n The annotated points are: {self.annotated_points}")
+            self.register_and_publish(self.annotated_points)
+            self.trigger('drill_complete')
+            self.waiting_for_segmentation_approval = False
+            self.pending_segmentation_data = None
+        else:
+            self.get_logger().warn('approve_segmentation called but not waiting for approval')
+    
+    def reject_segmentation(self):
+        """Called by TCP server when AVP rejects segmentation"""
+        if self.waiting_for_segmentation_approval:
+            self.get_logger().info('Segmentation rejected by AVP, clearing data')
+            self.waiting_for_segmentation_approval = False
+            self.pending_segmentation_data = None
+            self.trigger('drill_complete')  # Return to ready state
+        else:
+            self.get_logger().warn('reject_segmentation called but not waiting for approval')
+    
+    def publish_segmented_image(self, segmented_image):
+        """Publish segmented image for TCP server to send to AVP"""
+        try:
+            # Convert numpy array to ROS Image message
+            if len(segmented_image.shape) == 3 and segmented_image.shape[2] == 4:
+                # RGBA
+                image_msg = self.bridge.cv2_to_imgmsg(segmented_image, encoding='rgba8')
+            else:
+                # RGB
+                image_msg = self.bridge.cv2_to_imgmsg(segmented_image, encoding='rgb8')
+            
+            self.segmented_image_pub.publish(image_msg)
+            self.get_logger().info('Published segmented image')
+        except Exception as e:
+            self.get_logger().error(f'Failed to publish segmented image: {e}')
+    
+    def approve_segmentation_service(self, request, response):
+        """Service callback for approving segmentation"""
+        self.approve_segmentation()
+        return response
+    
+    def reject_segmentation_service(self, request, response):
+        """Service callback for rejecting segmentation"""
+        self.reject_segmentation()
+        return response
 
     # def after_stop_tracking(self, future, reset=True):
     #     try:

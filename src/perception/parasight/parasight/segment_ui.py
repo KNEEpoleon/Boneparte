@@ -271,13 +271,18 @@ class SegmentAnythingUI:
     
     def segment_using_points(self, image, femur_point, tibia_point, bones=None):
         self.original_image = image.copy()
+        self.image = image.copy()  # Initialize self.image
         if bones is not None:
             self.bones = bones
         self.femur_point = femur_point
         self.tibia_point = tibia_point
         self.generate_mask(display=False)
+        # Generate the mask overlay even when display=False
+        self.update_image_with_masks()
         self.mask_generated = True
-        result = (self.masks, [femur_point, tibia_point], self.mask_points)
+        # Store the segmented image before reset
+        segmented_image = self.image.copy()
+        result = (self.masks, [femur_point, tibia_point], self.mask_points, segmented_image)
         self.reset()
         cv2.destroyAllWindows()
         return result
