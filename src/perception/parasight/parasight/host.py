@@ -18,7 +18,6 @@ import open3d as o3d
 import os
 import numpy as np
 
-
 from parasight.segment_ui import SegmentAnythingUI
 from parasight.registration import RegistrationPipeline
 from parasight.dino_bone_extract import DINOBoneExtractor
@@ -247,13 +246,15 @@ class ParaSightHost(Node):
             self.complete_auto_reposition()
             return
         detected_bone_msg = self.bone_extractor.get_centroid(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"))
-        displacement_vector = detected_bone_msg['cluster_centroid']['vector']
-        self.get_logger().info(f"Displacement vector: {displacement_vector}")
-        msg = Vector3()
-        msg.x = displacement_vector[0]
-        msg.y = displacement_vector[1]
-        msg.z = 0.1
-        self.reposition_vector_publisher.publish(msg)
+        bone_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(detected_bone_msg['cluster_centroid']['pixel_coords'], query_id)
+        image_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(np.array([self.cx, self.cy]), query_id)
+        displacement_vector = bone_centroid_3d_camera_frame - image_centroid_3d_camera_frame
+        displacement_vector_msg = Vector3()
+        displacement_vector_msg.x = displacement_vector[0]
+        displacement_vector_msg.y = displacement_vector[1]
+        displacement_vector_msg.z = displacement_vector[2]
+        self.get_logger().info(f"Displacement vector: {displacement_vector_msg}")
+        self.reposition_vector_publisher.publish(displacement_vector_msg)
 
         self.complete_auto_reposition()
 
@@ -433,6 +434,14 @@ class ParaSightHost(Node):
         else:
             return -np.pi
 
+    def pixel_to_3d_camera_frame(self, pixel_coords, query_id):
+        """Convert pixel coordinates to 3D coordinates in the camera frame."""
+        depth_image_path = os.path.join(self.auto_reposition_dir, query_id, "depth_snapshot.png")
+        depth_image = self.load_depth_image(depth_image_path)
+        z = average_depth(depth_image, pixel_coords[1], pixel_coords[0])
+        x = (pixel_coords[0] - self.cx) * z / self.fx
+        y = (pixel_coords[1] - self.cy) * z / self.fy
+        return np.array([x, y, z])
     # ============================================================================
     # REGISTRATION AND PUBLISHING METHODS
     # ============================================================================

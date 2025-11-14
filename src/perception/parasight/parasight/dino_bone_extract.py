@@ -368,7 +368,6 @@ class DINOBoneExtractor():
             print(f"✗ No bone detected (best similarity: {best_sim:.3f} < threshold: {self.threshold})")
             
             # Save rejection status
-            os.makedirs(self.output_dir, exist_ok=True)
             output_name = os.path.splitext(os.path.basename(image_path))[0]
             rejection_path = os.path.join(self.output_dir, f"{output_name}_NO_DETECTION.txt")
             with open(rejection_path, 'w') as f:
@@ -489,7 +488,6 @@ class DINOBoneExtractor():
         plt.tight_layout()
         
         # Save results
-        os.makedirs(self.output_dir, exist_ok=True)
         output_name = os.path.splitext(os.path.basename(image_path))[0]
         
         if self.save_visualizations:
