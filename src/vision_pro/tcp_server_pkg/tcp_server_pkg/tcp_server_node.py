@@ -174,9 +174,9 @@ class TcpServerNode(Node):
             if self.last_rgb_image is None:
                 raise Exception("No image available for annotation")
             
-            # Convert image to PNG and encode as base64
-            self.get_logger().info('Converting image to PNG and base64...')
-            _, buffer = cv2.imencode('.png', self.last_rgb_image)
+            # Convert image to JPEG and encode as base64
+            self.get_logger().info('Converting image to JPEG and base64...')
+            _, buffer = cv2.imencode('.jpg', self.last_rgb_image, [cv2.IMWRITE_JPEG_QUALITY, 85])
             image_base64 = base64.b64encode(buffer).decode('utf-8')
             self.get_logger().info(f'Base64 encoding complete, size: {len(image_base64)} chars')
             
@@ -266,9 +266,9 @@ class TcpServerNode(Node):
                 # Already RGB, ensure correct color order
                 segmented_image = cv2.cvtColor(segmented_image, cv2.COLOR_BGR2RGB)
             
-            # Convert image to PNG and encode as base64
-            self.get_logger().info('Converting segmented image to PNG and base64...')
-            _, buffer = cv2.imencode('.png', segmented_image)
+            # Convert image to JPEG and encode as base64
+            self.get_logger().info('Converting segmented image to JPEG and base64...')
+            _, buffer = cv2.imencode('.jpg', segmented_image, [cv2.IMWRITE_JPEG_QUALITY, 85])
             image_base64 = base64.b64encode(buffer).decode('utf-8')
             self.get_logger().info(f'Base64 encoding complete, size: {len(image_base64)} chars')
             
