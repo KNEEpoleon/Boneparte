@@ -20,10 +20,10 @@ class DINOBoneExtractor():
     """
     Class to extract the bone using DINO.
     """
-    def __init__(self, checkpoint_path, dinov3_path, codebook_path, output_home, save_cluster_stats = True):
+    def __init__(self, checkpoint_path, dinov3_path, codebook_path, auto_reposition_dir, save_cluster_stats = True):
         self.checkpoint_path = checkpoint_path # shouldn't change
         self.dinov3_path = dinov3_path # shouldn't change
-        self.output_home = output_home # might not change
+        self.auto_reposition_dir = auto_reposition_dir # might not change
         self.output_dir = None
         self.save_visualizations = True # user configurable
         self.save_cluster_stats = True #user figurable
@@ -41,11 +41,9 @@ class DINOBoneExtractor():
         codebook['embedding'] = np.array(codebook['embedding'])
         return codebook
     
-    def make_output_dir(self, image_path):
-        """Make output folder for query image."""
-        self.output_dir = os.path.join(self.output_home, os.path.splitext(os.path.basename(image_path))[0])
-        if self.save_cluster_stats or self.save_visualizations:
-            os.makedirs(self.output_dir, exist_ok=True)
+    def set_auto_resposition_query_dir(self, query_id):
+        self.output_dir = os.path.join(self.auto_reposition_dir, query_id)
+        os.makedirs(self.output_dir, exist_ok=False)
 
     def load_dino_model(self):
         """Load the DINOv3 model."""
@@ -78,7 +76,6 @@ class DINOBoneExtractor():
         Returns:
             - bone centroid in the pixel space IF it exists
         """
-        self.make_output_dir(image_path)
         
         # Track overall timing
         start_time = time.time()

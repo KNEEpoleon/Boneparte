@@ -16,6 +16,7 @@ from std_msgs.msg import Int32
 from transitions import Machine
 import open3d as o3d
 import os
+import numpy as np
 
 
 from parasight.segment_ui import SegmentAnythingUI
@@ -62,6 +63,7 @@ class ParaSightHost(Node):
         # State Data
         self.last_rgb_image = None
         self.last_depth_image = None
+        self.last_depth_image_raw = None  # Keep original 16-bit depth data
         self.last_cloud = None
         self.annotated_points = None
         self.need_to_register = True
@@ -174,11 +176,11 @@ class ParaSightHost(Node):
         self.bridge = CvBridge()
         
         checkpoint_path = "/ros_ws/src/perception/dinov3/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
-        self.output_dir = "/ros_ws/src/perception/auto_reposition/"
+        self.auto_reposition_dir = "/ros_ws/src/perception/auto_reposition/"
         dinov3_path = "/ros_ws/src/perception/dinov3"
         codebook_path = "/ros_ws/src/perception/auto_reposition/fvd_bone_codebook.json"
 
-        self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, output_home=self.output_dir)
+        self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, auto_reposition_dir=self.auto_reposition_dir)
     
 
         # Initialize state machine after everything is set up
@@ -230,14 +232,21 @@ class ParaSightHost(Node):
         # TODO: Implement auto-reposition logic
         # For now, auto-complete for testing
         if self.last_rgb_image is not None:
-            os.makedirs(self.output_dir, exist_ok=True)
+            os.makedirs(self.auto_reposition_dir, exist_ok=True)
             # Get the current date and time
             now = datetime.now()
             # Format it into a concise string
-            query_id = "query_" + now.strftime("%m-%d_%H:%M:%S") + ".png"
-            cv2.imwrite(os.path.join(self.output_dir, query_id), self.last_rgb_image)
-
-        detected_bone_msg = self.bone_extractor.get_centroid(os.path.join(self.output_dir, query_id))
+            query_id = "query_" + now.strftime("%m-%d_%H:%M:%S")
+            self.bone_extractor.set_auto_resposition_query_dir(query_id)
+            cv2.imwrite(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"), self.last_rgb_image)
+            self.get_logger().info(f"Saved RGB image to {os.path.join(self.auto_reposition_dir, query_id, 'rgb_snapshot.png')}")
+            self.save_depth_image(os.path.join(self.auto_reposition_dir, query_id, "depth_snapshot.png"))
+            # cv2.imwrite(os.path.join(self.auto_reposition_dir, "depth_" + query_id), self.last_depth_image)
+        else:
+            self.get_logger().error("No RGB image available to save")
+            self.complete_auto_reposition()
+            return
+        detected_bone_msg = self.bone_extractor.get_centroid(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"))
         displacement_vector = detected_bone_msg['cluster_centroid']['vector']
         self.get_logger().info(f"Displacement vector: {displacement_vector}")
         msg = Vector3()
@@ -376,9 +385,14 @@ class ParaSightHost(Node):
 
     def depth_image_callback(self, msg):
         """Callback for depth image data - FULLY IMPLEMENTED."""
-        depth_image = self.bridge.imgmsg_to_cv2(msg, "16UC1") / 1000.0
+        # Keep original 16-bit depth data (in millimeters)
+        depth_image_raw = self.bridge.imgmsg_to_cv2(msg, "16UC1")
+        self.last_depth_image_raw = depth_image_raw
+        
+        # Convert to meters for processing (float64)
+        depth_image = depth_image_raw.astype(np.float64) / 1000.0
         self.last_depth_image = depth_image
-    
+
     def pcd_callback(self, msg):
         """Callback for point cloud data - FULLY IMPLEMENTED."""
         cloud = from_msg(msg)
@@ -535,6 +549,42 @@ class ParaSightHost(Node):
                 drill_pose_array.poses.append(pose)
         
         return drill_pose_array
+
+    def save_depth_image(self, filepath):
+        """Save depth image in multiple formats for maximum compatibility and losslessness."""
+        if self.last_depth_image_raw is None:
+            self.get_logger().warn("No depth image available to save")
+            return
+        
+        
+        # Method 1: Save as 16-bit PNG (lossless, widely compatible)
+        # This preserves the original millimeter precision from RealSense
+        # png_path = base_path + "_16bit.png"
+        # cv2.imwrite(png_path, self.last_depth_image_raw)
+        # self.get_logger().info(f"Saved 16-bit depth PNG: {png_path}")
+        
+        # Method 3: Save normalized 8-bit version for visualization (lossy but viewable)
+        if np.max(self.last_depth_image_raw) > 0:
+            # Normalize to 0-255 range for visualization
+            depth_normalized = (self.last_depth_image_raw.astype(np.float32) / np.max(self.last_depth_image_raw) * 255).astype(np.uint8)
+            cv2.imwrite(filepath, depth_normalized)
+            self.get_logger().info(f"Saved visualization depth PNG: {filepath}")
+
+    @staticmethod
+    def load_depth_image(filepath):
+        """Load depth image from saved files."""
+        base_path = os.path.splitext(filepath)[0]
+        
+        # # Try to load 16-bit PNG first (most compatible lossless format)
+        # png_path = base_path + "_16bit.png"
+        # if os.path.exists(png_path):
+        #     return cv2.imread(png_path, cv2.IMREAD_UNCHANGED)
+        
+        # Fall back to original path if it exists
+        if os.path.exists(filepath):
+            return cv2.imread(filepath, cv2.IMREAD_UNCHANGED)
+        
+        raise FileNotFoundError(f"No depth image found at {filepath}")
 
 
 # ============================================================================
