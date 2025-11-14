@@ -4,7 +4,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Empty, String
-from surgical_robot_planner.srv import SelectPose
+from surgical_robot_planner.srv import SelectPose, RobotCommand
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import socket
@@ -29,6 +29,7 @@ class TcpServerNode(Node):
 
         # Service client
         self.select_pose_client = self.create_client(SelectPose, '/select_pose')
+        self.robot_command_client = self.create_client(RobotCommand, '/robot_command')
 
         # Image subscription for annotation
         self.image_subscription = self.create_subscription(
@@ -228,6 +229,10 @@ class TcpServerNode(Node):
             self.get_logger().info('Stopped FSM /hard_reset_host')
         elif command == "KILLALL":
             self.handle_emergency_stop()
+        elif command == "robot_home":
+            self.call_robot_command_service("home")
+        elif command == "robot_away":
+            self.call_robot_command_service("away")
         elif command.startswith("drill_"):
             _, bone, hole = command.split('_')
             try:
@@ -272,6 +277,30 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Service responded: {response}')
         except Exception as e:
             self.get_logger().error(f'Service call failed: {e}')
+
+    def call_robot_command_service(self, command: str):
+        """Call the robot command service to move robot to home or away position"""
+        if not self.robot_command_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error('Service /robot_command not available')
+            return
+
+        request = RobotCommand.Request()
+        request.command = command  # "home" or "away"
+
+        future = self.robot_command_client.call_async(request)
+        future.add_done_callback(self.handle_robot_command_response)
+        self.get_logger().info(f"Commanding robot to move to: {command}")
+
+    def handle_robot_command_response(self, future):
+        """Handle response from robot command service"""
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info(f'Robot command succeeded: {response.message}')
+            else:
+                self.get_logger().error(f'Robot command failed: {response.message}')
+        except Exception as e:
+            self.get_logger().error(f'Robot command service call failed: {e}')
 
     def handle_emergency_stop(self):
         """Handle emergency stop command - kill all Docker containers and processes"""
