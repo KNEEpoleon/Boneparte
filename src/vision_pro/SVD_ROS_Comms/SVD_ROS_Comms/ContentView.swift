@@ -40,11 +40,8 @@ struct ContentView: View {
     // Command mapping
     private let commandMap: [String: String] = [
         "Annotate": "annotate",
-        "Restart": "restart",
-        "Drill": "CMD_DRILL",
-        "Track": "CMD_TRACK",
-        "Start": "CMD_START",
-        "Stop": "CMD_STOP",
+        "robot_away": "robot_away",
+        "robot_home": "robot_home",
         "Femur 1": "drill_femur_1",
         "Femur 2": "drill_femur_2",
         "Femur 3": "drill_femur_3",
@@ -226,41 +223,31 @@ struct ContentView: View {
                 icon: "slider.horizontal.3"
             )
             
-            StandardCard(title: "Annotation", subtitle: "Launch segmentation interface") {
+            StandardCard(title: "Launch segmentation interface") {
                 Button {
                     sendCommand("Annotate")
                 } label: {
-                    Label("Start", systemImage: "pencil.tip.crop.circle")
+                    Label("Annotate", systemImage: "pencil.tip.crop.circle")
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Calibration", subtitle: "ArUco hand-eye alignment") {
+            StandardCard(title: "Send the robot away") {
                 Button {
-                    // TODO: Backend integration
+                    sendCommand("robot_away")
                 } label: {
-                    Label("Start", systemImage: "target")
+                    Label("Send", systemImage: "paperplane.fill")
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Registration", subtitle: "Align bone models to patient") {
+            StandardCard(title: "Bring the robot home") {
                 Button {
-                    // TODO: Backend integration
+                    sendCommand("robot_home")
                 } label: {
-                    Label("Start", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
-            }
-            
-            StandardCard(title: "Execution", subtitle: "Robot mode & procedure execution") {
-                Button {
-                    sendCommand("Start")
-                } label: {
-                    Label("Start", systemImage: "play.fill")
+                    Label("Home", systemImage: "house.fill") 
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
