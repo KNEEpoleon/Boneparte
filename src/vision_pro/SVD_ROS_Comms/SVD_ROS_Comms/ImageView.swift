@@ -11,13 +11,30 @@ struct ImageView: View {
     let imageData: Data
     @State private var annotations: [AnnotationPoint] = []
     @State private var imageSize: CGSize = .zero
+    @Environment(\.dismiss) private var dismiss
     let onAnnotationsComplete: ([AnnotationPoint]) -> Void
+    
+    private let maxAnnotations = 2
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("Tap on the image to annotate")
-                .font(.headline)
-                .foregroundColor(.white)
+            // Header with close button
+            HStack {
+                Text("Tap on the image to annotate (2 points required)")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(.white)
+                }
+            }
+            .padding(.horizontal)
             
             // Image with tap gesture
             GeometryReader { geometry in
@@ -34,7 +51,7 @@ struct ImageView: View {
                             ForEach(Array(annotations.enumerated()), id: \.offset) { index, annotation in
                                 Circle()
                                     .fill(Color.red)
-                                    .frame(width: 20, height: 20)
+                                    .frame(width: 10, height: 10)
                                     .position(
                                         x: CGFloat(annotation.x) * geometry.size.width,
                                         y: CGFloat(annotation.y) * geometry.size.height
@@ -57,7 +74,7 @@ struct ImageView: View {
             
             // Annotation info
             VStack(spacing: 10) {
-                Text("Annotations: \(annotations.count)")
+                Text("Annotations: \(annotations.count)/\(maxAnnotations)")
                     .font(.subheadline)
                     .foregroundColor(.white)
                 
@@ -80,8 +97,10 @@ struct ImageView: View {
             
             // Action buttons
             HStack(spacing: 20) {
-                Button("Clear All") {
-                    annotations.removeAll()
+                Button("Undo Last") {
+                    if !annotations.isEmpty {
+                        annotations.removeLast()
+                    }
                 }
                 .padding()
                 .background(Color.orange)
@@ -89,14 +108,24 @@ struct ImageView: View {
                 .cornerRadius(8)
                 .disabled(annotations.isEmpty)
                 
-                Button("Send Annotations") {
-                    onAnnotationsComplete(annotations)
+                Button("Clear All") {
+                    annotations.removeAll()
                 }
                 .padding()
-                .background(Color.green)
+                .background(Color.red)
                 .foregroundColor(.white)
                 .cornerRadius(8)
                 .disabled(annotations.isEmpty)
+                
+                Button("Send Annotations") {
+                    onAnnotationsComplete(annotations)
+                    dismiss()
+                }
+                .padding()
+                .background(annotations.count == maxAnnotations ? Color.green : Color.gray)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .disabled(annotations.count != maxAnnotations)
             }
         }
         .padding()
@@ -105,6 +134,11 @@ struct ImageView: View {
     }
     
     private func addAnnotation(at location: CGPoint, in viewSize: CGSize) {
+        // Only allow up to maxAnnotations
+        guard annotations.count < maxAnnotations else {
+            return
+        }
+        
         // Convert tap location to normalized coordinates (0.0 to 1.0)
         let normalizedX = max(0.0, min(1.0, Double(location.x / viewSize.width)))
         let normalizedY = max(0.0, min(1.0, Double(location.y / viewSize.height)))
