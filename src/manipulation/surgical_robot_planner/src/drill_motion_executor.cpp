@@ -6,21 +6,22 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "surgical_robot_planner/srv/select_pose.hpp"
+#include "surgical_robot_planner/srv/robot_command.hpp"
+#include "surgical_robot_planner/msg/pin_drilled.hpp"
 #include <vector>
 #include <atomic>
 
 class PoseSubscriberNode : public rclcpp::Node {
 private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr drill_command_publisher_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr manipulator_command_publisher_;
-  rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr pin_drilled_publisher_;
+  rclcpp::Publisher<surgical_robot_planner::msg::PinDrilled>::SharedPtr pin_drilled_publisher_;
   std::string robot_name_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr subscription_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr registration_subscription_;
   rclcpp::Service<surgical_robot_planner::srv::SelectPose>::SharedPtr select_pose_service_;
+  rclcpp::Service<surgical_robot_planner::srv::RobotCommand>::SharedPtr robot_command_service_;
   std::vector<geometry_msgs::msg::Pose> stored_poses_;
-  std::atomic<bool> registration_complete_{false};
+  std::atomic<bool> poses_received_{false};
 
 public:
   static std::shared_ptr<PoseSubscriberNode> create() {
@@ -41,14 +42,12 @@ public:
 
     subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>("/surgical_drill_pose", 10,
         std::bind(&PoseSubscriberNode::pose_callback, this, std::placeholders::_1));
-    registration_subscription_ = this->create_subscription<std_msgs::msg::String>(
-        "/registration", 10,
-        std::bind(&PoseSubscriberNode::registration_callback, this, std::placeholders::_1));
     drill_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/drill_commands", 10);
-    manipulator_command_publisher_ = this->create_publisher<std_msgs::msg::String>("/manipulator_command", 10);
-    pin_drilled_publisher_ = this->create_publisher<geometry_msgs::msg::Pose>("/pin_drilled", 10);
+    pin_drilled_publisher_ = this->create_publisher<surgical_robot_planner::msg::PinDrilled>("/pin_drilled_info", 10);
     select_pose_service_ = this->create_service<surgical_robot_planner::srv::SelectPose>("/select_pose",
       std::bind(&PoseSubscriberNode::select_pose_callback, this, std::placeholders::_1, std::placeholders::_2));
+    robot_command_service_ = this->create_service<surgical_robot_planner::srv::RobotCommand>("/robot_command",
+      std::bind(&PoseSubscriberNode::robot_command_callback, this, std::placeholders::_1, std::placeholders::_2));
   }
   void pose_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
     if (msg->poses.empty()) {
@@ -56,18 +55,8 @@ public:
       return;
     }
     stored_poses_ = msg->poses;
+    poses_received_ = true;  // Mark that we've received valid poses
     RCLCPP_INFO(this->get_logger(), "Stored %zu poses. Ready for user selection via service.", stored_poses_.size());
-  }
-  
-  void registration_callback(const std_msgs::msg::String::SharedPtr msg) {
-    std::string state = msg->data;
-    if (state == "complete") {
-      registration_complete_ = true;
-      RCLCPP_INFO(this->get_logger(), "Registration complete. Drilling enabled.");
-    } else {
-      registration_complete_ = false;
-      RCLCPP_INFO(this->get_logger(), "Registration state: %s. Drilling disabled.", state.c_str());
-    }
   }
   
   void select_pose_callback(const std::shared_ptr<surgical_robot_planner::srv::SelectPose::Request> request,std::shared_ptr<surgical_robot_planner::srv::SelectPose::Response> response) {
@@ -79,20 +68,40 @@ public:
       return;
     }
     
-    if (!registration_complete_) {
+    if (!poses_received_) {
       response->success = false;
-      response->message = "Registration not complete. Please wait for registration to complete before drilling.";
-      RCLCPP_WARN(this->get_logger(), "Drilling blocked: Registration not complete. Current state: waiting for 'complete'.");
+      response->message = "No poses received yet. Please complete registration first to generate drill poses.";
+      RCLCPP_WARN(this->get_logger(), "Drilling blocked: No poses received yet. Waiting for /surgical_drill_pose.");
       return;
     }
     
     RCLCPP_INFO(this->get_logger(), "User selected pose index %d.", index);
-    drill_at_pose(stored_poses_[index]);
+    drill_at_pose(stored_poses_[index], index);
     response->success = true;
     response->message = "Calling drill at selected pose.";
   }
+  
+  void robot_command_callback(const std::shared_ptr<surgical_robot_planner::srv::RobotCommand::Request> request,
+                              std::shared_ptr<surgical_robot_planner::srv::RobotCommand::Response> response) {
+    std::string command = request->command;
+    RCLCPP_INFO(this->get_logger(), "Received robot command: %s", command.c_str());
+    
+    if (command == "home") {
+      bool success = return_to_home_pose();
+      response->success = success;
+      response->message = success ? "Successfully moved to home pose." : "Failed to move to home pose.";
+    } else if (command == "away") {
+      bool success = move_to_away_pose();
+      response->success = success;
+      response->message = success ? "Successfully moved to away pose." : "Failed to move to away pose.";
+    } else {
+      response->success = false;
+      response->message = "Invalid command. Valid commands are: 'home', 'away'.";
+      RCLCPP_WARN(this->get_logger(), "Unknown robot command: %s", command.c_str());
+    }
+  }
 
-  void drill_at_pose(const geometry_msgs::msg::Pose& target_pose) {
+  void drill_at_pose(const geometry_msgs::msg::Pose& target_pose, int pose_index) {
     geometry_msgs::msg::Pose above_pose = target_pose;
     geometry_msgs::msg::Pose final_pose= target_pose;
 
@@ -166,8 +175,11 @@ public:
         // Plan and execute return to pre-drill position
         return_to_pre_drill_position(above_pose);
         // Notify obstacle manager that a pin was drilled
-        pin_drilled_publisher_->publish(target_pose);
-        RCLCPP_INFO(this->get_logger(), "Published drilled pin pose to /pin_drilled.");
+        auto pin_drilled_msg = surgical_robot_planner::msg::PinDrilled();
+        pin_drilled_msg.pose = target_pose;
+        pin_drilled_msg.pose_index = pose_index;
+        pin_drilled_publisher_->publish(pin_drilled_msg);
+        RCLCPP_INFO(this->get_logger(), "Published drilled pin (index %d) to /pin_drilled_info.", pose_index);
         // Return to home, then move to away
         if (return_to_home_pose()) {
           move_to_away_pose();
@@ -212,8 +224,9 @@ public:
     move_group_interface_->setStartStateToCurrentState();
     move_group_interface_->setNamedTarget("Boneparte_home");  // target from SRDF
     move_group_interface_->setPlannerId("PTP");
-    move_group_interface_->setMaxVelocityScalingFactor(1);
-
+    move_group_interface_->setMaxVelocityScalingFactor(0.5);
+    move_group_interface_->setMaxAccelerationScalingFactor(0.2);
+    
     moveit::planning_interface::MoveGroupInterface::Plan home_plan;
     auto plan_result = move_group_interface_->plan(home_plan);
     if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
@@ -233,12 +246,33 @@ public:
     }
   }
 
-  void move_to_away_pose() {
-    RCLCPP_INFO(this->get_logger(), "Commanding manipulator to move to away pose...");
-    auto away_msg = std_msgs::msg::String();
-    away_msg.data = "go_away";
-    manipulator_command_publisher_->publish(away_msg);
-    RCLCPP_INFO(this->get_logger(), "Published 'go_away' command to /manipulator_command.");
+  bool move_to_away_pose() {
+    RCLCPP_INFO(this->get_logger(), "Moving manipulator to away pose...");
+    
+    move_group_interface_->setStartStateToCurrentState();
+    move_group_interface_->setNamedTarget("Boneparte_away");
+    move_group_interface_->setPlannerId("PTP");
+    move_group_interface_->setMaxVelocityScalingFactor(0.5);
+    move_group_interface_->setMaxAccelerationScalingFactor(0.2);
+
+    moveit::planning_interface::MoveGroupInterface::Plan away_plan;
+    auto plan_result = move_group_interface_->plan(away_plan);
+    
+    if (plan_result == moveit::core::MoveItErrorCode::SUCCESS) {
+      RCLCPP_INFO(this->get_logger(), "Planning successful. Executing movement to away pose...");
+      auto execution_result = move_group_interface_->execute(away_plan);
+      
+      if (execution_result == moveit::core::MoveItErrorCode::SUCCESS) {
+        RCLCPP_INFO(this->get_logger(), "Successfully moved to away pose.");
+        return true;
+      } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to execute movement to away pose with error code: %d", execution_result.val);
+        return false;
+      }
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "Failed to plan movement to away pose with error code: %d", plan_result.val);
+      return false;
+    }
   }
 };
 
