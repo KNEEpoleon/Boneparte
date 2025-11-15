@@ -5,3 +5,18 @@ install/
 __pycache__/
 src/perception/dinov3/
 src/test_aruco_axes.py
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcworkspace/xcuserdata/

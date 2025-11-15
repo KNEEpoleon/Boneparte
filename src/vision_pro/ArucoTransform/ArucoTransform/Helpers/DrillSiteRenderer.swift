@@ -16,9 +16,9 @@ class DrillSiteRenderer: ObservableObject {
     private var drillSiteEntities: [UUID: Entity] = [:]
     
     // Visual configuration
-    private let sphereRadius: Float = 0.01  // 1cm radius
-    private let axisLength: Float = 0.05    // 5cm axis length
-    private let axisThickness: Float = 0.002  // 2mm thickness
+    private let sphereRadius: Float = 0.005  // 0.5cm radius (half size)
+    private let axisLength: Float = 0.02    // 2.5cm axis length (half size)
+    private let axisThickness: Float = 0.001  // 1mm thickness (half size)
     
     func updateDrillSites(_ drillSites: [DrillSite], arucoTransform: simd_float4x4?) {
         guard let arucoToWorld = arucoTransform else {
@@ -70,7 +70,7 @@ class DrillSiteRenderer: ObservableObject {
         // Create axis vectors (X, Y, Z) to show orientation
         // Z-axis (drilling direction) - blue and longer
         let zAxis = createAxisCylinder(
-            length: axisLength * 2,
+            length: axisLength,
             color: .blue,
             direction: SIMD3<Float>(0, 0, 1)
         )
