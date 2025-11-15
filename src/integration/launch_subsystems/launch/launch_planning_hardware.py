@@ -54,10 +54,18 @@ def generate_launch_description():
         name='tcp_server_node',
         output='screen',  # Show logs in the terminal
     )
+
+    # 5. Run the obstacle_manager node
+    obstacle_manager_node = Node(
+        package='surgical_robot_planner',
+        executable='obstacle_manager',
+        name='obstacle_manager_node',
+        output='screen',
+    )
     # Add the actions to the launch description
     ld.add_action(lbr_bringup_launch)
     ld.add_action(planner_launch)
     ld.add_action(serial_node)
     ld.add_action(avp_ros_node)
-
+    ld.add_action(obstacle_manager_node)
     return ld
