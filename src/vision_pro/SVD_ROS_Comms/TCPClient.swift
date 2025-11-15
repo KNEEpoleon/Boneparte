@@ -19,6 +19,7 @@ class TCPClient: ObservableObject {
     @Published var statusMessage: String = "Waiting for connection..."
     @Published var statusColor: Color = .gray
     @Published var receivedImage: Data?
+    @Published var receivedSegmentedImage: Data?
     @Published var imageTransmissionStatus: String = ""
 
     private var host: String
@@ -112,49 +113,25 @@ class TCPClient: ObservableObject {
             receivedDataBuffer.removeFirst(distance)
             
             if message.hasPrefix("IMAGE:") {
-                handleImageData(message)
-            } else {
-                // Only print non-image messages (commands, status, etc.)
-                print("Received command: \(message)")
+                handleImageData(message, isSegmented: false)
+            } else if message.hasPrefix("SEGMENTED_IMAGE:") {
+                handleImageData(message, isSegmented: true)
             }
         }
     }
     
-    private func handleImageData(_ response: String) {
-        let imageDataString = String(response.dropFirst(6)) // Remove "IMAGE:" prefix
-        
-        guard imageDataString.count > 100 else {
-            print("Error: Base64 image data too short (\(imageDataString.count) characters)")
-            DispatchQueue.main.async {
-                self.imageTransmissionStatus = "Error: Invalid image data length"
-            }
-            return
-        }
+    private func handleImageData(_ response: String, isSegmented: Bool) {
+        let prefixLength = isSegmented ? 16 : 6 // "SEGMENTED_IMAGE:" (16 chars) or "IMAGE:" (6 chars)
+        let imageDataString = String(response.dropFirst(prefixLength))
         
         if let imageData = Data(base64Encoded: imageDataString, options: .ignoreUnknownCharacters) {
-            #if canImport(UIKit)
-            if let uiImage = UIImage(data: imageData) {
-                print("Image received: \(uiImage.size.width)x\(uiImage.size.height), \(imageData.count) bytes")
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if isSegmented {
+                    self.receivedSegmentedImage = imageData
+                } else {
                     self.receivedImage = imageData
-                    self.imageTransmissionStatus = "Image received successfully (\(imageData.count) bytes)"
                 }
-            } else {
-                print("Error: Failed to create UIImage from data")
-                DispatchQueue.main.async {
-                    self.imageTransmissionStatus = "Error: Invalid image format"
-                }
-            }
-            #else
-            DispatchQueue.main.async {
-                self.receivedImage = imageData
                 self.imageTransmissionStatus = "Image received successfully (\(imageData.count) bytes)"
-            }
-            #endif
-        } else {
-            print("Error: Failed to decode base64 image data")
-            DispatchQueue.main.async {
-                self.imageTransmissionStatus = "Error: Failed to decode image data"
             }
         }
     }
@@ -193,6 +170,22 @@ class TCPClient: ObservableObject {
                 self.statusMessage = "Failed to encode annotations: \(error.localizedDescription)"
                 self.statusColor = .red
             }
+        }
+    }
+
+    func sendAccept() {
+        send("accept\n")
+        // Clear segmented image after accepting
+        DispatchQueue.main.async {
+            self.receivedSegmentedImage = nil
+        }
+    }
+    
+    func sendReject() {
+        send("reject\n")
+        // Clear segmented image after rejecting
+        DispatchQueue.main.async {
+            self.receivedSegmentedImage = nil
         }
     }
 

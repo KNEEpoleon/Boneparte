@@ -3,3 +3,18 @@ log/
 install/
 .vscode/
 __pycache__/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcworkspace/xcuserdata/

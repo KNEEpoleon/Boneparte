@@ -36,15 +36,15 @@ struct ContentView: View {
     @StateObject private var tcpClient = TCPClient(host: "192.168.0.193", port: 5000)
     @State private var selectedDrillSite: String? = nil
     @State private var showEmergencyConfirm = false
+    @State private var drillCommandHistory: [DrillCommand] = []
+    @State private var lastConnectionState: Bool = false
+    @State private var storedOriginalImage: Data? = nil
     
     // Command mapping
     private let commandMap: [String: String] = [
         "Annotate": "annotate",
-        "Restart": "restart",
-        "Drill": "CMD_DRILL",
-        "Track": "CMD_TRACK",
-        "Start": "CMD_START",
-        "Stop": "CMD_STOP",
+        "robot_away": "robot_away",
+        "robot_home": "robot_home",
         "Femur 1": "drill_femur_1",
         "Femur 2": "drill_femur_2",
         "Femur 3": "drill_femur_3",
@@ -80,12 +80,12 @@ struct ContentView: View {
                 } else {
                     HStack(alignment: .top, spacing: Spacing.xl) {
                         leftColumn
-                            .frame(maxWidth: 480, alignment: .topLeading)
+                            .frame(maxWidth: 336, alignment: .topLeading)
                         rightColumn
-                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .frame(maxWidth: 480, alignment: .topLeading)
                     }
                     .padding(padding)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .frame(alignment: .topLeading)
                 }
             }
         }
@@ -103,8 +103,36 @@ struct ContentView: View {
             set: { _ in tcpClient.receivedImage = nil }
         )) { imageData in
             ImageView(imageData: imageData.data) { annotations in
+                // Store original image before sending annotations
+                storedOriginalImage = imageData.data
                 tcpClient.sendAnnotations(annotations)
             }
+        }
+        .sheet(item: Binding(
+            get: { tcpClient.receivedSegmentedImage.map { ImageData(data: $0) } },
+            set: { _ in tcpClient.receivedSegmentedImage = nil }
+        )) { imageData in
+            SegmentationView(imageData: imageData.data) {
+                // Accept callback
+                tcpClient.sendAccept()
+                storedOriginalImage = nil
+            } onReject: {
+                // Reject callback - send reject and reopen annotation window
+                tcpClient.sendReject()
+                // Reopen annotation window with stored original image
+                if let originalImage = storedOriginalImage {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        tcpClient.receivedImage = originalImage
+                    }
+                }
+            }
+        }
+        .onChange(of: isConnected) { oldValue, newValue in
+            // Clear history when transitioning from disconnected to connected
+            if !lastConnectionState && newValue {
+                drillCommandHistory.removeAll()
+            }
+            lastConnectionState = newValue
         }
     }
     
@@ -226,41 +254,31 @@ struct ContentView: View {
                 icon: "slider.horizontal.3"
             )
             
-            StandardCard(title: "Annotation", subtitle: "Launch segmentation interface") {
+            StandardCard(title: "Launch segmentation interface") {
                 Button {
                     sendCommand("Annotate")
                 } label: {
-                    Label("Start", systemImage: "pencil.tip.crop.circle")
+                    Label("Annotate", systemImage: "pencil.tip.crop.circle")
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Calibration", subtitle: "ArUco hand-eye alignment") {
+            StandardCard(title: "Send the robot away") {
                 Button {
-                    // TODO: Backend integration
+                    sendCommand("robot_away")
                 } label: {
-                    Label("Start", systemImage: "target")
+                    Label("Send", systemImage: "paperplane.fill")
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Registration", subtitle: "Align bone models to patient") {
+            StandardCard(title: "Bring the robot home") {
                 Button {
-                    // TODO: Backend integration
+                    sendCommand("robot_home")
                 } label: {
-                    Label("Start", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
-            }
-            
-            StandardCard(title: "Execution", subtitle: "Robot mode & procedure execution") {
-                Button {
-                    sendCommand("Start")
-                } label: {
-                    Label("Start", systemImage: "play.fill")
+                    Label("Home", systemImage: "house.fill") 
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
@@ -333,8 +351,6 @@ struct ContentView: View {
                                 }
                                 .disabled(!isConnected)
                             }
-                            
-                            Spacer()
                         }
                     }
                     
@@ -356,6 +372,51 @@ struct ContentView: View {
                             }
                             .font(.labelSmall)
                             .foregroundColor(.surgicalBlue)
+                        }
+                    }
+                    
+                    // Drill command history
+                    if !drillCommandHistory.isEmpty {
+                        Divider()
+                        
+                        VStack(alignment: .leading, spacing: Spacing.sm) {
+                            HStack {
+                                Text("Drill History")
+                                    .font(.labelLarge)
+                                    .foregroundColor(.textPrimary)
+                                
+                                Spacer()
+                                
+                                Button("Clear All") {
+                                    drillCommandHistory.removeAll()
+                                }
+                                .font(.labelSmall)
+                                .foregroundColor(.statusDanger)
+                            }
+                            
+                            ScrollView {
+                                VStack(spacing: Spacing.xs) {
+                                    ForEach(drillCommandHistory) { command in
+                                        HStack {
+                                            Circle()
+                                                .fill(command.siteName.contains("Femur") ? Color.femurColor : Color.tibiaColor)
+                                                .frame(width: 8, height: 8)
+                                            
+                                            Text(command.siteName)
+                                                .font(.caption)
+                                                .foregroundColor(.textPrimary)
+                                            
+                                            Spacer()
+                                            
+                                            Text(command.timestamp, style: .time)
+                                                .font(.caption2)
+                                                .foregroundColor(.textSecondary)
+                                        }
+                                        .padding(.vertical, 4)
+                                    }
+                                }
+                            }
+                            .frame(maxHeight: 150)
                         }
                     }
                 }
@@ -419,6 +480,10 @@ struct ContentView: View {
     private func selectDrillSite(_ site: String) {
         selectedDrillSite = site
         sendCommand(site)
+        
+        // Add to history
+        let command = DrillCommand(siteName: site, timestamp: Date())
+        drillCommandHistory.append(command)
     }
 }
 
@@ -430,4 +495,11 @@ struct ContentView: View {
 struct ImageData: Identifiable {
     let id = UUID()
     let data: Data
+}
+
+// Drill command tracking
+struct DrillCommand: Identifiable {
+    let id = UUID()
+    let siteName: String
+    let timestamp: Date
 }
