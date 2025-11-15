@@ -180,10 +180,7 @@ public:
         pin_drilled_msg.pose_index = pose_index;
         pin_drilled_publisher_->publish(pin_drilled_msg);
         RCLCPP_INFO(this->get_logger(), "Published drilled pin (index %d) to /pin_drilled_info.", pose_index);
-        // Return to home, then move to away
-        if (return_to_home_pose()) {
-          move_to_away_pose();
-        }
+        return_to_home_pose();
       } else {
         RCLCPP_ERROR(this->get_logger(), "Drilling motion execution failed with error code: %d", execution_result.val);
         return_to_home_pose();
