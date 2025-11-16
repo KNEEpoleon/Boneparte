@@ -1,4 +1,5 @@
-#include "geometry_msgs/msg/vector3.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "moveit/move_group_interface/move_group_interface.h"
 #include "rclcpp/rclcpp.hpp"
@@ -17,7 +18,7 @@ private:
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_interface_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-  rclcpp::Subscription<geometry_msgs::msg::Vector3>::SharedPtr direction_subscription_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr bone_centroid_subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr error_publisher_;
 
 public:
@@ -43,10 +44,10 @@ public:
     move_group_interface_->setPlanningPipelineId("pilz_industrial_motion_planner");
     move_group_interface_->setPlanningTime(5.0);
 
-    // Subscribe to error recovery direction from perception
-    direction_subscription_ = this->create_subscription<geometry_msgs::msg::Vector3>(
-        "/error_recovery_direction", 10,
-        std::bind(&ErrorRecoveryNode::direction_callback, this, std::placeholders::_1));
+    // Subscribe to bone centroid position from perception
+    bone_centroid_subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
+        "/bone_centroid_camera_frame", 10,
+        std::bind(&ErrorRecoveryNode::bone_centroid_callback, this, std::placeholders::_1));
     
     // Publisher for error recovery status
     error_publisher_ = this->create_publisher<std_msgs::msg::String>("/error_recovery_status", 10);
@@ -57,9 +58,18 @@ public:
 
 private:
 
-  void direction_callback(const geometry_msgs::msg::Vector3::SharedPtr msg) {
-    RCLCPP_INFO(this->get_logger(), "Received error recovery direction: [%.4f, %.4f, %.4f]", 
-                msg->x, msg->y, msg->z);
+  void bone_centroid_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg) {
+    // Check if PoseArray has at least one pose
+    if (msg->poses.empty()) {
+      RCLCPP_WARN(this->get_logger(), "Received empty PoseArray, ignoring");
+      return;
+    }
+    
+    // Extract the first pose from the PoseArray (bone centroid)
+    const auto& bone_centroid_pose = msg->poses[0];
+    RCLCPP_INFO(this->get_logger(), "Received bone centroid position: [%.4f, %.4f, %.4f] in frame %s", 
+                bone_centroid_pose.position.x, bone_centroid_pose.position.y, bone_centroid_pose.position.z,
+                msg->header.frame_id.c_str());
     
     try {
       // Get current end-effector pose in base frame using TF
@@ -89,18 +99,19 @@ private:
       geometry_msgs::msg::TransformStamped camera_to_base;
       try {
         camera_to_base = tf_buffer_->lookupTransform(
-            base_frame_, camera_frame_, 
+            base_frame_, msg->header.frame_id, 
             rclcpp::Time(0), 
             rclcpp::Duration::from_seconds(1.0));
       } catch (const tf2::TransformException &ex) {
         RCLCPP_ERROR(this->get_logger(), "Failed to get transform from %s to %s: %s", 
-                     camera_frame_.c_str(), base_frame_.c_str(), ex.what());
+                     msg->header.frame_id.c_str(), base_frame_.c_str(), ex.what());
         publish_error("TF transform lookup failed");
         return;
       }
 
-      // Convert offset vector from camera frame to base frame
-      tf2::Vector3 offset_camera(msg->x, msg->y, msg->z);
+      // Compute displacement vector from image center to bone centroid
+      // bone_centroid - image_center = (x, y, z) - (0, 0, z) = (x, y, 0)
+      tf2::Vector3 offset_camera(bone_centroid_pose.position.x, bone_centroid_pose.position.y, 0.0);
       
       // Extract rotation from transform
       tf2::Quaternion q(

@@ -39,6 +39,21 @@ def generate_launch_description():
         launch_arguments={'model': 'med7'}.items()
     )
 
+    # 2b. Launch surgical_robot_planner error_recovery.launch.py
+    error_recovery_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('surgical_robot_planner'),
+                'launch',
+                'error_recovery.launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'model': 'med7',
+            'mode': 'hardware'
+        }.items()
+    )
+
     # 3. Run serialcomms write_to_serial node
     serial_node = Node(
         package='serialcomms',
@@ -65,6 +80,7 @@ def generate_launch_description():
     # Add the actions to the launch description
     ld.add_action(lbr_bringup_launch)
     ld.add_action(planner_launch)
+    ld.add_action(error_recovery_launch)
     ld.add_action(serial_node)
     ld.add_action(avp_ros_node)
     ld.add_action(obstacle_manager_node)
