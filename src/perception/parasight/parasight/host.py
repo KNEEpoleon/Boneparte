@@ -55,7 +55,7 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='annotate', source='await_surgeon_input', dest='segment_and_register')
         self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='update_rviz')
         self.machine.add_transition(trigger='complete_map_update', source='update_rviz', dest='ready_to_drill')
-        self.machine.add_transition(trigger='reset_mission', source='ready_to_drill', dest='await_surgeon_input')
+        self.machine.add_transition(trigger='reset_mission', source=['segment_and_register', 'update_rviz', 'ready_to_drill'], dest='await_surgeon_input')
         self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
         self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
@@ -511,14 +511,14 @@ class ParaSightHost(Node):
         return response
 
     def reset_mission_callback(self, msg):
-        """Handle reset_mission command - transitions from ready_to_drill to await_surgeon_input."""
+        """Handle reset_mission command - transitions to await_surgeon_input from segmentation/drill states."""
         self.get_logger().info(f'Reset mission command received in state: {self.state}')
         
-        if self.state == 'ready_to_drill':
+        if self.state in ['segment_and_register', 'update_rviz', 'ready_to_drill']:
             self.get_logger().info('Triggering reset_mission transition...')
             self.trigger('reset_mission')
         else:
-            self.get_logger().warn(f'Reset mission command received but not in ready_to_drill state (current: {self.state})')
+            self.get_logger().warn(f'Reset mission command received but not in valid state (current: {self.state})')
 
     def start_drill_callback(self, msg):
         """Handle start_drill command - transitions from ready_to_drill to drill."""

@@ -21,9 +21,11 @@ class TcpServerNode(Node):
         super().__init__('tcp_server_node')
         self.get_logger().info('ROS2 TCP Server Node started')
 
-        # One-shot publisher
-        self.start_pub = self.create_publisher(Empty, '/trigger_host_ui', 10)
-        self.stop_pub = self.create_publisher(Empty, '/hard_reset_host', 10)
+        # FSM command publishers
+        self.annotate_pub = self.create_publisher(Empty, '/annotate', 10)
+        self.proceed_mission_pub = self.create_publisher(Empty, '/proceed_mission', 10)
+        self.reset_mission_pub = self.create_publisher(Empty, '/reset_mission', 10)
+        self.hard_reset_pub = self.create_publisher(Empty, '/hard_reset_host', 10)
         
         # Publisher for AVP annotations
         self.annotations_pub = self.create_publisher(String, '/avp_annotations', 10)
@@ -237,9 +239,9 @@ class TcpServerNode(Node):
             # NOTE(parth) calling another annotation window before annotations received from avp
             time.sleep(0.2)
             
-            # Now trigger the original ParaSight flow (will generate segmentation)
-            self.start_pub.publish(Empty())
-            self.get_logger().info('Started FSM /trigger_host_ui with AVP annotations')
+            # Now trigger the FSM annotate transition (will generate segmentation)
+            self.annotate_pub.publish(Empty())
+            self.get_logger().info('Published to /annotate with AVP annotations')
             # Segmented image will be sent via callback when ParaSight publishes it
             
         except Exception as e:
@@ -294,9 +296,11 @@ class TcpServerNode(Node):
     def handle_command(self, command: str):
         if command == "annotate":
             self.handle_annotate_command()
+        elif command == "proceed_mission":
+            self.handle_proceed_mission()
         elif command == "restart":
-            self.stop_pub.publish(Empty())
-            self.get_logger().info('Stopped FSM /hard_reset_host')
+            self.hard_reset_pub.publish(Empty())
+            self.get_logger().info('Published to /hard_reset_host')
         elif command == "KILLALL":
             self.handle_emergency_stop()
         elif command == "accept":
@@ -388,15 +392,32 @@ class TcpServerNode(Node):
         self.get_logger().info('Called approve_segmentation service')
     
     def handle_reject_segmentation(self):
-        """Handle reject command from AVP - clear segmentation and wait for new annotations"""
-        self.get_logger().info('Segmentation rejected by AVP, calling reject service')
+        """Handle reject command from AVP - reset FSM to await_surgeon_input for new annotations"""
+        self.get_logger().info('Segmentation rejected by AVP')
+        
+        # Call reject service first to clean up ParaSight state
         if not self.reject_seg_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().error('Service /reject_segmentation not available')
-            return
+        else:
+            request = EmptySrv.Request()
+            future = self.reject_seg_client.call_async(request)
+            self.get_logger().info('Called reject_segmentation service')
         
-        request = EmptySrv.Request()
-        future = self.reject_seg_client.call_async(request)
-        self.get_logger().info('Called reject_segmentation service')
+        # Reset FSM back to await_surgeon_input state
+        self.reset_mission_pub.publish(Empty())
+        self.get_logger().info('Published to /reset_mission - FSM returning to await_surgeon_input')
+    
+    def handle_proceed_mission(self):
+        """Handle proceed_mission command - move robot home and advance FSM through auto-reposition"""
+        self.get_logger().info('Proceed mission command received')
+        
+        # First, command robot to go home
+        self.call_robot_command_service("home")
+        
+        # Then publish to FSM to start proceed_mission transition
+        # FSM will: await_surgeon_input -> bring_manipulator -> auto_reposition -> await_surgeon_input
+        self.proceed_mission_pub.publish(Empty())
+        self.get_logger().info('Published to /proceed_mission - FSM starting bring_manipulator -> auto_reposition')
 
     def handle_emergency_stop(self):
         """Handle emergency stop command - kill all Docker containers and processes"""
