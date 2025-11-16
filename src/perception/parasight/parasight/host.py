@@ -84,7 +84,7 @@ class ParaSightHost(Node):
         self.approve_seg_service = self.create_service(EmptySrv, '/approve_segmentation', self.approve_segmentation_service)
         self.reject_seg_service = self.create_service(EmptySrv, '/reject_segmentation', self.reject_segmentation_service)
         
-        # D405 Intrinsics
+        # D405 Intrinsics from /camera_info
         self.fx = 425.19189453125
         self.fy = 424.6562805175781
         self.cx = 422.978515625
@@ -97,7 +97,7 @@ class ParaSightHost(Node):
         self.ee_frame = 'lbr/link_ee'
         self.tool_frame = 'lbr/link_tool'
         self.camera_link_frame = 'camera_link'
-        self.camera_frame = 'camera_depth_optical_frame'
+        self.camera_frame = 'camera_frame'
 
         # Trigger Subscribers (for state transitions)
         self.ui_trigger_subscription = self.create_subscription(
@@ -170,7 +170,7 @@ class ParaSightHost(Node):
         # Publishers
         self.pcd_publisher = self.create_publisher(PointCloud2, '/processed_point_cloud', 10)
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
-        self.bone_centroid_publisher = self.create_publisher(PoseStamped, '/bone_centroid_camera_frame', 10)
+        self.bone_centroid_publisher = self.create_publisher(PoseArray, '/bone_centroid_camera_frame', 10)
         self.manipulator_command_publisher = self.create_publisher(String, '/manipulator_command', 10)
         # self.reposition_vector_publisher = self.create_publisher(Vector3, '/error_recovery_direction', 10)
         # self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
@@ -252,7 +252,7 @@ class ParaSightHost(Node):
         # For now, auto-complete for testing
         while self.last_rgb_image is None or self.last_depth_image is None:
             time.sleep(0.5)
-            self.get_logger().error("No RGB image available to save")
+            self.get_logger().error("No RGB or depth image available")
 
         # Get the current date and time
         now = datetime.now()
@@ -263,13 +263,16 @@ class ParaSightHost(Node):
         self.save_depth_image(os.path.join(self.auto_reposition_dir, query_id, "depth_snapshot.png"))
         self.get_logger().info(f"Saved RGB image to {os.path.join(self.auto_reposition_dir, query_id, 'rgb_snapshot.png')}")
         detected_bone_msg = self.bone_extractor.get_centroid(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"))
-        bone_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(detected_bone_msg['cluster_centroid']['pixel_coords'], query_id)
-        bone_centroid_3d_camera_frame_msg = PoseStamped()
-        bone_centroid_3d_camera_frame_msg.pose.position.x = bone_centroid_3d_camera_frame[0]
-        bone_centroid_3d_camera_frame_msg.pose.position.y = bone_centroid_3d_camera_frame[1]
-        bone_centroid_3d_camera_frame_msg.pose.position.z = bone_centroid_3d_camera_frame[2]
+        # Use live depth image (already in meters) instead of reloading from file
+        bone_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(detected_bone_msg['cluster_centroid']['pixel_coords'], self.last_depth_image)
+        bone_centroid_3d_camera_frame_msg = PoseArray()
         bone_centroid_3d_camera_frame_msg.header.frame_id = self.camera_frame
         bone_centroid_3d_camera_frame_msg.header.stamp = self.get_clock().now().to_msg()
+        bone_centroid_pose = Pose()
+        bone_centroid_pose.position.x = bone_centroid_3d_camera_frame[0]
+        bone_centroid_pose.position.y = bone_centroid_3d_camera_frame[1]
+        bone_centroid_pose.position.z = bone_centroid_3d_camera_frame[2]
+        bone_centroid_3d_camera_frame_msg.poses.append(bone_centroid_pose)
         self.bone_centroid_publisher.publish(bone_centroid_3d_camera_frame_msg)
         # image_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(np.array([self.cx, self.cy]), query_id)
         # displacement_vector = bone_centroid_3d_camera_frame - image_centroid_3d_camera_frame
@@ -538,11 +541,12 @@ class ParaSightHost(Node):
 
     def depth_image_callback(self, msg):
         """Callback for depth image data - FULLY IMPLEMENTED."""
-        # Keep original 16-bit depth data (in millimeters)
+        # Keep original 16-bit depth data (in millimeters per ROS2 16UC1 standard)
         depth_image_raw = self.bridge.imgmsg_to_cv2(msg, "16UC1")
         self.last_depth_image_raw = depth_image_raw
         
-        # Convert to meters for processing (float64)
+        # Convert millimeters to meters for processing (float64)
+        # 16UC1 encoding is standard millimeters for RealSense depth images
         depth_image = depth_image_raw.astype(np.float64) / 1000.0
         self.last_depth_image = depth_image
 
@@ -586,11 +590,17 @@ class ParaSightHost(Node):
         else:
             return -np.pi
 
-    def pixel_to_3d_camera_frame(self, pixel_coords, query_id):
-        """Convert pixel coordinates to 3D coordinates in the camera frame."""
-        depth_image_path = os.path.join(self.auto_reposition_dir, query_id, "depth_snapshot.png")
-        depth_image = self.load_depth_image(depth_image_path)
-        z = average_depth(depth_image, pixel_coords[1], pixel_coords[0])
+    def pixel_to_3d_camera_frame(self, pixel_coords, depth_image_meters):
+        """Convert pixel coordinates to 3D coordinates in the camera frame.
+        
+        Args:
+            pixel_coords: [u, v] pixel coordinates
+            depth_image_meters: Depth image in meters (from self.last_depth_image)
+        
+        Returns:
+            np.array([x, y, z]) in meters in the optical frame coordinate system
+        """
+        z = average_depth(depth_image_meters, pixel_coords[1], pixel_coords[0])
         x = (pixel_coords[0] - self.cx) * z / self.fx
         y = (pixel_coords[1] - self.cy) * z / self.fy
         return np.array([x, y, z])
@@ -755,25 +765,18 @@ class ParaSightHost(Node):
         self.get_logger().info(f"Saved RGB image: {filepath}")
 
     def save_depth_image(self, filepath):
-        """Save depth image in multiple formats for maximum compatibility and losslessness."""
+        """Save depth image preserving 16-bit millimeter values from RealSense.
+        
+        Saves the raw 16UC1 depth data (millimeters) for archival/debugging purposes.
+        Note: For 3D computations, use self.last_depth_image (meters) directly.
+        """
         if self.last_depth_image_raw is None:
             self.get_logger().warn("No depth image available to save")
             return
         
-
-        
-        # Method 1: Save as 16-bit PNG (lossless, widely compatible)
-        # This preserves the original millimeter precision from RealSense
-        # png_path = base_path + "_16bit.png"
-        # cv2.imwrite(png_path, self.last_depth_image_raw)
-        # self.get_logger().info(f"Saved 16-bit depth PNG: {png_path}")
-        
-        # Method 3: Save normalized 8-bit version for visualization (lossy but viewable)
-        if np.max(self.last_depth_image_raw) > 0:
-            # Normalize to 0-255 range for visualization
-            depth_normalized = (self.last_depth_image_raw.astype(np.float32) / np.max(self.last_depth_image_raw) * 255).astype(np.uint8)
-            cv2.imwrite(filepath, depth_normalized)
-            self.get_logger().info(f"Saved visualization depth PNG: {filepath}")
+        # Save as 16-bit PNG preserving original millimeter values (16UC1 standard)
+        cv2.imwrite(filepath, self.last_depth_image_raw)
+        self.get_logger().info(f"Saved 16-bit depth PNG (millimeters): {filepath}")
 
     @staticmethod
     def load_depth_image(filepath):
