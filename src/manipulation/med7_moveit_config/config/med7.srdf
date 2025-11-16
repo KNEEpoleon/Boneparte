@@ -26,9 +26,9 @@
         <joint name="lbr_A1" value="0"/>
         <joint name="lbr_A2" value="0"/>
         <joint name="lbr_A3" value="0"/>
-        <joint name="lbr_A4" value="1.39626"/>
+        <joint name="lbr_A4" value="1.5708"/>
         <joint name="lbr_A5" value="0"/>
-        <joint name="lbr_A6" value="-1.74533"/>
+        <joint name="lbr_A6" value="-1.5708"/>
         <joint name="lbr_A7" value="0"/>
     </group_state>
     <group_state name="Boneparte_away" group="arm">
