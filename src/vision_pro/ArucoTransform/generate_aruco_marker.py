@@ -41,7 +41,7 @@ def generate_aruco_marker(marker_id=0, marker_size_px=700, output_file='aruco_ma
     marker_image = cv2.aruco.generateImageMarker(aruco_dict, marker_id, marker_size_px)
     
     # Add white border for better detection
-    border_size = 50
+    border_size = 25
     bordered_image = cv2.copyMakeBorder(
         marker_image,
         border_size, border_size, border_size, border_size,
