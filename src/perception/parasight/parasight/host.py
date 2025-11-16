@@ -59,6 +59,7 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
         self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
+        self.machine.add_transition(trigger='hard_reset', source='*', dest='start')
         
         # State Data
         self.last_rgb_image = None
@@ -336,10 +337,7 @@ class ParaSightHost(Node):
     def hard_reset_callback(self, msg):
         """Reset the state machine to initial state."""
         self.get_logger().warn('Hard reset triggered - returning to start state')
-        self.to_start()
-
-    def custom_callback_to_reset_FSM(self, rand_arg=True):
-        self.state == 'ready'
+        self.trigger('hard_reset')
 
     def avp_annotations_callback(self, msg):
         """Store AVP annotations for use in segmentation"""
@@ -448,7 +446,7 @@ class ParaSightHost(Node):
             self.get_logger().info('Triggering complete_mission transition...')
             self.trigger('complete_mission')
         else:
-            self.get_logger().warn('UI trigger received but not in ready state')
+            self.get_logger().warn(f'Complete mission command received but not in await_surgeon_input state (current: {self.state})')
     
     def approve_segmentation(self):
         """Called by TCP server when AVP accepts segmentation"""
@@ -464,7 +462,7 @@ class ParaSightHost(Node):
             
             # Proceed with registration using the stored masks
             self.register_and_publish_with_masks(masks, annotated_points, all_mask_points)
-            self.trigger('drill_complete')
+            # Note: AVP workflow needs integration with FSM - trigger removed during merge fix
             self.waiting_for_segmentation_approval = False
             self.pending_segmentation_data = None
         else:
@@ -476,7 +474,7 @@ class ParaSightHost(Node):
             self.get_logger().info('Segmentation rejected by AVP, clearing data')
             self.waiting_for_segmentation_approval = False
             self.pending_segmentation_data = None
-            self.trigger('drill_complete')  # Return to ready state
+            # Note: AVP workflow needs integration with FSM - trigger removed during merge fix
         else:
             self.get_logger().warn('reject_segmentation called but not waiting for approval')
     
@@ -499,13 +497,14 @@ class ParaSightHost(Node):
     def approve_segmentation_service(self, request, response):
         """Service callback for approving segmentation"""
         self.approve_segmentation()
+        self.get_logger().info('Approved segmentation')
         return response
     
     def reject_segmentation_service(self, request, response):
         """Service callback for rejecting segmentation"""
         self.reject_segmentation()
+        self.get_logger().warn('Rejected segmentation')
         return response
-            self.get_logger().warn(f'Complete mission command received but not in await_surgeon_input state (current: {self.state})')
 
     def reset_mission_callback(self, msg):
         """Handle reset_mission command - transitions from ready_to_drill to await_surgeon_input."""
@@ -630,11 +629,9 @@ class ParaSightHost(Node):
         self.pose_array_publisher.publish(drill_pose_array)
 
     def register_and_publish(self, points):
-        # self.pause_tracking() # Pause tracking while registering to improve performance
-        masks, annotated_points, all_mask_points, _ = self.segmentation_ui.segment_using_points(self.last_rgb_image, points[0], points[1], self.bones)
-        self.annotated_points = annotated_points # cache
         """Segment, register, and publish bone point clouds and drill poses - FULLY IMPLEMENTED."""
-        masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
+        # self.pause_tracking() # Pause tracking while registering to improve performance
+        masks, annotated_points, all_mask_points, _ = self.segmentation_ui.segment_using_points(
             self.last_rgb_image, points[0], points[1], self.bones
         )
 
