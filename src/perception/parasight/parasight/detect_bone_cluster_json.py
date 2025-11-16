@@ -197,7 +197,6 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
         print("="*60)
         
         # Save rejection status
-        os.makedirs(output_dir, exist_ok=True)
         output_name = os.path.splitext(os.path.basename(image_path))[0]
         rejection_path = os.path.join(output_dir, f"{output_name}_NO_DETECTION.txt")
         with open(rejection_path, 'w') as f:
@@ -309,7 +308,6 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
     plt.tight_layout()
     
     # Save results
-    os.makedirs(output_dir, exist_ok=True)
     output_name = os.path.splitext(os.path.basename(image_path))[0]
     viz_path = os.path.join(output_dir, f"{output_name}_detection.png")
     plt.savefig(viz_path, dpi=150, bbox_inches='tight')

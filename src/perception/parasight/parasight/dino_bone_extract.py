@@ -30,7 +30,9 @@ class DINOBoneExtractor():
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = self.load_dino_model()
         self.codebook = self.load_bone_features(codebook_path)
-        self.threshold = 0.7
+        # self.threshold = 0.69
+        self.threshold = 0.6
+
         self.min_size = 100
 
     def load_bone_features(self, json_path):

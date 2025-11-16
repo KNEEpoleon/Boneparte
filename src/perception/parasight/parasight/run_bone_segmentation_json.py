@@ -233,7 +233,6 @@ def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/
         output_name = os.path.splitext(os.path.basename(image_path))[0]
         # output_path = os.path.join(output_dir, model_name, output_name)
         output_path = os.path.join(output_dir, output_name)
-        os.makedirs(output_path, exist_ok=True)
         
         # Upsample for visualizations
         zoom_h = h_pixels / patch_h

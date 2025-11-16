@@ -22,6 +22,7 @@ from parasight.segment_ui import SegmentAnythingUI
 from parasight.registration import RegistrationPipeline
 from parasight.dino_bone_extract import DINOBoneExtractor
 from parasight.utils import *
+from parasight.scripts.snapshot import SnapshotNode as snapshot_node
 
 
 import time
@@ -151,7 +152,7 @@ class ParaSightHost(Node):
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.bone_centroid_publisher = self.create_publisher(PoseStamped, '/bone_centroid_camera_frame', 10)
         self.manipulator_command_publisher = self.create_publisher(String, '/manipulator_command', 10)
-        self.reposition_vector_publisher = self.create_publisher(Vector3, '/error_recovery_direction', 10)
+        # self.reposition_vector_publisher = self.create_publisher(Vector3, '/error_recovery_direction', 10)
         # self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
         # Parameters
@@ -180,8 +181,6 @@ class ParaSightHost(Node):
         codebook_path = "/ros_ws/src/perception/auto_reposition/fvd_bone_codebook.json"
 
         self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, auto_reposition_dir=self.auto_reposition_dir)
-    
-
         # Initialize state machine after everything is set up
         self.initialize()
 
@@ -222,6 +221,7 @@ class ParaSightHost(Node):
         msg = String()
         msg.data = 'bring_home'
         self.manipulator_command_publisher.publish(msg)
+        time.sleep(2.5)
         
         self.complete_bring_manipulator()
 
@@ -230,31 +230,35 @@ class ParaSightHost(Node):
         self.get_logger().info('Auto-repositioning...')
         # TODO: Implement auto-reposition logic
         # For now, auto-complete for testing
-        if self.last_rgb_image is not None:
-            os.makedirs(self.auto_reposition_dir, exist_ok=True)
-            # Get the current date and time
-            now = datetime.now()
-            # Format it into a concise string
-            query_id = "query_" + now.strftime("%m-%d_%H:%M:%S")
-            self.bone_extractor.set_auto_resposition_query_dir(query_id)
-            cv2.imwrite(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"), self.last_rgb_image)
-            self.get_logger().info(f"Saved RGB image to {os.path.join(self.auto_reposition_dir, query_id, 'rgb_snapshot.png')}")
-            self.save_depth_image(os.path.join(self.auto_reposition_dir, query_id, "depth_snapshot.png"))
-            # cv2.imwrite(os.path.join(self.auto_reposition_dir, "depth_" + query_id), self.last_depth_image)
-        else:
+        while self.last_rgb_image is None or self.last_depth_image is None:
+            time.sleep(0.5)
             self.get_logger().error("No RGB image available to save")
-            self.complete_auto_reposition()
-            return
+
+        # Get the current date and time
+        now = datetime.now()
+        # Format it into a concise string
+        query_id = "query_" + now.strftime("%m-%d_%H:%M:%S")
+        self.bone_extractor.set_auto_resposition_query_dir(query_id)
+        self.save_rgb_image(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"))
+        self.save_depth_image(os.path.join(self.auto_reposition_dir, query_id, "depth_snapshot.png"))
+        self.get_logger().info(f"Saved RGB image to {os.path.join(self.auto_reposition_dir, query_id, 'rgb_snapshot.png')}")
         detected_bone_msg = self.bone_extractor.get_centroid(os.path.join(self.auto_reposition_dir, query_id, "rgb_snapshot.png"))
         bone_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(detected_bone_msg['cluster_centroid']['pixel_coords'], query_id)
-        image_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(np.array([self.cx, self.cy]), query_id)
-        displacement_vector = bone_centroid_3d_camera_frame - image_centroid_3d_camera_frame
-        displacement_vector_msg = Vector3()
-        displacement_vector_msg.x = displacement_vector[0]
-        displacement_vector_msg.y = displacement_vector[1]
-        displacement_vector_msg.z = displacement_vector[2]
-        self.get_logger().info(f"Displacement vector: {displacement_vector_msg}")
-        self.reposition_vector_publisher.publish(displacement_vector_msg)
+        bone_centroid_3d_camera_frame_msg = PoseStamped()
+        bone_centroid_3d_camera_frame_msg.pose.position.x = bone_centroid_3d_camera_frame[0]
+        bone_centroid_3d_camera_frame_msg.pose.position.y = bone_centroid_3d_camera_frame[1]
+        bone_centroid_3d_camera_frame_msg.pose.position.z = bone_centroid_3d_camera_frame[2]
+        bone_centroid_3d_camera_frame_msg.header.frame_id = self.camera_frame
+        bone_centroid_3d_camera_frame_msg.header.stamp = self.get_clock().now().to_msg()
+        self.bone_centroid_publisher.publish(bone_centroid_3d_camera_frame_msg)
+        # image_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(np.array([self.cx, self.cy]), query_id)
+        # displacement_vector = bone_centroid_3d_camera_frame - image_centroid_3d_camera_frame
+        # displacement_vector_msg = Vector3()
+        # displacement_vector_msg.x = displacement_vector[0]
+        # displacement_vector_msg.y = displacement_vector[1]
+        # displacement_vector_msg.z = displacement_vector[2]
+        # self.get_logger().info(f"Displacement vector: {displacement_vector_msg}")
+        # self.reposition_vector_publisher.publish(displacement_vector_msg)
 
         self.complete_auto_reposition()
 
@@ -514,7 +518,11 @@ class ParaSightHost(Node):
                     curr_theta = -np.pi/2
                 elif bone == "femur" and hole_name == 'hole3':
                     curr_theta = -np.pi/2
-
+                elif bone == "tibia" and hole_name == 'hole4':
+                    curr_theta = -np.pi/4-np.pi/2
+                elif bone == "tibia" and hole_name == 'hole5':
+                    curr_theta = np.pi +np.pi/12-np.pi/2
+#                    curr_theta = np.pi/6-np.pi/4-np.pi/2
                 mesh = o3d.geometry.TriangleMesh()
                 mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
                 mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
@@ -559,12 +567,21 @@ class ParaSightHost(Node):
         
         return drill_pose_array
 
+
+    def save_rgb_image(self, filepath):
+        if self.last_rgb_image is None:
+            self.get_logger().warn("No RGB image available to save")
+            return
+        cv2.imwrite(filepath, self.last_rgb_image)
+        self.get_logger().info(f"Saved RGB image: {filepath}")
+
     def save_depth_image(self, filepath):
         """Save depth image in multiple formats for maximum compatibility and losslessness."""
         if self.last_depth_image_raw is None:
             self.get_logger().warn("No depth image available to save")
             return
         
+
         
         # Method 1: Save as 16-bit PNG (lossless, widely compatible)
         # This preserves the original millimeter precision from RealSense
