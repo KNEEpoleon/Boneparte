@@ -42,7 +42,7 @@ Can be found inside the src folder
 
 ## Sponsors
 
-Developed as part of the CMU MRSD Capstone with support from [Smith + Nephew](www.smith-nephew.com)
+Developed as part of the CMU MRSD Capstone with support from [Smith + Nephew](https://www.smith-nephew.com/en-us)
 
 ## License
 

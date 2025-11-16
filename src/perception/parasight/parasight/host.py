@@ -7,7 +7,7 @@ from rclpy.node import Node
 from rcl_interfaces.msg import SetParametersResult
 from sensor_msgs.msg import Image, PointCloud2
 from geometry_msgs.msg import PoseArray, Point, Pose, PoseStamped, PointStamped, Vector3
-from std_msgs.msg import Empty, String
+from std_msgs.msg import Empty, String, String
 from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
@@ -71,6 +71,18 @@ class ParaSightHost(Node):
         self.last_drill_pose_array = None
         self.last_drill_pose = None
         
+        # AVP annotations
+        self.avp_annotations = None
+        self.waiting_for_segmentation_approval = False
+        self.pending_segmentation_data = None
+        
+        # Publisher for segmented image
+        self.segmented_image_pub = self.create_publisher(Image, '/segmented_image', 10)
+        
+        # Services for segmentation approval
+        self.approve_seg_service = self.create_service(EmptySrv, '/approve_segmentation', self.approve_segmentation_service)
+        self.reject_seg_service = self.create_service(EmptySrv, '/reject_segmentation', self.reject_segmentation_service)
+        
         # D405 Intrinsics
         self.fx = 425.19189453125
         self.fy = 424.6562805175781
@@ -128,6 +140,13 @@ class ParaSightHost(Node):
             Empty,
             '/start_drill',
             self.start_drill_callback,
+            10)
+        
+        # AVP annotations subscription
+        self.avp_annotations_subscription = self.create_subscription(
+            String,
+            '/avp_annotations',
+            self.avp_annotations_callback,
             10)
         
         # Data Subscribers
@@ -319,7 +338,80 @@ class ParaSightHost(Node):
         self.get_logger().warn('Hard reset triggered - returning to start state')
         self.to_start()
 
+    def custom_callback_to_reset_FSM(self, rand_arg=True):
+        self.state == 'ready'
+
+    def avp_annotations_callback(self, msg):
+        """Store AVP annotations for use in segmentation"""
+        try:
+            import json
+            self.avp_annotations = json.loads(msg.data)
+            self.get_logger().info(f'Received AVP annotations: {self.avp_annotations}')
+        except Exception as e:
+            self.get_logger().error(f'Failed to parse AVP annotations: {e}')
+
+    def all_systems_ready(self, dummy=True):
+        if dummy:
+            return True
+            
+        try:
+            # Check tf transform
+            self.tf_buffer.lookup_transform('world', 'camera_color_optical_frame', rclpy.time.Time())
+            
+            # Check required nodes
+            node_names = [node.split('/')[-1] for node in self.get_node_names()]
+            if 'io_node' not in node_names or 'registration_node' not in node_names:
+                return False
+                
+            return True
+            
+        except TransformException:
+            return False
+
+    def publish_state(self):
+        self.get_logger().info(f'Current state: {self.state}')
+
     def ui_trigger_callback(self, msg):
+        print(f"\n! The self state is: {self.state}")
+
+        self.get_logger().info('UI trigger received')
+        if self.state == 'ready':
+            self.trigger('start_parasight')
+            
+            # Check if we have AVP annotations, otherwise use UI
+            if self.avp_annotations is not None:
+                self.get_logger().info('Using AVP annotations for segmentation')
+                # Convert pixel coordinates to the format expected by segment_using_points
+                femur_point = tuple(self.avp_annotations[0])  # [x, y]
+                tibia_point = tuple(self.avp_annotations[1])  # [x, y]
+                result = self.segmentation_ui.segment_using_points(
+                    self.last_rgb_image, femur_point, tibia_point, self.bones)
+                masks, annotated_points, all_mask_points, segmented_image = result
+                
+                # Store segmentation data and wait for AVP approval
+                self.pending_segmentation_data = {
+                    'masks': masks,
+                    'annotated_points': annotated_points,
+                    'all_mask_points': all_mask_points,
+                    'segmented_image': segmented_image
+                }
+                self.waiting_for_segmentation_approval = True
+                
+                # Send segmented image to AVP via TCP server
+                self.get_logger().info('Segmentation complete, publishing segmented image')
+                self.publish_segmented_image(segmented_image)
+                
+                # Clear AVP annotations after use
+                self.avp_annotations = None
+            else:
+                self.get_logger().info('Using UI for segmentation')
+                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
+                self.annotated_points = annotated_points
+                print(f"\n The annotated points are: {self.annotated_points}")
+                # For UI mode, proceed immediately
+                self.register_and_publish(annotated_points)
+                self.trigger('drill_complete')
+
         """Handle UI trigger to start segmentation process."""
         self.get_logger().info(f'UI trigger received in state: {self.state}')
         
@@ -356,6 +448,63 @@ class ParaSightHost(Node):
             self.get_logger().info('Triggering complete_mission transition...')
             self.trigger('complete_mission')
         else:
+            self.get_logger().warn('UI trigger received but not in ready state')
+    
+    def approve_segmentation(self):
+        """Called by TCP server when AVP accepts segmentation"""
+        if self.waiting_for_segmentation_approval and self.pending_segmentation_data:
+            self.get_logger().info('Segmentation approved by AVP, proceeding with registration')
+            # Use the already-computed segmentation data instead of re-segmenting
+            masks = self.pending_segmentation_data['masks']
+            annotated_points = self.pending_segmentation_data['annotated_points']
+            all_mask_points = self.pending_segmentation_data['all_mask_points']
+            
+            self.annotated_points = annotated_points
+            print(f"\n The annotated points are: {self.annotated_points}")
+            
+            # Proceed with registration using the stored masks
+            self.register_and_publish_with_masks(masks, annotated_points, all_mask_points)
+            self.trigger('drill_complete')
+            self.waiting_for_segmentation_approval = False
+            self.pending_segmentation_data = None
+        else:
+            self.get_logger().warn('approve_segmentation called but not waiting for approval')
+    
+    def reject_segmentation(self):
+        """Called by TCP server when AVP rejects segmentation"""
+        if self.waiting_for_segmentation_approval:
+            self.get_logger().info('Segmentation rejected by AVP, clearing data')
+            self.waiting_for_segmentation_approval = False
+            self.pending_segmentation_data = None
+            self.trigger('drill_complete')  # Return to ready state
+        else:
+            self.get_logger().warn('reject_segmentation called but not waiting for approval')
+    
+    def publish_segmented_image(self, segmented_image):
+        """Publish segmented image for TCP server to send to AVP"""
+        try:
+            # Convert numpy array to ROS Image message
+            if len(segmented_image.shape) == 3 and segmented_image.shape[2] == 4:
+                # RGBA
+                image_msg = self.bridge.cv2_to_imgmsg(segmented_image, encoding='rgba8')
+            else:
+                # RGB
+                image_msg = self.bridge.cv2_to_imgmsg(segmented_image, encoding='rgb8')
+            
+            self.segmented_image_pub.publish(image_msg)
+            self.get_logger().info('Published segmented image')
+        except Exception as e:
+            self.get_logger().error(f'Failed to publish segmented image: {e}')
+    
+    def approve_segmentation_service(self, request, response):
+        """Service callback for approving segmentation"""
+        self.approve_segmentation()
+        return response
+    
+    def reject_segmentation_service(self, request, response):
+        """Service callback for rejecting segmentation"""
+        self.reject_segmentation()
+        return response
             self.get_logger().warn(f'Complete mission command received but not in await_surgeon_input state (current: {self.state})')
 
     def reset_mission_callback(self, msg):
@@ -450,7 +599,40 @@ class ParaSightHost(Node):
     # REGISTRATION AND PUBLISHING METHODS
     # ============================================================================
 
+    def register_and_publish_with_masks(self, masks, annotated_points, all_mask_points):
+        """Registration and publishing using pre-computed masks (for AVP workflow)"""
+        # Cache annotated points
+        self.annotated_points = annotated_points
+        annotated_points = self.add_depth(annotated_points)
+        registered_clouds = []
+        transforms = {}
+        for i, bone in enumerate(self.bones):
+            t0 = time.time()
+            mask = masks[i]
+            mask_points = all_mask_points[i]
+            source = self.sources[bone]
+            mask_points = self.add_depth(mask_points)
+            transform, fitness = self.regpipe.register(mask, source, self.last_cloud, annotated_points, mask_points, bone=bone)
+            t1 = time.time()
+            self.get_logger().info(f'\n\nRegistration time for {bone}: {t1 - t0}, \nfitness: {fitness}')
+            source_cloud = source.voxel_down_sample(voxel_size=0.003)
+            source_cloud.transform(transform)
+            source_cloud.paint_uniform_color(self.colors[bone])
+            registered_clouds.append(source_cloud)
+            transforms[bone] = transform
+
+        self.publish_point_cloud(registered_clouds)
+
+        theta = self.pose_direction(annotated_points)
+        drill_pose_array = self.compute_plan(transforms, theta=theta)
+        drill_pose_array.header.frame_id = self.camera_frame
+        drill_pose_array.header.stamp = self.get_clock().now().to_msg()
+        self.pose_array_publisher.publish(drill_pose_array)
+
     def register_and_publish(self, points):
+        # self.pause_tracking() # Pause tracking while registering to improve performance
+        masks, annotated_points, all_mask_points, _ = self.segmentation_ui.segment_using_points(self.last_rgb_image, points[0], points[1], self.bones)
+        self.annotated_points = annotated_points # cache
         """Segment, register, and publish bone point clouds and drill poses - FULLY IMPLEMENTED."""
         masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_points(
             self.last_rgb_image, points[0], points[1], self.bones
@@ -472,7 +654,7 @@ class ParaSightHost(Node):
             )
 
             t1 = time.time()
-            self.get_logger().info(f'Registration time for {bone}: {t1 - t0}')
+            self.get_logger().info(f'\n\nRegistration time for {bone}: {t1 - t0}, \nfitness: {fitness}')
             source_cloud = source.voxel_down_sample(voxel_size=0.003)
             source_cloud.transform(transform)
             source_cloud.paint_uniform_color(self.colors[bone])

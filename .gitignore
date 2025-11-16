@@ -11,3 +11,17 @@ src/perception/do_not_commit_auto_reposition/
 *.pyc
 **/__pycache__/
 .ipynb_checkpoints/
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcworkspace/xcuserdata/

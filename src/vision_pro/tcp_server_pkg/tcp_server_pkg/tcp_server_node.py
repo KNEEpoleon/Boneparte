@@ -3,9 +3,18 @@
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty
-from surgical_robot_planner.srv import SelectPose
+from std_msgs.msg import Empty, String
+from std_srvs.srv import Empty as EmptySrv
+from surgical_robot_planner.srv import SelectPose, RobotCommand
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 import socket
+import base64
+import cv2
+import json
+import threading
+import time
+import subprocess
 
 class TcpServerNode(Node):
     def __init__(self):
@@ -15,9 +24,40 @@ class TcpServerNode(Node):
         # One-shot publisher
         self.start_pub = self.create_publisher(Empty, '/trigger_host_ui', 10)
         self.stop_pub = self.create_publisher(Empty, '/hard_reset_host', 10)
+        
+        # Publisher for AVP annotations
+        self.annotations_pub = self.create_publisher(String, '/avp_annotations', 10)
 
         # Service client
         self.select_pose_client = self.create_client(SelectPose, '/select_pose')
+        self.robot_command_client = self.create_client(RobotCommand, '/robot_command')
+
+        # Image subscription for annotation
+        self.image_subscription = self.create_subscription(
+            Image,
+            '/camera/color/image_rect_raw',
+            self.image_callback,
+            10)
+        self.bridge = CvBridge()
+        self.last_rgb_image = None
+
+        # Annotation response handling
+        self.annotation_response = None
+        self.annotation_lock = threading.Lock()
+        self.waiting_for_annotation = False
+        self.annotation_start_time = None
+        
+        # Service clients for segmentation approval
+        self.approve_seg_client = self.create_client(EmptySrv, '/approve_segmentation')
+        self.reject_seg_client = self.create_client(EmptySrv, '/reject_segmentation')
+        
+        # Subscription to get segmented image
+        self.segmented_image_subscription = self.create_subscription(
+            Image,
+            '/segmented_image',
+            self.segmented_image_callback,
+            10)
+        self.pending_segmented_image = None
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -31,6 +71,26 @@ class TcpServerNode(Node):
 
         self.timer = self.create_timer(0.1, self.poll_socket)
 
+    def image_callback(self, msg):
+        """Store the latest RGB image for annotation"""
+        try:
+            rgb_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+            rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+            self.last_rgb_image = rgb_image
+        except Exception as e:
+            self.get_logger().error(f'Failed to process image: {e}')
+    
+    def segmented_image_callback(self, msg):
+        """Receive segmented image from ParaSight and send to AVP"""
+        try:
+            segmented_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+            self.pending_segmented_image = segmented_image
+            self.get_logger().info('Received segmented image from ParaSight')
+            # Send immediately to AVP
+            self.send_segmented_image_to_avp()
+        except Exception as e:
+            self.get_logger().error(f'Failed to process segmented image: {e}')
+
     def poll_socket(self):
         if self.client_sock is None:
             try:
@@ -43,12 +103,21 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Accepted TCP connection from {addr}')
             return
 
+        # Check for annotation timeout
+        if self.waiting_for_annotation:
+            if time.time() - self.annotation_start_time > 60:  # 60 second timeout
+                with self.annotation_lock:
+                    self.waiting_for_annotation = False
+                self.get_logger().error("Timeout waiting for annotation response")
+                return
+        
         try:
             data = self.client_sock.recv(1024)
         except BlockingIOError:
             return
 
         if not data:
+            print("\n\n\n", data, flush = True)
             self.get_logger().info('Client disconnected')
             self.client_sock.close()
             self.client_sock = None
@@ -56,22 +125,188 @@ class TcpServerNode(Node):
         else:
             message = data.decode('utf-8').strip()
             if message:
-                self.get_logger().info(f'Received command: "{message}"')
-                self.handle_command(message)
+                self.get_logger().info(f'Received raw data from AVP: "{message}"')
+                self.get_logger().info(f'Message length: {len(message)} characters')
+                self.get_logger().info(f'Message starts with ANNOTATIONS: {message.startswith("ANNOTATIONS:")}')
+                
+                # Check if this is an annotation response
+                if message.startswith("ANNOTATIONS:"):
+                    self.get_logger().info('Processing AVP annotation response...')
+                    self.handle_annotation_response(message)
+                else:
+                    self.get_logger().info(f'Processing non-annotation command: "{message}"')
+                    self.handle_command(message)
 
                 try:
                     self.client_sock.sendall(b'acknowledged\n')
                 except Exception as e:
                     self.get_logger().error(f'Failed to send acknowledgment: {e}')
 
+    def handle_annotation_response(self, message: str):
+        """Handle annotation response from AVP"""
+        try:
+            self.get_logger().info(f'Full annotation message: "{message}"')
+            
+            # Extract JSON part after "ANNOTATIONS:"
+            json_str = message[12:]  # Remove "ANNOTATIONS:" prefix
+            self.get_logger().info(f'Extracted JSON string: "{json_str}"')
+            
+            annotations = json.loads(json_str)
+            self.get_logger().info(f'Parsed annotations successfully: {annotations}')
+            
+            with self.annotation_lock:
+                self.annotation_response = annotations
+                self.waiting_for_annotation = False
+            
+            self.get_logger().info(f'AVP annotations stored and waiting flag cleared. Annotations: {annotations}')
+            
+            # Process the annotations immediately
+            self.process_annotations_and_continue()
+        except json.JSONDecodeError as e:
+            self.get_logger().error(f'JSON decode error: {e}. Raw JSON: "{json_str}"')
+        except Exception as e:
+            self.get_logger().error(f'Failed to parse annotation response: {e}. Full message: "{message}"')
+
+    def handle_annotate_command(self):
+        """Handle annotation command by sending image to AVP and waiting for response"""
+        try:
+            # Check if we have an image
+            if self.last_rgb_image is None:
+                raise Exception("No image available for annotation")
+            
+            # Convert image to JPEG and encode as base64
+            self.get_logger().info('Converting image to JPEG and base64...')
+            _, buffer = cv2.imencode('.jpg', self.last_rgb_image, [cv2.IMWRITE_JPEG_QUALITY, 85])
+            image_base64 = base64.b64encode(buffer).decode('utf-8')
+            self.get_logger().info(f'Base64 encoding complete, size: {len(image_base64)} chars')
+            
+            # Send image to AVP
+            image_message = f"IMAGE:{image_base64}\n"
+            self.get_logger().info(f'Preparing to send message, total size: {len(image_message)} chars')
+            
+            # Temporarily make socket blocking for large send
+            self.get_logger().info('Setting socket to blocking mode...')
+            original_blocking = self.client_sock.getblocking()
+            self.client_sock.setblocking(True)
+            try:
+                self.get_logger().info('Sending image data to AVP...')
+                self.client_sock.sendall(image_message.encode('utf-8'))
+                self.get_logger().info('Sent image to AVP for annotation')
+            finally:
+                # Restore original blocking state
+                self.get_logger().info('Restoring socket blocking state...')
+                self.client_sock.setblocking(original_blocking)
+            
+            # Set up waiting state
+            with self.annotation_lock:
+                self.annotation_response = None
+                self.waiting_for_annotation = True
+                self.annotation_start_time = time.time()
+            
+            self.get_logger().info('Waiting for annotation response (non-blocking)...')
+                
+        except Exception as e:
+            self.get_logger().error(f'Annotation command failed: {e}')
+            raise
+
+
+    def process_annotations_and_continue(self):
+        """Process received annotations and continue with original pipeline"""
+        try:
+            # Convert normalized coordinates to pixel coordinates
+            # TODO: Confirm this is the correct image source
+            height, width = self.last_rgb_image.shape[:2]
+            
+            pixel_coords = []
+            for annotation in self.annotation_response:
+                x_norm = annotation['x']  # 0.0 to 1.0
+                y_norm = annotation['y']  # 0.0 to 1.0
+                
+                x_pixel = int(x_norm * width)
+                y_pixel = int(y_norm * height)
+                pixel_coords.append([x_pixel, y_pixel])
+            
+            self.get_logger().info(f'Converted annotations to pixel coordinates: {pixel_coords}')
+            
+            # Publish the annotations for ParaSight host to use
+            annotations_msg = String()
+            annotations_msg.data = json.dumps(pixel_coords)
+            self.annotations_pub.publish(annotations_msg)
+            self.get_logger().info('Published AVP annotations to ParaSight host')
+            
+            # NOTE(parth) calling another annotation window before annotations received from avp
+            time.sleep(0.2)
+            
+            # Now trigger the original ParaSight flow (will generate segmentation)
+            self.start_pub.publish(Empty())
+            self.get_logger().info('Started FSM /trigger_host_ui with AVP annotations')
+            # Segmented image will be sent via callback when ParaSight publishes it
+            
+        except Exception as e:
+            self.get_logger().error(f'Failed to process annotations: {e}')
+            raise
+    
+    def send_segmented_image_to_avp(self):
+        """Send segmented image to AVP for review"""
+        try:
+            if self.pending_segmented_image is None:
+                self.get_logger().error('No pending segmented image to send')
+                return
+            
+            if self.client_sock is None:
+                self.get_logger().error('No client connection available')
+                return
+            
+            segmented_image = self.pending_segmented_image
+            
+            # Convert to RGB if needed
+            if len(segmented_image.shape) == 3 and segmented_image.shape[2] == 4:
+                segmented_image = cv2.cvtColor(segmented_image, cv2.COLOR_RGBA2RGB)
+            elif len(segmented_image.shape) == 3 and segmented_image.shape[2] == 3:
+                # Already RGB, ensure correct color order
+                segmented_image = cv2.cvtColor(segmented_image, cv2.COLOR_BGR2RGB)
+            
+            # Convert image to JPEG and encode as base64
+            self.get_logger().info('Converting segmented image to JPEG and base64...')
+            _, buffer = cv2.imencode('.jpg', segmented_image, [cv2.IMWRITE_JPEG_QUALITY, 85])
+            image_base64 = base64.b64encode(buffer).decode('utf-8')
+            self.get_logger().info(f'Base64 encoding complete, size: {len(image_base64)} chars')
+            
+            # Send segmented image to AVP
+            image_message = f"SEGMENTED_IMAGE:{image_base64}\n"
+            self.get_logger().info(f'Preparing to send segmented image, total size: {len(image_message)} chars')
+            
+            # Temporarily make socket blocking for large send
+            original_blocking = self.client_sock.getblocking()
+            self.client_sock.setblocking(True)
+            try:
+                self.get_logger().info('Sending segmented image to AVP...')
+                self.client_sock.sendall(image_message.encode('utf-8'))
+                self.get_logger().info('Sent segmented image to AVP for review')
+            finally:
+                # Restore original blocking state
+                self.client_sock.setblocking(original_blocking)
+                self.pending_segmented_image = None  # Clear after sending
+                
+        except Exception as e:
+            self.get_logger().error(f'Failed to send segmented image: {e}')
+
     def handle_command(self, command: str):
         if command == "annotate":
-            self.start_pub.publish(Empty())
-            self.get_logger().info('Started FSM /trigger_host_ui')
+            self.handle_annotate_command()
         elif command == "restart":
             self.stop_pub.publish(Empty())
             self.get_logger().info('Stopped FSM /hard_reset_host')
-
+        elif command == "KILLALL":
+            self.handle_emergency_stop()
+        elif command == "accept":
+            self.handle_accept_segmentation()
+        elif command == "reject":
+            self.handle_reject_segmentation()
+        elif command == "robot_home":
+            self.call_robot_command_service("home")
+        elif command == "robot_away":
+            self.call_robot_command_service("away")
         elif command.startswith("drill_"):
             _, bone, hole = command.split('_')
             try:
@@ -116,6 +351,70 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Service responded: {response}')
         except Exception as e:
             self.get_logger().error(f'Service call failed: {e}')
+
+    def call_robot_command_service(self, command: str):
+        """Call the robot command service to move robot to home or away position"""
+        if not self.robot_command_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error('Service /robot_command not available')
+            return
+
+        request = RobotCommand.Request()
+        request.command = command  # "home" or "away"
+
+        future = self.robot_command_client.call_async(request)
+        future.add_done_callback(self.handle_robot_command_response)
+        self.get_logger().info(f"Commanding robot to move to: {command}")
+
+    def handle_robot_command_response(self, future):
+        """Handle response from robot command service"""
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info(f'Robot command succeeded: {response.message}')
+            else:
+                self.get_logger().error(f'Robot command failed: {response.message}')
+        except Exception as e:
+            self.get_logger().error(f'Robot command service call failed: {e}')
+    
+    def handle_accept_segmentation(self):
+        """Handle accept command from AVP - proceed with drill pose computation"""
+        self.get_logger().info('Segmentation accepted by AVP, calling approve service')
+        if not self.approve_seg_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error('Service /approve_segmentation not available')
+            return
+        
+        request = EmptySrv.Request()
+        future = self.approve_seg_client.call_async(request)
+        self.get_logger().info('Called approve_segmentation service')
+    
+    def handle_reject_segmentation(self):
+        """Handle reject command from AVP - clear segmentation and wait for new annotations"""
+        self.get_logger().info('Segmentation rejected by AVP, calling reject service')
+        if not self.reject_seg_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error('Service /reject_segmentation not available')
+            return
+        
+        request = EmptySrv.Request()
+        future = self.reject_seg_client.call_async(request)
+        self.get_logger().info('Called reject_segmentation service')
+
+    def handle_emergency_stop(self):
+        """Handle emergency stop command - kill all Docker containers and processes"""
+        self.get_logger().error('EMERGENCY STOP ACTIVATED - Killing all containers and processes')
+        
+        try:
+            # Kill all running Docker containers
+            subprocess.run(['docker', 'kill', '$(docker ps -q)'], shell=True, check=False)
+            self.get_logger().info('Killed all running Docker containers')
+            
+            # Kill any remaining ROS2 processes
+            subprocess.run(['pkill', '-f', 'ros2'], check=False)
+            subprocess.run(['pkill', '-f', 'rclpy'], check=False)
+            
+            self.get_logger().info('Emergency stop completed - all processes terminated')
+            
+        except Exception as e:
+            self.get_logger().error(f'Error during emergency stop: {e}')
 
 def main(args=None):
     rclpy.init(args=args)

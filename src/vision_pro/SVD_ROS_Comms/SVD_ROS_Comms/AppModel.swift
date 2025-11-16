@@ -9,8 +9,7 @@ import SwiftUI
 
 /// Maintains app-wide state
 @MainActor
-@Observable
-class AppModel {
+class AppModel: ObservableObject {
     let immersiveSpaceID = "ImmersiveSpace"
     enum ImmersiveSpaceState {
         case closed
@@ -18,4 +17,17 @@ class AppModel {
         case open
     }
     var immersiveSpaceState = ImmersiveSpaceState.closed
+    
+    // Image annotation state
+    enum AnnotationState {
+        case idle
+        case waitingForImage
+        case imageReceived
+        case annotating
+        case sendingAnnotations
+        case complete
+    }
+    @Published var annotationState = AnnotationState.idle
+    @Published var currentImageData: Data?
+    @Published var currentAnnotations: [AnnotationPoint] = []
 }
