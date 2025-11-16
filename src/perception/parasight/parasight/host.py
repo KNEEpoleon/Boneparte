@@ -59,7 +59,7 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
         self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
-        self.machine.add_transition(trigger='hard_reset', source='*', dest='start')
+        self.machine.add_transition(trigger='hard_reset', source='*', dest='bring_manipulator')
         
         # State Data
         self.last_rgb_image = None
@@ -100,11 +100,6 @@ class ParaSightHost(Node):
         self.camera_frame = 'camera_frame'
 
         # Trigger Subscribers (for state transitions)
-        self.ui_trigger_subscription = self.create_subscription(
-            Empty,
-            '/trigger_host_ui',
-            self.ui_trigger_callback,
-            10)
         
         self.hard_reset_subscription = self.create_subscription(
             Empty,
@@ -113,6 +108,12 @@ class ParaSightHost(Node):
             10)
         
         # Surgeon command subscribers (for await_surgeon_input state)
+        self.ui_trigger_subscription = self.create_subscription(
+            Empty,
+            '/trigger_host_ui',
+            self.ui_trigger_callback,
+            10)
+
         self.proceed_mission_subscription = self.create_subscription(
             Empty,
             '/proceed_mission',
