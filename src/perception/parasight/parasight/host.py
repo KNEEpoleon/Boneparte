@@ -53,9 +53,10 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='complete_bring_manipulator', source='bring_manipulator', dest='auto_reposition')
         self.machine.add_transition(trigger='complete_auto_reposition', source='auto_reposition', dest='await_surgeon_input')
         self.machine.add_transition(trigger='annotate', source='await_surgeon_input', dest='segment_and_register')
+        self.machine.add_transition(trigger='avp_annotations', source='await_surgeon_input', dest='segment_and_register')
         self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='update_rviz')
         self.machine.add_transition(trigger='complete_map_update', source='update_rviz', dest='ready_to_drill')
-        self.machine.add_transition(trigger='reset_mission', source='ready_to_drill', dest='await_surgeon_input')
+        self.machine.add_transition(trigger='reset_mission', source='*', dest='await_surgeon_input')
         self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
         self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
@@ -239,9 +240,9 @@ class ParaSightHost(Node):
         # TODO: Implement manipulator positioning logic
         # For now, auto-complete for testing
         # self.get_logger().info('Auto-completing bring_manipulator (not implemented yet)')
-        msg = String()
-        msg.data = 'bring_home'
-        self.manipulator_command_publisher.publish(msg)
+        # msg = String()
+        # msg.data = 'bring_home'
+        # self.manipulator_command_publisher.publish(msg)
         time.sleep(2.5)
         
         self.complete_bring_manipulator()
@@ -275,15 +276,6 @@ class ParaSightHost(Node):
         bone_centroid_pose.position.z = bone_centroid_3d_camera_frame[2]
         bone_centroid_3d_camera_frame_msg.poses.append(bone_centroid_pose)
         self.bone_centroid_publisher.publish(bone_centroid_3d_camera_frame_msg)
-        # image_centroid_3d_camera_frame = self.pixel_to_3d_camera_frame(np.array([self.cx, self.cy]), query_id)
-        # displacement_vector = bone_centroid_3d_camera_frame - image_centroid_3d_camera_frame
-        # displacement_vector_msg = Vector3()
-        # displacement_vector_msg.x = displacement_vector[0]
-        # displacement_vector_msg.y = displacement_vector[1]
-        # displacement_vector_msg.z = displacement_vector[2]
-        # self.get_logger().info(f"Displacement vector: {displacement_vector_msg}")
-        # self.reposition_vector_publisher.publish(displacement_vector_msg)
-
         self.complete_auto_reposition()
 
     def on_enter_segment_and_register(self):
@@ -307,7 +299,7 @@ class ParaSightHost(Node):
         self.get_logger().info('Updating RViz visualization...')
         # TODO: Implement RViz update logic
         # For now, auto-complete for testing
-        self.get_logger().info('Auto-completing update_rviz (not implemented yet)')
+        self.get_logger().info('\n update_rviz Obstacles')
         self.complete_map_update()
 
     def on_enter_ready_to_drill(self):
@@ -351,6 +343,7 @@ class ParaSightHost(Node):
             self.get_logger().info(f'Received AVP annotations: {self.avp_annotations}')
         except Exception as e:
             self.get_logger().error(f'Failed to parse AVP annotations: {e}')
+        self.trigger('avp_annotations')
 
     def all_systems_ready(self, dummy=True):
         if dummy:
@@ -377,8 +370,7 @@ class ParaSightHost(Node):
         print(f"\n! The self state is: {self.state}")
 
         self.get_logger().info('UI trigger received')
-        if self.state == 'ready':
-            self.trigger('start_parasight')
+        if self.state == 'ready_to_drill':
             
             # Check if we have AVP annotations, otherwise use UI
             if self.avp_annotations is not None:
