@@ -31,10 +31,10 @@ class ObjectAnchorVisualization {
         //+x is to the right from the face z is referenced above
         
         let spherePositions: [SIMD3<Float>] = [
-            SIMD3(-0.19, 0.05, 0.027),
-            //SIMD3(-0.20, 0.066, 0.022),
-            SIMD3(-0.17, 0.06, 0.00),
-            SIMD3(-0.22, 0.063, -0.02)
+            //SIMD3(-0.19, 0.05, 0.027),
+            SIMD3(-0.16, 0.062, 0.00),
+            SIMD3(-0.18, 0.06, 0.00),
+            SIMD3(-0.234, 0.058, 0.015)
             //SIMD3(-0.23, 0.075, -0.03)
         ]
 
@@ -47,7 +47,8 @@ class ObjectAnchorVisualization {
         }
         // create an anchor 3d text with reference object name
         let font = MeshResource.Font(name: "Helvetica", size: CGFloat(textBaseHeight))!
-        let mesh = MeshResource.generateText(anchor.referenceObject.name.replacingOccurrences(of: "_", with: " "), extrusionDepth: textBaseHeight * 0.05, font: font)
+//        let mesh = MeshResource.generateText(anchor.referenceObject.name.replacingOccurrences(of: "_", with: " "), extrusionDepth: textBaseHeight * 0.05, font: font)
+        let mesh = MeshResource.generateText("Femur", extrusionDepth: textBaseHeight * 0.05, font: font)
         let material = UnlitMaterial(color: .white)
         let text = ModelEntity(mesh: mesh, materials: [material])
         text.transform.translation.x = anchor.boundingBox.center.x - mesh.bounds.max.x / 2
@@ -60,9 +61,17 @@ class ObjectAnchorVisualization {
         
         if let model {
             // Use occlusion material instead of rendering the mesh
-            let occlusionMaterial = OcclusionMaterial()
-            self.applyMaterialRecursively(withModel: model, withMaterial: occlusionMaterial)
+//            let occlusionMaterial = OcclusionMaterial()
+//            self.applyMaterialRecursively(withModel: model, withMaterial: occlusionMaterial)
+            var wireFrameMaterial = PhysicallyBasedMaterial()
+            wireFrameMaterial.triangleFillMode = .lines
+            wireFrameMaterial.faceCulling = .back
+            wireFrameMaterial.baseColor = .init(tint: .red)
+            wireFrameMaterial.blending = .transparent(opacity: 0.4)
+
+            self.applyMaterialRecursively(withModel: model, withMaterial: wireFrameMaterial)
             
+            self.entity.addChild(model)
 //            var wireFrameMaterial = PhysicallyBasedMaterial()
 //            wireFrameMaterial.triangleFillMode = .lines
 //            wireFrameMaterial.faceCulling = .back
@@ -71,7 +80,7 @@ class ObjectAnchorVisualization {
 //
 //            self.applyMaterialRecursively(withModel: model, withMaterial: wireFrameMaterial)
 //            
-            self.entity.addChild(model)
+            //self.entity.addChild(model)
         }
     }
     
