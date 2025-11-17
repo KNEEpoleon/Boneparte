@@ -298,6 +298,8 @@ class TcpServerNode(Node):
             self.handle_annotate_command()
         elif command == "proceed_mission":
             self.handle_proceed_mission()
+        elif command == "reset_mission":
+            self.handle_reset_mission()
         elif command == "restart":
             self.hard_reset_pub.publish(Empty())
             self.get_logger().info('Published to /hard_reset_host')
@@ -418,6 +420,15 @@ class TcpServerNode(Node):
         # FSM will: await_surgeon_input -> bring_manipulator -> auto_reposition -> await_surgeon_input
         self.proceed_mission_pub.publish(Empty())
         self.get_logger().info('Published to /proceed_mission - FSM starting bring_manipulator -> auto_reposition')
+
+    def handle_reset_mission(self):
+        """Handle reset_mission command - return FSM to bring_manipulator state for reannotation"""
+        self.get_logger().info('Reset mission command received')
+        
+        # Publish to FSM to trigger reset_mission transition
+        # FSM will: * -> bring_manipulator
+        self.reset_mission_pub.publish(Empty())
+        self.get_logger().info('Published to /reset_mission - FSM transitioning to bring_manipulator')
 
     def handle_emergency_stop(self):
         """Handle emergency stop command - kill all Docker containers and processes"""

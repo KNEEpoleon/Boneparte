@@ -42,6 +42,8 @@ struct ContentView: View {
     
     // Command mapping
     private let commandMap: [String: String] = [
+        "Proceed Mission": "proceed_mission",
+        "Reset Mission": "reset_mission",
         "Annotate": "annotate",
         "robot_away": "robot_away",
         "robot_home": "robot_home",
@@ -254,6 +256,26 @@ struct ContentView: View {
                 icon: "slider.horizontal.3"
             )
             
+            StandardCard(title: "Begin mission (home + auto-reposition)") {
+                Button {
+                    sendCommand("Proceed Mission")
+                } label: {
+                    Label("Proceed Mission", systemImage: "play.circle.fill")
+                }
+                .primaryButton(fullWidth: true)
+                .disabled(!isConnected)
+            }
+            
+            StandardCard(title: "Reset mission (reannotate from ready_to_drill)") {
+                Button {
+                    sendCommand("Reset Mission")
+                } label: {
+                    Label("Reset Mission", systemImage: "arrow.counterclockwise.circle.fill")
+                }
+                .primaryButton(fullWidth: true)
+                .disabled(!isConnected)
+            }
+            
             StandardCard(title: "Launch segmentation interface") {
                 Button {
                     sendCommand("Annotate")
@@ -274,7 +296,7 @@ struct ContentView: View {
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Bring the robot home") {
+            StandardCard(title: "Bring the robot home (backup)") {
                 Button {
                     sendCommand("robot_home")
                 } label: {
