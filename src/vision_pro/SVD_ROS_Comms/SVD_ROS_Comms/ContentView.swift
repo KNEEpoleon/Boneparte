@@ -60,37 +60,13 @@ struct ContentView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            let isCompactLayout = geometry.size.width < 1180
-            let padding = EdgeInsets(
-                top: Spacing.xl,
-                leading: Spacing.xl,
-                bottom: Spacing.xl,
-                trailing: Spacing.xl
-            )
-            
-            Group {
-                if isCompactLayout {
-                    VStack(alignment: .leading, spacing: Spacing.xl) {
-                        leftColumn
-                        Divider()
-                            .background(Color.surfaceLight.opacity(0.35))
-                        rightColumn
-                        Spacer()
-                    }
-                    .padding(padding)
-                } else {
-                    HStack(alignment: .top, spacing: Spacing.xl) {
-                        leftColumn
-                            .frame(maxWidth: 420, alignment: .topLeading)
-                        rightColumn
-                            .frame(maxWidth: 540, alignment: .topLeading)
-                    }
-                    .padding(padding)
-                    .frame(alignment: .topLeading)
-                }
-            }
+        HStack(alignment: .top, spacing: Spacing.xl) {
+            leftColumn
+                .frame(width: 420, alignment: .topLeading)
+            rightColumn
+                .frame(width: 540, alignment: .topLeading)
         }
+        .padding(Spacing.xl)
         .background(GlassmorphismBackground())
         .alert("Emergency Stop", isPresented: $showEmergencyConfirm) {
             Button("Cancel", role: .cancel) { }
@@ -143,7 +119,6 @@ struct ContentView: View {
             headerSection
             connectionStatusCard
             workflowControlPanel
-            Spacer()
         }
     }
     
@@ -151,7 +126,6 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: Spacing.lg) {
             emergencySection
             drillSiteSelection
-            Spacer()
         }
     }
     
