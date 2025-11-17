@@ -30,6 +30,7 @@ from datetime import datetime
 
 from std_srvs.srv import Empty as EmptySrv
 from functools import partial
+from surgical_robot_planner.srv import RobotCommand
 
 from ament_index_python.packages import get_package_share_directory
 from scipy.spatial.transform import Rotation as R
@@ -73,6 +74,10 @@ class ParaSightHost(Node):
         self.last_drill_pose_array = None
         self.last_drill_pose = None
         
+        # Robot command state tracking
+        self.robot_command_future = None
+        self.robot_command_timer = None
+        
         # AVP annotations
         self.avp_annotations = None
         self.waiting_for_segmentation_approval = False
@@ -84,6 +89,9 @@ class ParaSightHost(Node):
         # Services for segmentation approval
         self.approve_seg_service = self.create_service(EmptySrv, '/approve_segmentation', self.approve_segmentation_service)
         self.reject_seg_service = self.create_service(EmptySrv, '/reject_segmentation', self.reject_segmentation_service)
+        
+        # Service client for robot commands
+        self.robot_command_client = self.create_client(RobotCommand, '/robot_command')
         
         # D405 Intrinsics from /camera_info
         self.fx = 425.19189453125
@@ -121,12 +129,6 @@ class ParaSightHost(Node):
             self.proceed_mission_callback,
             10)
         
-        self.annotate_subscription = self.create_subscription(
-            Empty,
-            '/annotate',
-            self.annotate_callback,
-            10)
-        
         self.complete_mission_subscription = self.create_subscription(
             Empty,
             '/complete_mission',
@@ -143,6 +145,12 @@ class ParaSightHost(Node):
             Empty,
             '/start_drill',
             self.start_drill_callback,
+            10)        
+
+        self.annotate_subscription = self.create_subscription(
+            Empty,
+            '/annotate',
+            self.annotate_callback,
             10)
         
         # AVP annotations subscription
@@ -236,25 +244,76 @@ class ParaSightHost(Node):
 
     def on_enter_bring_manipulator(self):
         """Entry handler for bring_manipulator state."""
-        self.get_logger().info('Bringing manipulator to position...')
-        # TODO: Implement manipulator positioning logic
-        # For now, auto-complete for testing
-        # self.get_logger().info('Auto-completing bring_manipulator (not implemented yet)')
-        # msg = String()
-        # msg.data = 'bring_home'
-        # self.manipulator_command_publisher.publish(msg)
-        time.sleep(2.5)
+        self.get_logger().info('\n\nBringing manipulator to position...')
         
-        self.complete_bring_manipulator()
+        # Wait for service to be available
+        if not self.robot_command_client.wait_for_service(timeout_sec=5.0):
+            self.get_logger().error('Service /robot_command not available, cannot move manipulator')
+            self.complete_bring_manipulator()
+            return
+        
+        # Call service to move robot to "home" position (robot is already in away position)
+        request = RobotCommand.Request()
+        request.command = "home"
+        
+        self.get_logger().info('Calling robot_command service to move to home position...')
+        self.robot_command_future = self.robot_command_client.call_async(request)
+        self.robot_command_start_time = self.get_clock().now()
+        
+        # Create a timer to check the future status periodically (non-blocking)
+        self.robot_command_timer = self.create_timer(0.1, self.check_robot_command_status)
+    
+    def check_robot_command_status(self):
+        """Timer callback to check robot command service response."""
+        if self.robot_command_future is None:
+            return
+        
+        timeout_sec = 30.0
+        elapsed = (self.get_clock().now() - self.robot_command_start_time).nanoseconds / 1e9
+        
+        if self.robot_command_future.done():
+            # Cancel timer
+            if self.robot_command_timer:
+                self.robot_command_timer.cancel()
+                self.robot_command_timer = None
+            
+            try:
+                response = self.robot_command_future.result()
+                if response.success:
+                    self.get_logger().info(f'Robot successfully moved to home position: {response.message}')
+                else:
+                    self.get_logger().error(f'Robot command failed: {response.message}')
+            except Exception as e:
+                self.get_logger().error(f'Exception while calling robot_command service: {e}')
+            
+            self.robot_command_future = None
+            self.complete_bring_manipulator()
+        elif elapsed > timeout_sec:
+            # Timeout
+            if self.robot_command_timer:
+                self.robot_command_timer.cancel()
+                self.robot_command_timer = None
+            
+            self.get_logger().warn(f'Robot command service call timed out after {elapsed:.1f}s')
+            self.robot_command_future = None
+            self.complete_bring_manipulator()
 
     def on_enter_auto_reposition(self):
         """Entry handler for auto_reposition state."""
         self.get_logger().info('Auto-repositioning...')
-        # TODO: Implement auto-reposition logic
-        # For now, auto-complete for testing
-        while self.last_rgb_image is None or self.last_depth_image is None:
-            time.sleep(0.5)
-            self.get_logger().error("No RGB or depth image available")
+        # Wait for images to be available (robot should already be in position from bring_manipulator)
+        max_wait_iterations = 20  # 20 * 0.5s = 10s max wait
+        iteration = 0
+        while (self.last_rgb_image is None or self.last_depth_image is None) and iteration < max_wait_iterations:
+            rclpy.spin_once(self, timeout_sec=0.5)
+            iteration += 1
+            if iteration % 4 == 0:  # Log every 2 seconds
+                self.get_logger().warn(f"Waiting for RGB/depth images... ({iteration * 0.5:.1f}s)")
+        
+        if self.last_rgb_image is None or self.last_depth_image is None:
+            self.get_logger().error("Timeout waiting for RGB or depth image - cannot proceed with auto-reposition")
+            self.complete_auto_reposition()
+            return
 
         # Get the current date and time
         now = datetime.now()
@@ -334,6 +393,17 @@ class ParaSightHost(Node):
         """Reset the state machine to initial state."""
         self.get_logger().warn('Hard reset triggered - returning to start state')
         self.trigger('hard_reset')
+
+    def annotate_callback(self, msg):
+        """Handle annotate command - transitions to segment_and_register."""
+        self.get_logger().info(f'Annotate command received in state: {self.state}')
+        
+        if self.state == 'await_surgeon_input':
+            self.get_logger().info('Triggering annotate transition...')
+            self.trigger('annotate')
+        else:
+            self.get_logger().warn(f'Annotate command received but not in await_surgeon_input state (current: {self.state})')
+        
 
     def avp_annotations_callback(self, msg):
         """Store AVP annotations for use in segmentation"""
@@ -423,16 +493,6 @@ class ParaSightHost(Node):
             self.trigger('proceed_mission')
         else:
             self.get_logger().warn(f'Proceed mission command received but not in await_surgeon_input state (current: {self.state})')
-
-    def annotate_callback(self, msg):
-        """Handle annotate command - transitions to segment_and_register."""
-        self.get_logger().info(f'Annotate command received in state: {self.state}')
-        
-        if self.state == 'await_surgeon_input':
-            self.get_logger().info('Triggering annotate transition...')
-            self.trigger('annotate')
-        else:
-            self.get_logger().warn(f'Annotate command received but not in await_surgeon_input state (current: {self.state})')
 
     def complete_mission_callback(self, msg):
         """Handle complete_mission command - transitions to finished."""

@@ -411,8 +411,8 @@ class TcpServerNode(Node):
         """Handle proceed_mission command - move robot home and advance FSM through auto-reposition"""
         self.get_logger().info('Proceed mission command received')
         
-        # First, command robot to go home
-        self.call_robot_command_service("home")
+        # Robot home command is now handled by host.py in bring_manipulator state
+        # self.call_robot_command_service("home")
         
         # Then publish to FSM to start proceed_mission transition
         # FSM will: await_surgeon_input -> bring_manipulator -> auto_reposition -> await_surgeon_input
