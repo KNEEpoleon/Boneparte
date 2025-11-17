@@ -33,6 +33,15 @@ ros2 topic pub --once /reset_mission std_msgs/msg/Empty '{}'
 ros2 topic pub --once /proceed_mission std_msgs/msg/Empty
 ```
 
+> Send the `manipulator away`
+```bash
+ros2 service call /robot_command surgical_robot_planner/srv/RobotCommand "{command: 'away'}"
+```
+
+> bring the `manipulator home`
+```bash
+ros2 service call /robot_command surgical_robot_planner/srv/RobotCommand "{command: 'home'}"
+```
 
 ## Workstation workflow
 > publish the annotate command:
