@@ -70,6 +70,8 @@ class TcpServerNode(Node):
             10)
         self.latest_drill_poses = None
         self.poses_lock = threading.Lock()
+        self.last_pose_send_time = 0
+        self.pose_send_interval = 0.5  # Send poses every 500ms instead of 100ms
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -107,7 +109,7 @@ class TcpServerNode(Node):
         """Store latest drill poses for streaming to AVP"""
         with self.poses_lock:
             self.latest_drill_poses = msg
-        self.get_logger().debug(f'Received {len(msg.poses)} drill poses in aruco_marker frame')
+        self.get_logger().info(f'Received {len(msg.poses)} drill poses in aruco_marker frame - will stream to AVP')
 
     def poll_socket(self):
         if self.client_sock is None:
@@ -121,22 +123,26 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Accepted TCP connection from {addr}')
             return
 
-        # Send drill poses if available (stream continuously)
-        with self.poses_lock:
-            if self.latest_drill_poses is not None and len(self.latest_drill_poses.poses) > 0:
-                try:
-                    message = self.format_poses_message(self.latest_drill_poses)
-                    self.client_sock.sendall(message.encode('utf-8'))
-                except (BrokenPipeError, ConnectionResetError, OSError) as e:
-                    self.get_logger().warn(f'Client disconnected while sending drill poses: {e}')
+        # Send drill poses if available (rate limited to avoid flooding)
+        current_time = time.time()
+        if current_time - self.last_pose_send_time >= self.pose_send_interval:
+            with self.poses_lock:
+                if self.latest_drill_poses is not None and len(self.latest_drill_poses.poses) > 0:
                     try:
-                        self.client_sock.close()
-                    except:
-                        pass
-                    self.client_sock = None
-                    self.client_addr = None
-                    self.get_logger().info('Waiting for new connection...')
-                    return
+                        message = self.format_poses_message(self.latest_drill_poses)
+                        self.client_sock.sendall(message.encode('utf-8'))
+                        self.last_pose_send_time = current_time
+                        self.get_logger().debug(f'Sent {len(self.latest_drill_poses.poses)} drill poses to AVP')
+                    except (BrokenPipeError, ConnectionResetError, OSError) as e:
+                        self.get_logger().warn(f'Client disconnected while sending drill poses: {e}')
+                        try:
+                            self.client_sock.close()
+                        except:
+                            pass
+                        self.client_sock = None
+                        self.client_addr = None
+                        self.get_logger().info('Waiting for new connection...')
+                        return
         
         # Check for annotation timeout
         if self.waiting_for_annotation:
@@ -231,6 +237,8 @@ class TcpServerNode(Node):
                 self.get_logger().info('Sending image data to AVP...')
                 self.client_sock.sendall(image_message.encode('utf-8'))
                 self.get_logger().info('Sent image to AVP for annotation')
+                # Brief pause to let TCP buffer clear
+                time.sleep(0.05)
             finally:
                 # Restore original blocking state
                 self.get_logger().info('Restoring socket blocking state...')
@@ -322,6 +330,8 @@ class TcpServerNode(Node):
                 self.get_logger().info('Sending segmented image to AVP...')
                 self.client_sock.sendall(image_message.encode('utf-8'))
                 self.get_logger().info('Sent segmented image to AVP for review')
+                # Brief pause to let TCP buffer clear
+                time.sleep(0.05)
             finally:
                 # Restore original blocking state
                 self.client_sock.setblocking(original_blocking)
