@@ -39,7 +39,7 @@ from visualization_msgs.msg import Marker
 
 
 class ParaSightHost(Node):
-    states = ['start', 'await_surgeon_input', 'bring_manipulator', 'auto_reposition', 'segment_and_register', 'ready_to_drill', 'drill', 'finished']
+    states = ['start', 'await_surgeon_input', 'bring_manipulator', 'auto_reposition', 'segment_and_register', 'finished']
 
     def __init__(self):
         super().__init__('parasight_host')
@@ -55,9 +55,9 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='complete_auto_reposition', source='auto_reposition', dest='await_surgeon_input')
         self.machine.add_transition(trigger='annotate', source='await_surgeon_input', dest='segment_and_register')
         self.machine.add_transition(trigger='avp_annotations', source='await_surgeon_input', dest='segment_and_register')
-        self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='ready_to_drill')
-        self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
-        self.machine.add_transition(trigger='complete_drill', source='drill', dest='finished')
+        self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='await_surgeon_input')
+        # self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
+        # self.machine.add_transition(trigger='complete_drill', source='drill', dest='finished')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
         self.machine.add_transition(trigger='reset_mission', source='*', dest='bring_manipulator')
         
@@ -103,7 +103,7 @@ class ParaSightHost(Node):
         self.base_frame = 'lbr/link_0'
         self.ee_frame = 'lbr/link_ee'
         self.tool_frame = 'lbr/link_tool'
-        self.camera_link_frame = 'camera_link'
+        # self.camera_link_frame = 'camera_link'
         self.camera_frame = 'camera_frame'
 
         # Trigger Subscribers (for state transitions)
@@ -387,16 +387,6 @@ class ParaSightHost(Node):
             # Transition to next state
             self.trigger('complete_segment_and_register')
 
-    def on_enter_ready_to_drill(self):
-        """Entry handler for ready_to_drill state."""
-        self.get_logger().info('Ready to drill - awaiting mission pin...')
-
-    def on_enter_drill(self):
-        """Entry handler for drill state."""
-        self.get_logger().info('Drilling in progress...')
-        # TODO: Implement actual drilling logic - wait for drill completion signal
-        # For now, immediately complete (should be replaced with actual drill execution)
-        self.trigger('complete_drill')
 
     def on_enter_finished(self):
         """Entry handler for finished state."""
@@ -464,7 +454,6 @@ class ParaSightHost(Node):
     def ui_trigger_callback(self, msg):
         """Handle UI trigger - triggers annotation workflow from await_surgeon_input state.
         
-        Note: For re-segmentation from ready_to_drill state, use /annotate topic directly.
         The segmentation logic (AVP vs GUI) is handled automatically in on_enter_segment_and_register()
         based on whether avp_annotations are present.
         """
@@ -473,14 +462,8 @@ class ParaSightHost(Node):
         if self.state == 'await_surgeon_input':
             # Trigger annotation workflow - will use GUI or AVP annotations based on what's available
             self.trigger('annotate')
-        elif self.state == 'ready_to_drill':
-            # Re-segmentation from ready_to_drill state
-            # Note: This requires AVP annotations to be set first via /avp_annotations topic
-            # Then use /annotate topic to trigger the transition
-            self.get_logger().info('Re-segmentation requested from ready_to_drill state')
-            self.get_logger().warn('Cannot transition directly from ready_to_drill. Use /annotate topic after setting /avp_annotations to re-segment.')
         else:
-            self.get_logger().warn(f'UI trigger received but not in await_surgeon_input or ready_to_drill state (current: {self.state})')
+            self.get_logger().warn(f'UI trigger received but not in await_surgeon_input state (current: {self.state})')
 
     def proceed_mission_callback(self, msg):
         """Handle proceed_mission command - transitions to bring_manipulator."""
@@ -533,7 +516,6 @@ class ParaSightHost(Node):
             self.get_logger().info('Segmentation rejected by AVP, clearing data')
             self.waiting_for_segmentation_approval = False
             self.pending_segmentation_data = None
-            # State machine remains in ready_to_drill, waiting for new segmentation
         else:
             self.get_logger().warn('reject_segmentation called but not waiting for approval')
     
