@@ -7,6 +7,7 @@ from std_msgs.msg import Empty, String
 from std_srvs.srv import Empty as EmptySrv
 from surgical_robot_planner.srv import SelectPose, RobotCommand
 from sensor_msgs.msg import Image
+from geometry_msgs.msg import PoseArray
 from cv_bridge import CvBridge
 import socket
 import base64
@@ -60,6 +61,15 @@ class TcpServerNode(Node):
             self.segmented_image_callback,
             10)
         self.pending_segmented_image = None
+        
+        # Subscription for drill poses (from ArUco transform)
+        self.drill_poses_subscription = self.create_subscription(
+            PoseArray,
+            '/aruco_drill_poses',
+            self.drill_poses_callback,
+            10)
+        self.latest_drill_poses = None
+        self.poses_lock = threading.Lock()
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -92,6 +102,12 @@ class TcpServerNode(Node):
             self.send_segmented_image_to_avp()
         except Exception as e:
             self.get_logger().error(f'Failed to process segmented image: {e}')
+    
+    def drill_poses_callback(self, msg):
+        """Store latest drill poses for streaming to AVP"""
+        with self.poses_lock:
+            self.latest_drill_poses = msg
+        self.get_logger().debug(f'Received {len(msg.poses)} drill poses in aruco_marker frame')
 
     def poll_socket(self):
         if self.client_sock is None:
@@ -105,6 +121,19 @@ class TcpServerNode(Node):
             self.get_logger().info(f'Accepted TCP connection from {addr}')
             return
 
+        # Send drill poses if available (stream continuously)
+        with self.poses_lock:
+            if self.latest_drill_poses is not None and len(self.latest_drill_poses.poses) > 0:
+                try:
+                    message = self.format_poses_message(self.latest_drill_poses)
+                    self.client_sock.sendall(message.encode('utf-8'))
+                except (BrokenPipeError, ConnectionResetError, OSError) as e:
+                    self.get_logger().warn(f'Failed to send drill poses: {e}')
+                    self.client_sock.close()
+                    self.client_sock = None
+                    self.client_addr = None
+                    return
+        
         # Check for annotation timeout
         if self.waiting_for_annotation:
             if time.time() - self.annotation_start_time > 60:  # 60 second timeout
@@ -292,6 +321,23 @@ class TcpServerNode(Node):
                 
         except Exception as e:
             self.get_logger().error(f'Failed to send segmented image: {e}')
+    
+    def format_poses_message(self, poses):
+        """Format poses as: POSES|x,y,z,qx,qy,qz,qw|x,y,z,qx,qy,qz,qw|..."""
+        pose_strings = []
+        for pose in poses.poses:
+            pose_str = (
+                f"{pose.position.x:.6f},"
+                f"{pose.position.y:.6f},"
+                f"{pose.position.z:.6f},"
+                f"{pose.orientation.x:.6f},"
+                f"{pose.orientation.y:.6f},"
+                f"{pose.orientation.z:.6f},"
+                f"{pose.orientation.w:.6f}"
+            )
+            pose_strings.append(pose_str)
+        
+        return "POSES|" + "|".join(pose_strings) + "\n"
 
     def handle_command(self, command: str):
         if command == "annotate":
