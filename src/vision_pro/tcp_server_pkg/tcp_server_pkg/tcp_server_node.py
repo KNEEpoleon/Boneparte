@@ -7,7 +7,6 @@ from std_msgs.msg import Empty, String
 from std_srvs.srv import Empty as EmptySrv
 from surgical_robot_planner.srv import SelectPose, RobotCommand
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import PoseArray
 from cv_bridge import CvBridge
 import socket
 import base64
@@ -61,17 +60,6 @@ class TcpServerNode(Node):
             self.segmented_image_callback,
             10)
         self.pending_segmented_image = None
-        
-        # Subscription for drill poses (from ArUco transform)
-        self.drill_poses_subscription = self.create_subscription(
-            PoseArray,
-            '/aruco_drill_poses',
-            self.drill_poses_callback,
-            10)
-        self.latest_drill_poses = None
-        self.poses_lock = threading.Lock()
-        self.last_pose_send_time = 0
-        self.pose_send_interval = 0.5  # Send poses every 500ms instead of 100ms
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -105,12 +93,6 @@ class TcpServerNode(Node):
         except Exception as e:
             self.get_logger().error(f'Failed to process segmented image: {e}')
     
-    def drill_poses_callback(self, msg):
-        """Store latest drill poses for streaming to AVP"""
-        with self.poses_lock:
-            self.latest_drill_poses = msg
-        self.get_logger().info(f'Received {len(msg.poses)} drill poses in aruco_marker frame - will stream to AVP')
-
     def poll_socket(self):
         if self.client_sock is None:
             try:
@@ -122,27 +104,6 @@ class TcpServerNode(Node):
             self.client_sock.setblocking(False)
             self.get_logger().info(f'Accepted TCP connection from {addr}')
             return
-
-        # Send drill poses if available (rate limited to avoid flooding)
-        current_time = time.time()
-        if current_time - self.last_pose_send_time >= self.pose_send_interval:
-            with self.poses_lock:
-                if self.latest_drill_poses is not None and len(self.latest_drill_poses.poses) > 0:
-                    try:
-                        message = self.format_poses_message(self.latest_drill_poses)
-                        self.client_sock.sendall(message.encode('utf-8'))
-                        self.last_pose_send_time = current_time
-                        self.get_logger().debug(f'Sent {len(self.latest_drill_poses.poses)} drill poses to AVP')
-                    except (BrokenPipeError, ConnectionResetError, OSError) as e:
-                        self.get_logger().warn(f'Client disconnected while sending drill poses: {e}')
-                        try:
-                            self.client_sock.close()
-                        except:
-                            pass
-                        self.client_sock = None
-                        self.client_addr = None
-                        self.get_logger().info('Waiting for new connection...')
-                        return
         
         # Check for annotation timeout
         if self.waiting_for_annotation:
@@ -156,9 +117,20 @@ class TcpServerNode(Node):
             data = self.client_sock.recv(1024)
         except BlockingIOError:
             return
+        except Exception as e:
+            self.get_logger().error(f'Error receiving data: {e}')
+            try:
+                self.client_sock.close()
+            except:
+                pass
+            self.client_sock = None
+            self.client_addr = None
+            self.get_logger().info('Waiting for new connection...')
+            return
 
         if not data:
-            self.get_logger().info('Client disconnected')
+            # Client disconnected gracefully
+            self.get_logger().info('Client disconnected gracefully')
             try:
                 self.client_sock.close()
             except:
@@ -184,8 +156,15 @@ class TcpServerNode(Node):
 
                 try:
                     self.client_sock.sendall(b'acknowledged\n')
-                except Exception as e:
-                    self.get_logger().error(f'Failed to send acknowledgment: {e}')
+                except (BrokenPipeError, ConnectionResetError, OSError) as e:
+                    self.get_logger().warn(f'Client disconnected while sending acknowledgment: {e}')
+                    try:
+                        self.client_sock.close()
+                    except:
+                        pass
+                    self.client_sock = None
+                    self.client_addr = None
+                    self.get_logger().info('Waiting for new connection...')
 
     def handle_annotation_response(self, message: str):
         """Handle annotation response from AVP"""
@@ -237,12 +216,21 @@ class TcpServerNode(Node):
                 self.get_logger().info('Sending image data to AVP...')
                 self.client_sock.sendall(image_message.encode('utf-8'))
                 self.get_logger().info('Sent image to AVP for annotation')
-                # Brief pause to let TCP buffer clear
-                time.sleep(0.05)
+            except (BrokenPipeError, ConnectionResetError, OSError) as e:
+                self.get_logger().error(f'Client disconnected while sending image: {e}')
+                try:
+                    self.client_sock.close()
+                except:
+                    pass
+                self.client_sock = None
+                self.client_addr = None
+                self.get_logger().info('Waiting for new connection...')
+                raise
             finally:
                 # Restore original blocking state
                 self.get_logger().info('Restoring socket blocking state...')
-                self.client_sock.setblocking(original_blocking)
+                if self.client_sock is not None:
+                    self.client_sock.setblocking(original_blocking)
             
             # Set up waiting state
             with self.annotation_lock:
@@ -330,32 +318,24 @@ class TcpServerNode(Node):
                 self.get_logger().info('Sending segmented image to AVP...')
                 self.client_sock.sendall(image_message.encode('utf-8'))
                 self.get_logger().info('Sent segmented image to AVP for review')
-                # Brief pause to let TCP buffer clear
-                time.sleep(0.05)
+            except (BrokenPipeError, ConnectionResetError, OSError) as e:
+                self.get_logger().error(f'Client disconnected while sending segmented image: {e}')
+                try:
+                    self.client_sock.close()
+                except:
+                    pass
+                self.client_sock = None
+                self.client_addr = None
+                self.get_logger().info('Waiting for new connection...')
+                raise
             finally:
                 # Restore original blocking state
-                self.client_sock.setblocking(original_blocking)
+                if self.client_sock is not None:
+                    self.client_sock.setblocking(original_blocking)
                 self.pending_segmented_image = None  # Clear after sending
                 
         except Exception as e:
             self.get_logger().error(f'Failed to send segmented image: {e}')
-    
-    def format_poses_message(self, poses):
-        """Format poses as: POSES|x,y,z,qx,qy,qz,qw|x,y,z,qx,qy,qz,qw|..."""
-        pose_strings = []
-        for pose in poses.poses:
-            pose_str = (
-                f"{pose.position.x:.6f},"
-                f"{pose.position.y:.6f},"
-                f"{pose.position.z:.6f},"
-                f"{pose.orientation.x:.6f},"
-                f"{pose.orientation.y:.6f},"
-                f"{pose.orientation.z:.6f},"
-                f"{pose.orientation.w:.6f}"
-            )
-            pose_strings.append(pose_str)
-        
-        return "POSES|" + "|".join(pose_strings) + "\n"
 
     def handle_command(self, command: str):
         if command == "annotate":
