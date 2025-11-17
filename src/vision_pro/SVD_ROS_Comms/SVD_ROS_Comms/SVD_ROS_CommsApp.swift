@@ -16,6 +16,8 @@ struct SVD_ROS_CommsApp: App {
         WindowGroup {
             ContentView()
         }
+        .defaultSize(width: 1040, height: 900)
+        .windowResizability(.contentSize)
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
             ImmersiveView()
