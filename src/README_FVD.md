@@ -16,6 +16,11 @@ ros2 launch launch_subsystems launch_planning_hardware.py
 ```bash
 ros2 launch launch_subsystems launch_planning_perception.py
 ```  
+
+**Launch the second AVP node**
+```bash
+ros2 run tcp_server_pkg avp_tcp_server 
+```
 ___
 
 
