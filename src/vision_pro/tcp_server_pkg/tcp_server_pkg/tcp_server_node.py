@@ -128,10 +128,14 @@ class TcpServerNode(Node):
                     message = self.format_poses_message(self.latest_drill_poses)
                     self.client_sock.sendall(message.encode('utf-8'))
                 except (BrokenPipeError, ConnectionResetError, OSError) as e:
-                    self.get_logger().warn(f'Failed to send drill poses: {e}')
-                    self.client_sock.close()
+                    self.get_logger().warn(f'Client disconnected while sending drill poses: {e}')
+                    try:
+                        self.client_sock.close()
+                    except:
+                        pass
                     self.client_sock = None
                     self.client_addr = None
+                    self.get_logger().info('Waiting for new connection...')
                     return
         
         # Check for annotation timeout
@@ -148,11 +152,15 @@ class TcpServerNode(Node):
             return
 
         if not data:
-            print("\n\n\n", data, flush = True)
             self.get_logger().info('Client disconnected')
-            self.client_sock.close()
+            try:
+                self.client_sock.close()
+            except:
+                pass
             self.client_sock = None
             self.client_addr = None
+            self.get_logger().info('Waiting for new connection...')
+            return
         else:
             message = data.decode('utf-8').strip()
             if message:
