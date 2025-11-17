@@ -82,9 +82,9 @@ struct ContentView: View {
                 } else {
                     HStack(alignment: .top, spacing: Spacing.xl) {
                         leftColumn
-                            .frame(maxWidth: 336, alignment: .topLeading)
+                            .frame(maxWidth: 420, alignment: .topLeading)
                         rightColumn
-                            .frame(maxWidth: 480, alignment: .topLeading)
+                            .frame(maxWidth: 540, alignment: .topLeading)
                     }
                     .padding(padding)
                     .frame(alignment: .topLeading)
@@ -256,7 +256,7 @@ struct ContentView: View {
                 icon: "slider.horizontal.3"
             )
             
-            StandardCard(title: "Begin mission (home + auto-reposition)") {
+            StandardCard {
                 Button {
                     sendCommand("Proceed Mission")
                 } label: {
@@ -266,7 +266,7 @@ struct ContentView: View {
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Reset mission (reannotate from ready_to_drill)") {
+            StandardCard {
                 Button {
                     sendCommand("Reset Mission")
                 } label: {
@@ -276,7 +276,7 @@ struct ContentView: View {
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Launch segmentation interface") {
+            StandardCard {
                 Button {
                     sendCommand("Annotate")
                 } label: {
@@ -286,21 +286,21 @@ struct ContentView: View {
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Send the robot away") {
+            StandardCard {
                 Button {
                     sendCommand("robot_away")
                 } label: {
-                    Label("Send", systemImage: "paperplane.fill")
+                    Label("Send Robot Away", systemImage: "paperplane.fill")
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)
             }
             
-            StandardCard(title: "Bring the robot home (backup)") {
+            StandardCard {
                 Button {
                     sendCommand("robot_home")
                 } label: {
-                    Label("Home", systemImage: "house.fill") 
+                    Label("Bring Robot Home", systemImage: "house.fill") 
                 }
                 .primaryButton(fullWidth: true)
                 .disabled(!isConnected)

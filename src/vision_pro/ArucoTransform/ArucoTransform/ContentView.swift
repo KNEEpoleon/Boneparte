@@ -16,7 +16,7 @@ struct ContentView: View {
     
     // ISSUE #3: Use @StateObject with immediate initialization (like SVD_ROS_Comms)
     // ISSUE #2: Hardcode IP directly in initialization (no appModel override)
-    @StateObject private var tcpClient = ArucoTCPClient(host: "192.168.0.193", port: 5000)  // ROS2 PC server
+    @StateObject private var tcpClient = ArucoTCPClient(host: "192.168.0.193", port: 5001)  // ROS2 PC server - avp_tcp_server.py
     
     var body: some View {
         VStack(spacing: 20) {
@@ -34,7 +34,7 @@ struct ContentView: View {
                 // ISSUE #4: Display static IP/Port (removed TextField)
                 HStack {
                     Text("Server:")
-                    Text("192.168.0.193:5000")
+                    Text("192.168.0.193:5001")
                         .foregroundColor(.secondary)
                         .fontWeight(.medium)
                 }

@@ -34,7 +34,7 @@ class AppModel {
     
     // Server configuration
     var serverIP = "192.168.0.193"  // Static IP for ROS server
-    var serverPort: UInt16 = 5000  // Same port as SVD_ROS_Comms (working port)
+    var serverPort: UInt16 = 5001  // Port for avp_tcp_server.py (drill poses only)
 }
 
 struct DrillSite: Identifiable {
