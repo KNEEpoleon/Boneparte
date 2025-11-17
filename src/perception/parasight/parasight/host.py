@@ -39,7 +39,7 @@ from visualization_msgs.msg import Marker
 
 
 class ParaSightHost(Node):
-    states = ['start', 'await_surgeon_input', 'bring_manipulator', 'auto_reposition', 'segment_and_register', 'update_rviz', 'ready_to_drill', 'drill', 'finished']
+    states = ['start', 'await_surgeon_input', 'bring_manipulator', 'auto_reposition', 'segment_and_register', 'ready_to_drill', 'drill', 'finished']
 
     def __init__(self):
         super().__init__('parasight_host')
@@ -55,13 +55,11 @@ class ParaSightHost(Node):
         self.machine.add_transition(trigger='complete_auto_reposition', source='auto_reposition', dest='await_surgeon_input')
         self.machine.add_transition(trigger='annotate', source='await_surgeon_input', dest='segment_and_register')
         self.machine.add_transition(trigger='avp_annotations', source='await_surgeon_input', dest='segment_and_register')
-        self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='update_rviz')
-        self.machine.add_transition(trigger='complete_map_update', source='update_rviz', dest='ready_to_drill')
-        self.machine.add_transition(trigger='reset_mission', source='*', dest='bring_manipulator')
+        self.machine.add_transition(trigger='complete_segment_and_register', source='segment_and_register', dest='ready_to_drill')
         self.machine.add_transition(trigger='start_drill', source='ready_to_drill', dest='drill')
-        self.machine.add_transition(trigger='complete_drill', source='drill', dest='await_surgeon_input')
+        self.machine.add_transition(trigger='complete_drill', source='drill', dest='finished')
         self.machine.add_transition(trigger='complete_mission', source='await_surgeon_input', dest='finished')
-        # self.machine.add_transition(trigger='hard_reset', source='*', dest='bring_manipulator')
+        self.machine.add_transition(trigger='reset_mission', source='*', dest='bring_manipulator')
         
         # State Data
         self.last_rgb_image = None
@@ -202,7 +200,7 @@ class ParaSightHost(Node):
         # Interfaces
         self.regpipe = RegistrationPipeline()
         self.segmentation_ui = SegmentAnythingUI()
-        print(f"Made the SAM object")
+        self.get_logger().info("Initialized SAM (Segment Anything Model) object")
         self.bridge = CvBridge()
         
         checkpoint_path = "/ros_ws/src/perception/dinov3/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
@@ -338,28 +336,56 @@ class ParaSightHost(Node):
         self.complete_auto_reposition()
 
     def on_enter_segment_and_register(self):
-        """Entry handler for segment_and_register state - FULLY IMPLEMENTED."""
+        """Entry handler for segment_and_register state - FULLY IMPLEMENTED.
+        
+        Handles both AVP annotations (from /avp_annotations) and normal GUI annotations (from /annotate).
+        - If AVP annotations exist: uses segment_using_points() (no GUI, displays on AVP)
+        - Otherwise: uses segment_using_ui() (GUI on workstation)
+        """
         self.get_logger().info('Entering segment_and_register - using SAM to segment bones')
-        # Segmentation and registration is implemented via segment_with_ui
-        masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(
-            self.last_rgb_image, self.bones
-        )
-        self.annotated_points = annotated_points
-        self.get_logger().info(f'Annotated points: {self.annotated_points}')
         
-        # Perform registration
-        self.register_and_publish(annotated_points)
-        
-        # Transition to next state
-        self.trigger('complete_segment_and_register')
-
-    def on_enter_update_rviz(self):
-        """Entry handler for update_rviz state."""
-        self.get_logger().info('Updating RViz visualization...')
-        # TODO: Implement RViz update logic
-        # For now, auto-complete for testing
-        self.get_logger().info('\n update_rviz Obstacles')
-        self.complete_map_update()
+        # Check if we have AVP annotations (from AVP workflow)
+        if self.avp_annotations is not None:
+            self.get_logger().info('Using AVP annotations for segmentation (no GUI)')
+            # Convert pixel coordinates to the format expected by segment_using_points
+            femur_point = tuple(self.avp_annotations[0])  # [x, y]
+            tibia_point = tuple(self.avp_annotations[1])  # [x, y]
+            result = self.segmentation_ui.segment_using_points(
+                self.last_rgb_image, femur_point, tibia_point, self.bones)
+            masks, annotated_points, all_mask_points, segmented_image = result
+            
+            # Store segmentation data and wait for AVP approval
+            self.pending_segmentation_data = {
+                'masks': masks,
+                'annotated_points': annotated_points,
+                'all_mask_points': all_mask_points,
+                'segmented_image': segmented_image
+            }
+            self.waiting_for_segmentation_approval = True
+            
+            # Send segmented image to AVP via TCP server
+            self.get_logger().info('Segmentation complete, publishing segmented image to AVP')
+            self.publish_segmented_image(segmented_image)
+            
+            # Clear AVP annotations after use
+            self.avp_annotations = None
+            
+            # Note: Registration will happen after AVP approves via approve_segmentation_service()
+            # The state machine will remain in segment_and_register until approval
+        else:
+            # Normal GUI workflow (workstation)
+            self.get_logger().info('Using GUI for segmentation (workstation)')
+            masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(
+                self.last_rgb_image, self.bones
+            )
+            self.annotated_points = annotated_points
+            self.get_logger().info(f'Annotated points: {self.annotated_points}')
+            
+            # Perform registration immediately (no approval needed for GUI workflow)
+            self.register_and_publish(annotated_points)
+            
+            # Transition to next state
+            self.trigger('complete_segment_and_register')
 
     def on_enter_ready_to_drill(self):
         """Entry handler for ready_to_drill state."""
@@ -368,10 +394,9 @@ class ParaSightHost(Node):
     def on_enter_drill(self):
         """Entry handler for drill state."""
         self.get_logger().info('Drilling in progress...')
-        # TODO: Implement drilling logic
-        # For now, auto-complete for testing
-        self.get_logger().info('Auto-completing drill (not implemented yet)')
-        self.complete_drill()
+        # TODO: Implement actual drilling logic - wait for drill completion signal
+        # For now, immediately complete (should be replaced with actual drill execution)
+        self.trigger('complete_drill')
 
     def on_enter_finished(self):
         """Entry handler for finished state."""
@@ -390,9 +415,9 @@ class ParaSightHost(Node):
         return SetParametersResult(successful=True)
 
     def hard_reset_callback(self, msg):
-        """Reset the state machine to initial state."""
-        self.get_logger().warn('Hard reset triggered - returning to start state')
-        self.trigger('hard_reset')
+        """Reset the state machine by transitioning to bring_manipulator state."""
+        self.get_logger().warn('Hard reset triggered - resetting mission to bring_manipulator state')
+        self.trigger('reset_mission')
 
     def annotate_callback(self, msg):
         """Handle annotate command - transitions to segment_and_register."""
@@ -437,52 +462,25 @@ class ParaSightHost(Node):
         self.get_logger().info(f'Current state: {self.state}')
 
     def ui_trigger_callback(self, msg):
-        print(f"\n! The self state is: {self.state}")
-
-        self.get_logger().info('UI trigger received')
-        if self.state == 'ready_to_drill':
-            
-            # Check if we have AVP annotations, otherwise use UI
-            if self.avp_annotations is not None:
-                self.get_logger().info('Using AVP annotations for segmentation')
-                # Convert pixel coordinates to the format expected by segment_using_points
-                femur_point = tuple(self.avp_annotations[0])  # [x, y]
-                tibia_point = tuple(self.avp_annotations[1])  # [x, y]
-                result = self.segmentation_ui.segment_using_points(
-                    self.last_rgb_image, femur_point, tibia_point, self.bones)
-                masks, annotated_points, all_mask_points, segmented_image = result
-                
-                # Store segmentation data and wait for AVP approval
-                self.pending_segmentation_data = {
-                    'masks': masks,
-                    'annotated_points': annotated_points,
-                    'all_mask_points': all_mask_points,
-                    'segmented_image': segmented_image
-                }
-                self.waiting_for_segmentation_approval = True
-                
-                # Send segmented image to AVP via TCP server
-                self.get_logger().info('Segmentation complete, publishing segmented image')
-                self.publish_segmented_image(segmented_image)
-                
-                # Clear AVP annotations after use
-                self.avp_annotations = None
-            else:
-                self.get_logger().info('Using UI for segmentation')
-                masks, annotated_points, all_mask_points = self.segmentation_ui.segment_using_ui(self.last_rgb_image, self.bones) # Blocking call
-                self.annotated_points = annotated_points
-                print(f"\n The annotated points are: {self.annotated_points}")
-                # For UI mode, proceed immediately
-                self.register_and_publish(annotated_points)
-                self.trigger('drill_complete')
-
-        """Handle UI trigger to start segmentation process."""
+        """Handle UI trigger - triggers annotation workflow from await_surgeon_input state.
+        
+        Note: For re-segmentation from ready_to_drill state, use /annotate topic directly.
+        The segmentation logic (AVP vs GUI) is handled automatically in on_enter_segment_and_register()
+        based on whether avp_annotations are present.
+        """
         self.get_logger().info(f'UI trigger received in state: {self.state}')
         
         if self.state == 'await_surgeon_input':
+            # Trigger annotation workflow - will use GUI or AVP annotations based on what's available
             self.trigger('annotate')
+        elif self.state == 'ready_to_drill':
+            # Re-segmentation from ready_to_drill state
+            # Note: This requires AVP annotations to be set first via /avp_annotations topic
+            # Then use /annotate topic to trigger the transition
+            self.get_logger().info('Re-segmentation requested from ready_to_drill state')
+            self.get_logger().warn('Cannot transition directly from ready_to_drill. Use /annotate topic after setting /avp_annotations to re-segment.')
         else:
-            self.get_logger().warn(f'UI trigger received but not in await_surgeon_input state (current: {self.state})')
+            self.get_logger().warn(f'UI trigger received but not in await_surgeon_input or ready_to_drill state (current: {self.state})')
 
     def proceed_mission_callback(self, msg):
         """Handle proceed_mission command - transitions to bring_manipulator."""
@@ -514,13 +512,18 @@ class ParaSightHost(Node):
             all_mask_points = self.pending_segmentation_data['all_mask_points']
             
             self.annotated_points = annotated_points
-            print(f"\n The annotated points are: {self.annotated_points}")
+            self.get_logger().info(f'Annotated points: {self.annotated_points}')
             
             # Proceed with registration using the stored masks
             self.register_and_publish_with_masks(masks, annotated_points, all_mask_points)
-            # Note: AVP workflow needs integration with FSM - trigger removed during merge fix
+            
+            # Clear approval state
             self.waiting_for_segmentation_approval = False
             self.pending_segmentation_data = None
+            
+            # Transition to next state (only if we're in segment_and_register state)
+            if self.state == 'segment_and_register':
+                self.trigger('complete_segment_and_register')
         else:
             self.get_logger().warn('approve_segmentation called but not waiting for approval')
     
@@ -530,7 +533,7 @@ class ParaSightHost(Node):
             self.get_logger().info('Segmentation rejected by AVP, clearing data')
             self.waiting_for_segmentation_approval = False
             self.pending_segmentation_data = None
-            # Note: AVP workflow needs integration with FSM - trigger removed during merge fix
+            # State machine remains in ready_to_drill, waiting for new segmentation
         else:
             self.get_logger().warn('reject_segmentation called but not waiting for approval')
     
@@ -728,13 +731,13 @@ class ParaSightHost(Node):
 
     def publish_point_cloud(self, clouds):
         """Combine and publish point clouds - FULLY IMPLEMENTED."""
-        print(f"How many clouds are there: {len(clouds)}")
+        self.get_logger().debug(f'Combining {len(clouds)} point clouds')
         combined_cloud = o3d.geometry.PointCloud()
         for c in clouds:
-            print(f"in host py we have a cloud!")
             combined_cloud += c
         cloud_msg = to_msg(combined_cloud, frame_id=self.camera_frame)
         self.pcd_publisher.publish(cloud_msg)
+        self.get_logger().info(f'Published combined point cloud with {len(combined_cloud.points)} points')
 
     def compute_plan(self, transforms, theta=-np.pi/2):
         """Compute surgical drill points by transforming plan points with registration transforms - FULLY IMPLEMENTED."""

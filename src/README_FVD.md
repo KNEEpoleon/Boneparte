@@ -23,7 +23,7 @@ ___
 ### Hard reset to `bring_manipulator`
 
 ```bash
-ros2 topic pub --once /hard_reset_host std_msgs/msg/Empty '{}'
+ros2 topic pub --once /reset_mission std_msgs/msg/Empty '{}'
 ```
 
 ### When in the awaiting surgeon state
