@@ -156,9 +156,9 @@ The manipulation node should handle actual planning and execution.
 ### Q: "please suggest if it makes sense to merge this state"
 
 **A:** Merged:
-- ✅ `doc_verify` + `ready_to_drill` → `waiting` (both passive)
-- ✅ Removed planning states (not perception's job)
-- ✅ Kept `segmenting` + `registering` separate (different concerns)
+- `doc_verify` + `ready_to_drill` → `waiting` (both passive)
+- Removed planning states (not perception's job)
+- Kept `segmenting` + `registering` separate (different concerns)
 
 ## Next Steps
 
@@ -172,10 +172,10 @@ The manipulation node should handle actual planning and execution.
 
 ## Benefits of New Design
 
-- ✅ **Simpler**: 6 states instead of 10
-- ✅ **Clearer**: Each state has single responsibility
-- ✅ **Decoupled**: Perception and manipulation separated
-- ✅ **Testable**: Can test without robot hardware
-- ✅ **Flexible**: Easy to add new states/transitions
-- ✅ **Maintainable**: Clear documentation and structure
+- **Simpler**: 6 states instead of 10
+- **Clearer**: Each state has single responsibility
+- **Decoupled**: Perception and manipulation separated
+- **Testable**: Can test without robot hardware
+- **Flexible**: Easy to add new states/transitions
+- **Maintainable**: Clear documentation and structure
 

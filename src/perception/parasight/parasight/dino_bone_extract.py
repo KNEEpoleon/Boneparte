@@ -367,7 +367,7 @@ class DINOBoneExtractor():
         
         # Check if detection is reliable
         if best_sim < self.threshold:
-            print(f"✗ No bone detected (best similarity: {best_sim:.3f} < threshold: {self.threshold})")
+            print(f"No bone detected (best similarity: {best_sim:.3f} < threshold: {self.threshold})")
             
             # Save rejection status
             output_name = os.path.splitext(os.path.basename(image_path))[0]
@@ -384,7 +384,7 @@ class DINOBoneExtractor():
             return None
         
         # Valid detection
-        print(f"✓ Bone detected (similarity: {best_sim:.3f})")
+        print(f"Bone detected (similarity: {best_sim:.3f})")
         
         # Compute 2D bone centroid (median of bone cluster points)
         coords = cluster_statistics['clusters'][best_idx]['pixel_coords']  # Shape: (N, 2) with [row, col] format

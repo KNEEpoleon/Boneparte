@@ -61,7 +61,7 @@ def send_segmented_image(host='127.0.0.1', port=5000):
         print("Sending...")
         
         sock.sendall(message.encode('utf-8'))
-        print("✅ Segmented image sent successfully!")
+        print("Segmented image sent successfully!")
         
         # Wait a bit for response
         print("\nWaiting for AVP response (accept/reject)...")
@@ -77,9 +77,9 @@ def send_segmented_image(host='127.0.0.1', port=5000):
         time.sleep(2)
         
     except ConnectionRefusedError:
-        print("❌ Connection refused. Is the AVP app running and listening on port 5000?")
+        print("Connection refused. Is the AVP app running and listening on port 5000?")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
     finally:
         sock.close()
         print("\nConnection closed.")
@@ -111,7 +111,7 @@ def send_annotation_image_first(host='127.0.0.1', port=5000):
         message = f"IMAGE:{image_base64}\n"
         print(f"Sending annotation image ({len(message)} chars)...")
         sock.sendall(message.encode('utf-8'))
-        print("✅ Annotation image sent!")
+        print("Annotation image sent!")
         
         # Wait for annotations response
         print("\nWaiting for annotations from AVP...")
@@ -122,7 +122,7 @@ def send_annotation_image_first(host='127.0.0.1', port=5000):
             print(f"Received: {response}")
             
             if "ANNOTATIONS:" in response:
-                print("\n✅ Got annotations! Now sending segmented image...")
+                print("\nGot annotations! Now sending segmented image...")
                 time.sleep(1)
                 
                 # Send segmented image
@@ -132,7 +132,7 @@ def send_annotation_image_first(host='127.0.0.1', port=5000):
                 message = f"SEGMENTED_IMAGE:{image_base64}\n"
                 print(f"Sending segmented image ({len(message)} chars)...")
                 sock.sendall(message.encode('utf-8'))
-                print("✅ Segmented image sent!")
+                print("Segmented image sent!")
                 
                 # Wait for accept/reject
                 print("\nWaiting for accept/reject from AVP...")
@@ -147,7 +147,7 @@ def send_annotation_image_first(host='127.0.0.1', port=5000):
         print("\nTest complete!")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     import sys
@@ -172,5 +172,5 @@ if __name__ == "__main__":
     else:
         print("Invalid choice. Use 1 or 2")
         
-    print("\n✅ Test complete!")
+    print("\nTest complete!")
 

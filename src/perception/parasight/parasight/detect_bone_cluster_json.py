@@ -62,11 +62,11 @@ def build_codebook(bone_features_dir, output_path):
             if bone_cluster_data['clusters']:
                 largest_cluster = bone_cluster_data['clusters'][0]
                 bones.append(largest_cluster)
-                print(f"  ✓ {os.path.dirname(bf)} (using largest cluster)")
+                print(f"  {os.path.dirname(bf)} (using largest cluster)")
             else:
-                print(f"  ✗ No clusters found in {bf}")
+                print(f"  No clusters found in {bf}")
         except Exception as e:
-            print(f"  ✗ Failed to load or process {bf}: {e}")
+            print(f"  Failed to load or process {bf}: {e}")
     
     if len(bones) == 0:
         print("Error: No valid bone features loaded")
@@ -112,7 +112,7 @@ def build_codebook(bone_features_dir, output_path):
     print(f"Std deviation: {codebook['statistics']['std_similarity']:.4f}")
     print(f"Min similarity: {codebook['statistics']['min_similarity']:.4f}")
     print(f"Max similarity: {codebook['statistics']['max_similarity']:.4f}")
-    print(f"\n✓ Codebook saved to: {output_path}")
+    print(f"\nCodebook saved to: {output_path}")
     print("="*60)
     
     plt.figure(figsize=(10, 6))
@@ -128,7 +128,7 @@ def build_codebook(bone_features_dir, output_path):
     
     plot_path = base_path + '_similarity_dist.png'
     plt.savefig(plot_path, dpi=150)
-    print(f"✓ Similarity plot saved to: {plot_path}")
+    print(f"Similarity plot saved to: {plot_path}")
     plt.show()
 
 
@@ -174,7 +174,7 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
     print("="*60)
     for i, (cluster_idx, sim, reason) in enumerate(scores[:5]):
         cluster = cluster_data['clusters'][cluster_idx]
-        status = "✓" if reason == 'valid' else "✗"
+        status = "VALID" if reason == 'valid' else "INVALID"
         print(f"{status} Rank {i+1}: Cluster {cluster_idx}")
         print(f"   Similarity: {sim:.4f}")
         print(f"   Size: {cluster['n_pixels']} pixels")
@@ -190,7 +190,7 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
     
     # Check if detection is reliable
     if best_sim < threshold:
-        print(f"✗ NO BONE DETECTED")
+        print(f"NO BONE DETECTED")
         print(f"  Best candidate similarity: {best_sim:.4f}")
         print(f"  Required threshold: {threshold:.4f}")
         print(f"  Status: All clusters below confidence threshold")
@@ -209,12 +209,12 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
             for i, (idx, sim, reason) in enumerate(scores[:3]):
                 f.write(f"  {i+1}. Cluster {idx}: {sim:.4f}\n")
         
-        print(f"\n✗ Rejection report saved to: {rejection_path}")
-        print("\n⚠️  WARNING: No reliable bone detection in this image")
+        print(f"\nRejection report saved to: {rejection_path}")
+        print("\nWARNING: No reliable bone detection in this image")
         return  # Exit without visualization
     
     # Valid detection
-    print(f"✓ BONE DETECTED: Cluster {best_idx}")
+    print(f"BONE DETECTED: Cluster {best_idx}")
     print(f"  Confidence: {best_sim:.4f}")
     print(f"  Size: {best_cluster['n_pixels']} pixels")
     print("="*60)
@@ -311,7 +311,7 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
     output_name = os.path.splitext(os.path.basename(image_path))[0]
     viz_path = os.path.join(output_dir, f"{output_name}_detection.png")
     plt.savefig(viz_path, dpi=150, bbox_inches='tight')
-    print(f"\n✓ Visualization saved to: {viz_path}")
+    print(f"\nVisualization saved to: {viz_path}")
     
     # Save detected bone
     detected_bone = {
@@ -336,7 +336,7 @@ def detect_bone(codebook_path, cluster_stats_path, image_path, output_dir,
     detected_path = os.path.join(output_dir, f"{output_name}_detected_bone.json")
     with open(detected_path, 'w') as f:
         json.dump(detected_bone, f, indent=2)
-    print(f"✓ Detection data saved to: {detected_path}")
+    print(f"Detection data saved to: {detected_path}")
     
     plt.show()
 

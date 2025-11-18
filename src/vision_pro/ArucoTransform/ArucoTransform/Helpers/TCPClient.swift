@@ -28,31 +28,31 @@ class TCPClient: ObservableObject {
         let nwHost = NWEndpoint.Host(host)
         let nwPort = NWEndpoint.Port(rawValue: port)!
         
-        print("🔵 Attempting TCP connection to \(host):\(port)")
+        print("Attempting TCP connection to \(host):\(port)")
         
         connection = NWConnection(host: nwHost, port: nwPort, using: .tcp)
         
         connection?.stateUpdateHandler = { [weak self] newState in
             DispatchQueue.main.async {
-                print("🔵 Connection state changed: \(newState)")
+                print("Connection state changed: \(newState)")
                 switch newState {
                 case .ready:
                     self?.onConnectionStateChanged?(true, "Connected to \(self?.host ?? ""):\(self?.port ?? 0)")
-                    print("✅ TCP connected to \(self?.host ?? ""):\(self?.port ?? 0)")
+                    print("TCP connected to \(self?.host ?? ""):\(self?.port ?? 0)")
                 case .failed(let error):
                     self?.onConnectionStateChanged?(false, "Failed: \(error.localizedDescription)")
-                    print("❌ TCP connection failed: \(error)")
+                    print("TCP connection failed: \(error)")
                 case .cancelled:
                     self?.onConnectionStateChanged?(false, "Connection cancelled")
-                    print("⚠️ TCP connection cancelled")
+                    print("TCP connection cancelled")
                 case .waiting(let error):
-                    print("⏳ TCP connection waiting: \(error)")
+                    print("TCP connection waiting: \(error)")
                 case .preparing:
-                    print("🔧 TCP connection preparing")
+                    print("TCP connection preparing")
                 case .setup:
-                    print("🔧 TCP connection setup")
+                    print("TCP connection setup")
                 @unknown default:
-                    print("❓ Unknown connection state: \(newState)")
+                    print("Unknown connection state: \(newState)")
                 }
             }
         }
@@ -125,7 +125,7 @@ class TCPClient: ObservableObject {
                 DispatchQueue.main.async { [weak self] in
                     self?.onDrillPosesReceived?(drillSites)
                 }
-                print("📍 Received \(drillSites.count) drill sites from ROS")
+                print("Received \(drillSites.count) drill sites from ROS")
             }
         }
     }

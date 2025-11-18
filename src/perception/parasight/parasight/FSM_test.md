@@ -45,7 +45,7 @@ ros2 topic pub --once /proceed_mission std_msgs/msg/Empty
 - DINO detection runs (~770ms)
 - Bone centroid published to `/bone_centroid_camera_frame`
 - Reposition vector published to `/error_recovery_direction`
-- Console shows: "DINO forward pass", "MeanShift clustering", "✓ Bone detected", "Displacement vector"
+- Console shows: "DINO forward pass", "MeanShift clustering", "Bone detected", "Displacement vector"
 
 ---
 

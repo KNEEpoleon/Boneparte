@@ -150,14 +150,14 @@ def reset_mission_callback(self, msg):
    - Robot moves away via service call
    - No FSM state change
 
-3. **AVP: Press "Proceed Mission"** ⭐ NEW
+3. **AVP: Press "Proceed Mission"** NEW
    - Robot moves home via service call
    - Publishes to `/proceed_mission` topic
    - FSM: `await_surgeon_input` → `bring_manipulator` → `auto_reposition` → `await_surgeon_input`
    - DINO vision system auto-detects bone position
    - Takes ~2.5 seconds
 
-4. **AVP: Press "Annotate"** ✅ FIXED
+4. **AVP: Press "Annotate"** FIXED
    - Publishes to `/annotate` topic (was `/trigger_host_ui`)
    - FSM: `await_surgeon_input` → `segment_and_register`
    - AVP shows annotation window
@@ -173,7 +173,7 @@ def reset_mission_callback(self, msg):
    - **If ACCEPT**:
      - FSM: `segment_and_register` → `update_rviz` → `ready_to_drill`
      - Drill poses computed and visualized
-   - **If REJECT**: ✅ FIXED
+   - **If REJECT**: FIXED
      - Publishes to `/reset_mission` topic
      - FSM: Returns to `await_surgeon_input`
      - Surgeon can press "Annotate" again
@@ -271,27 +271,27 @@ ros2 topic echo /parasight_state  # If published by FSM
    - Fixed `handle_reject_segmentation()` to reset FSM
    - Updated command handlers
 
-3. `src/perception/parasight/parasight/host.py` ⭐ **NEW**
+3. `src/perception/parasight/parasight/host.py` **NEW**
    - Extended `reset_mission` transition to work from multiple states
    - Updated `reset_mission_callback()` to accept transitions from `segment_and_register`, `update_rviz`, and `ready_to_drill`
    - **Why**: Original implementation only allowed reset from `ready_to_drill`, but rejection happens during `segment_and_register`
 
 ## Expected Behavior After Fix
 
-✅ **Annotate button works from `await_surgeon_input` state**
+**Annotate button works from `await_surgeon_input` state**
 - No longer random/broken
 - Only works after auto-reposition completes
 
-✅ **Proceed Mission button starts full workflow**
+**Proceed Mission button starts full workflow**
 - Robot goes home
 - Auto-reposition runs
 - Returns to await_surgeon_input ready for annotation
 
-✅ **Rejection properly resets workflow**
+**Rejection properly resets workflow**
 - Returns to await_surgeon_input
 - Surgeon can re-annotate
 
-✅ **Clear workflow progression**
+**Clear workflow progression**
 - Away → Proceed Mission → Annotate → Accept/Reject → Drill
 
 ## Notes

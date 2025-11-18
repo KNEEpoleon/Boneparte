@@ -1,10 +1,10 @@
-🆕 [2025-09-17] :fire: DINOv3 backbones are now supported by the [PyTorch Image Models / timm](https://github.com/huggingface/pytorch-image-models/) library starting with version [1.0.20](https://github.com/huggingface/pytorch-image-models/releases/tag/v1.0.20)
+[2025-09-17] DINOv3 backbones are now supported by the [PyTorch Image Models / timm](https://github.com/huggingface/pytorch-image-models/) library starting with version [1.0.20](https://github.com/huggingface/pytorch-image-models/releases/tag/v1.0.20)
 
 [2025-08-29] DINOv3 backbones are [supported](https://huggingface.co/docs/transformers/model_doc/dinov3) by released versions of the Hugging Face [Transformers](https://huggingface.co/docs/transformers/index) library starting with version [4.56.0](https://github.com/huggingface/transformers/releases/tag/v4.56.0)
 
 [2025-08-14] DINOv3 backbones are now available in [Hugging Face Hub](https://huggingface.co/collections/facebook/dinov3-68924841bd6b561778e31009) and [supported](https://huggingface.co/docs/transformers/model_doc/dinov3) by the [development](https://github.com/huggingface/transformers/) version of the Hugging Face [Transformers](https://huggingface.co/docs/transformers/index) library
 
-# DINOv3 🦖🦖🦖
+# DINOv3
 
 **[Meta AI Research, FAIR](https://ai.meta.com/research/)**
 
@@ -15,7 +15,7 @@ Timothée Darcet, Théo Moutakanni, Leonel Sentana, Claire Roberts, <br/>
 Andrea Vedaldi, Jamie Tolan, John Brandt, Camille Couprie, <br/>
 Julien Mairal, Hervé Jégou, Patrick Labatut, Piotr Bojanowski
 
-[ :scroll: [`Paper`](https://arxiv.org/abs/2508.10104)] [ :newspaper: [`Blog`](https://ai.meta.com/blog/dinov3-self-supervised-vision-model/)] [ :globe_with_meridians: [`Website`](https://ai.meta.com/dinov3/)] [ :book: [`BibTeX`](#citing-dinov3)]
+[ [`Paper`](https://arxiv.org/abs/2508.10104)] [ [`Blog`](https://ai.meta.com/blog/dinov3-self-supervised-vision-model/)] [ [`Website`](https://ai.meta.com/dinov3/)] [ [`BibTeX`](#citing-dinov3)]
 
 Reference PyTorch implementation and models for DINOv3. For details, see the **[DINOv3](https://arxiv.org/abs/2508.10104)** paper.
 
@@ -33,13 +33,13 @@ An extended family of versatile vision foundation models producing high-quality 
 
 ## Pretrained models
 
-:information_source: Please follow the link provided below to get access to all the model weights: once accepted, an e-mail will be sent with the complete list of URLs pointing to all the available model weights (both backbones and adapters). These URLs can then be used to either:
+Please follow the link provided below to get access to all the model weights: once accepted, an e-mail will be sent with the complete list of URLs pointing to all the available model weights (both backbones and adapters). These URLs can then be used to either:
 - download the model or adapter weights to a local filesystem and point `torch.hub.load()` to these local weights via the `weights` or `backbone_weights` parameters, or
 - directly invoke `torch.hub.load()` to download and load a backbone or an adapter from its URL via also the `weights` or `backbone_weights` parameters.
 
 See the example code snippets below.
 
-:warning: Please use `wget` instead of a web browser to download the weights.
+WARNING: Please use `wget` instead of a web browser to download the weights.
 
 ViT models pretrained on web dataset (LVD-1689M):
 <table style="margin: auto">

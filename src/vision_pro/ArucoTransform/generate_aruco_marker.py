@@ -52,9 +52,9 @@ def generate_aruco_marker(marker_id=0, marker_size_px=700, output_file='aruco_ma
     # Save image
     cv2.imwrite(output_file, bordered_image)
     
-    print(f"\n✅ Marker saved: {output_file}")
+    print(f"\nMarker saved: {output_file}")
     print(f"   Image size: {bordered_image.shape[1]}x{bordered_image.shape[0]} pixels")
-    print("\n📐 PRINTING INSTRUCTIONS:")
+    print("\nPRINTING INSTRUCTIONS:")
     print("   1. Open the PNG file in an image viewer")
     print("   2. Print with these settings:")
     print("      - Paper size: A4 or Letter")
@@ -65,7 +65,7 @@ def generate_aruco_marker(marker_id=0, marker_size_px=700, output_file='aruco_ma
     print("      - Use a ruler to verify")
     print("   4. Mount on rigid surface (foam board, acrylic, cardboard)")
     print("   5. Ensure marker is flat (no warping)")
-    print("\n⚠️  CRITICAL: Marker must be EXACTLY 15cm for accurate localization!")
+    print("\nCRITICAL: Marker must be EXACTLY 15cm for accurate localization!")
     print("=" * 60)
     
     # Create a calibration guide image
@@ -125,10 +125,10 @@ def create_calibration_guide(marker_id, marker_size_px):
         
         # Save calibration guide
         cv2.imwrite('aruco_marker_id0_15cm_with_ruler.png', guide)
-        print(f"✅ Calibration guide saved: aruco_marker_id0_15cm_with_ruler.png")
+        print(f"Calibration guide saved: aruco_marker_id0_15cm_with_ruler.png")
         print("   (Includes ruler marks for verification)")
     except Exception as e:
-        print(f"⚠️  Warning: Could not create calibration guide: {e}")
+        print(f"Warning: Could not create calibration guide: {e}")
         print("   (Main marker image is still available)")
 
 def verify_opencv():
@@ -137,15 +137,15 @@ def verify_opencv():
     
     try:
         cv_version = cv2.__version__
-        print(f"✅ OpenCV version: {cv_version}")
+        print(f"OpenCV version: {cv_version}")
         
         # Check if ArUco module is available
         aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-        print("✅ ArUco module available")
+        print("ArUco module available")
         
         return True
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         print("\nPlease install OpenCV with ArUco support:")
         print("   pip install opencv-contrib-python")
         return False
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     
     generate_aruco_marker()
     
-    print("\n📄 Files created:")
+    print("\nFiles created:")
     print("   1. aruco_marker_id0_15cm.png - Simple marker")
     print("   2. aruco_marker_id0_15cm_with_ruler.png - With calibration ruler")
     print("\nNext steps:")

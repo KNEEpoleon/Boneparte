@@ -12,12 +12,12 @@ ArUco-based spatial localization and drill site visualization for surgical robot
 
 ## Features
 
-✅ **ArUco Marker Detection** - One-time localization using ArUco marker (DICT_6X6_250, ID=0)  
-✅ **TCP Communication** - Receives drill poses from ROS server on port 5001  
-✅ **World Tracking** - Maintains stable coordinate system using ARKit  
-✅ **Mixed Reality Rendering** - Red spheres (1cm) with 3-axis vectors (5cm)  
-✅ **Real-time Updates** - 30 Hz refresh rate for smooth visualization  
-✅ **Transform Chain** - Bone → Camera → Robot Base → ArUco → AVP World
+**ArUco Marker Detection** - One-time localization using ArUco marker (DICT_6X6_250, ID=0)  
+**TCP Communication** - Receives drill poses from ROS server on port 5001  
+**World Tracking** - Maintains stable coordinate system using ARKit  
+**Mixed Reality Rendering** - Red spheres (1cm) with 3-axis vectors (5cm)  
+**Real-time Updates** - 30 Hz refresh rate for smooth visualization  
+**Transform Chain** - Bone → Camera → Robot Base → ArUco → AVP World
 
 ## Requirements
 
@@ -302,14 +302,14 @@ All positions in meters, orientations as quaternions (x, y, z, w).
 
 ### Without Enterprise License
 
-✅ **Available:**
+**Available:**
 - World tracking (WorldTrackingProvider)
 - Camera access
 - World anchors
 - AR overlays
 - TCP networking
 
-❌ **Not Available:**
+**Not Available:**
 - Object tracking (ObjectTrackingProvider)
 - Scene reconstruction
 - Plane detection

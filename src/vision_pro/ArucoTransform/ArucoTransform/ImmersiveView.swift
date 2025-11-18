@@ -54,7 +54,7 @@ struct ImmersiveView: View {
                     VStack(spacing: 8) {
                         ProgressView()
                             .scaleEffect(1.2)
-                        Text("🔍 Looking for ArUco Marker")
+                        Text("Looking for ArUco Marker")
                             .font(.title2)
                             .fontWeight(.bold)
                         Text("Point your Vision Pro at the 15cm ArUco marker (ID=0)")
@@ -90,44 +90,44 @@ struct ImmersiveView: View {
     }
     
     private func startARKitSession() async {
-        print("🔵 Starting ARKit session...")
+        print("Starting ARKit session...")
         
         // Load reference images from AR Resources group (same as working FemurTracking2 app)
-        print("🔵 Loading reference images from 'AR Resources'...")
+        print("Loading reference images from 'AR Resources'...")
         
         do {
             let referenceImages = try await ReferenceImage.loadReferenceImages(inGroupNamed: "AR Resources", bundle: nil)
             
-            print("✅ Loaded \(referenceImages.count) reference image(s) for tracking")
+            print("Loaded \(referenceImages.count) reference image(s) for tracking")
             
             guard !referenceImages.isEmpty else {
-                print("❌ No reference images found in 'AR Resources' group")
-                print("⚠️ Starting with world tracking only...")
+                print("No reference images found in 'AR Resources' group")
+                print("Starting with world tracking only...")
                 try await arKitSession.run([worldTracking])
-                print("✅ ARKit session started with world tracking only")
+                print("ARKit session started with world tracking only")
                 return
             }
             
             // Create image tracking provider
-            print("🔵 Creating image tracking provider...")
+            print("Creating image tracking provider...")
             imageTracking = ImageTrackingProvider(referenceImages: referenceImages)
             
             // Start ARKit session with both world tracking and image tracking
-            print("🔵 Starting ARKit with world + image tracking...")
+            print("Starting ARKit with world + image tracking...")
             try await arKitSession.run([worldTracking, imageTracking!])
-            print("✅ ARKit session started with world and image tracking")
+            print("ARKit session started with world and image tracking")
             
         } catch {
-            print("❌ Failed to start ARKit session: \(error)")
-            print("❌ Error details: \(error.localizedDescription)")
+            print("Failed to start ARKit session: \(error)")
+            print("Error details: \(error.localizedDescription)")
             
             // Try to start with just world tracking as fallback
             do {
-                print("⚠️ Attempting fallback to world tracking only...")
+                print("Attempting fallback to world tracking only...")
                 try await arKitSession.run([worldTracking])
-                print("✅ Fallback successful - running with world tracking only")
+                print("Fallback successful - running with world tracking only")
             } catch let fallbackError {
-                print("❌ Fallback also failed: \(fallbackError)")
+                print("Fallback also failed: \(fallbackError)")
             }
         }
     }
@@ -137,11 +137,11 @@ struct ImmersiveView: View {
         guard !appModel.arucoTransformEstablished else { return }
         
         guard let imageTracking = imageTracking else {
-            print("❌ Image tracking provider not available")
+            print("Image tracking provider not available")
             return
         }
         
-        print("🔍 Waiting for ArUco marker detection...")
+        print("Waiting for ArUco marker detection...")
         
         do {
             // Monitor image anchor updates
@@ -153,11 +153,11 @@ struct ImmersiveView: View {
                 }
                 
                 guard anchor.isTracked else {
-                    print("⚠️ ArUco marker detected but not tracked")
+                    print("ArUco marker detected but not tracked")
                     continue
                 }
                 
-                print("✅ ArUco marker '\(anchor.referenceImage.name ?? "unknown")' detected and tracked!")
+                print("ArUco marker '\(anchor.referenceImage.name ?? "unknown")' detected and tracked!")
                 
                 // Get the transform from the image anchor
                 // anchor.originFromAnchorTransform gives us ArUco marker → World transform
@@ -170,7 +170,7 @@ struct ImmersiveView: View {
                     appModel.isArucoDetected = true
                 }
                 
-                print("✅ Transform established: ArUco → AVP World")
+                print("Transform established: ArUco → AVP World")
                 print("  Position: (\(arucoToWorld.columns.3.x), \(arucoToWorld.columns.3.y), \(arucoToWorld.columns.3.z))")
                 
                 // Start logging transform every second
@@ -181,7 +181,7 @@ struct ImmersiveView: View {
                 // Don't break - keep tracking to update transform
             }
         } catch {
-            print("❌ ArUco detection error: \(error)")
+            print("ArUco detection error: \(error)")
         }
     }
     
@@ -203,7 +203,7 @@ struct ImmersiveView: View {
             let transform = worldAnchorManager.arucoToWorldTransform ?? initialTransform
             let pos = transform.columns.3
             
-            print("🔄 [\(logCount)s] ArUco → AVP Transform:")
+            print("[\(logCount)s] ArUco → AVP Transform:")
             print("   Position: (x: \(String(format: "%.3f", pos.x)), y: \(String(format: "%.3f", pos.y)), z: \(String(format: "%.3f", pos.z)))")
             print("   Drill sites being displayed: \(appModel.drillSites.count)")
         }

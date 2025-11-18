@@ -62,14 +62,14 @@ def run_server(host='0.0.0.0', port=5000):
     server_sock.bind((host, port))
     server_sock.listen(1)
     
-    print(f"\n✅ Server listening on {host}:{port}")
+    print(f"\nServer listening on {host}:{port}")
     print("Waiting for connection...")
     
     try:
         while True:
             # Accept connection
             client_sock, client_addr = server_sock.accept()
-            print(f"\n✅ Connected to AVP at {client_addr}")
+            print(f"\nConnected to AVP at {client_addr}")
             client_sock.setblocking(False)
             
             receive_buffer = ""
@@ -92,45 +92,45 @@ def run_server(host='0.0.0.0', port=5000):
                             receive_buffer = receive_buffer[newline_idx + 1:]
                             
                             if message:
-                                print(f"\n📨 Received: {message[:100]}...")
+                                print(f"\nReceived: {message[:100]}...")
                                 
                                 # Handle different commands
                                 if message == "annotate":
-                                    print("📤 Sending annotation image...")
+                                    print("Sending annotation image...")
                                     img = create_test_annotation_image()
                                     _, buffer = cv2.imencode('.png', img)
                                     image_base64 = base64.b64encode(buffer).decode('utf-8')
                                     response = f"IMAGE:{image_base64}\n"
                                     client_sock.sendall(response.encode('utf-8'))
-                                    print(f"✅ Annotation image sent ({len(response)} chars)")
+                                    print(f"Annotation image sent ({len(response)} chars)")
                                     
                                 elif message.startswith("ANNOTATIONS:"):
-                                    print("📥 Received annotations!")
+                                    print("Received annotations!")
                                     json_str = message[12:]
                                     annotations = json.loads(json_str)
                                     print(f"   Annotations: {annotations}")
                                     
                                     # Send acknowledgment
                                     client_sock.sendall(b'acknowledged\n')
-                                    print("✅ Sent acknowledgment")
+                                    print("Sent acknowledgment")
                                     
                                     # Wait a moment, then send segmented image
                                     time.sleep(0.5)
-                                    print("\n📤 Sending SEGMENTED image...")
+                                    print("\nSending SEGMENTED image...")
                                     img = create_test_segmented_image()
                                     _, buffer = cv2.imencode('.png', img)
                                     image_base64 = base64.b64encode(buffer).decode('utf-8')
                                     response = f"SEGMENTED_IMAGE:{image_base64}\n"
                                     print(f"   Sending {len(response)} chars...")
                                     client_sock.sendall(response.encode('utf-8'))
-                                    print("✅ Segmented image sent! Check AVP for popup.")
+                                    print("Segmented image sent! Check AVP for popup.")
                                     
                                 elif message == "accept":
-                                    print("✅ AVP ACCEPTED segmentation!")
+                                    print("AVP ACCEPTED segmentation!")
                                     client_sock.sendall(b'acknowledged\n')
                                     
                                 elif message == "reject":
-                                    print("❌ AVP REJECTED segmentation")
+                                    print("AVP REJECTED segmentation")
                                     client_sock.sendall(b'acknowledged\n')
                                     
                                 else:
@@ -149,7 +149,7 @@ def run_server(host='0.0.0.0', port=5000):
                 print("\nConnection closed. Waiting for new connection...")
                 
     except KeyboardInterrupt:
-        print("\n\n🛑 Server stopped by user")
+        print("\n\nServer stopped by user")
     finally:
         server_sock.close()
         print("Server shut down.")

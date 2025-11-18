@@ -22,7 +22,7 @@ def send_annotations_only(host='localhost', port=5000):
         print(f"Connecting to {host}:{port}...")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, port))
-        print("✓ Connected!")
+        print("Connected!")
         
         time.sleep(0.2)
         
@@ -30,9 +30,9 @@ def send_annotations_only(host='localhost', port=5000):
         annotations_json = json.dumps(annotations)
         message = f"ANNOTATIONS:{annotations_json}\n"
         
-        print(f"\n📤 Sending: {message.strip()}")
+        print(f"\nSending: {message.strip()}")
         sock.sendall(message.encode('utf-8'))
-        print("✓ Sent!")
+        print("Sent!")
         
         time.sleep(0.5)
         
@@ -40,15 +40,15 @@ def send_annotations_only(host='localhost', port=5000):
         try:
             sock.settimeout(2.0)
             response = sock.recv(1024)
-            print(f"📥 Server response: {response.decode('utf-8').strip()}")
+            print(f"Server response: {response.decode('utf-8').strip()}")
         except socket.timeout:
-            print("⏱ No response (timeout)")
+            print("No response (timeout)")
         
         sock.close()
-        print("\n✓ Done! Check ROS logs for processing.")
+        print("\nDone! Check ROS logs for processing.")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     host = sys.argv[1] if len(sys.argv) > 1 else 'localhost'
