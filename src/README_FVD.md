@@ -130,5 +130,4 @@ ros2 launch surgical_robot_planner drill_motion_executor.launch.py model:=med7
 ```bash
  ros2 launch parasight segment_rs_launch.py
 ```
-
 ___
