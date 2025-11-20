@@ -737,13 +737,13 @@ class ParaSightHost(Node):
                 p1, p2, p3 = hole
 
                 curr_theta = 0
-                if bone == 'femur' and hole_name == 'hole2':
+                if bone == 'femur' and hole_name == 'hole1':
                     curr_theta = -np.pi/2
-                elif bone == "femur" and hole_name == 'hole3':
+                elif bone == "femur" and hole_name == 'hole2':
                     curr_theta = -np.pi/2
-                elif bone == "tibia" and hole_name == 'hole4':
+                elif bone == "tibia" and hole_name == 'hole1':
                     curr_theta = -np.pi/4-np.pi/2
-                elif bone == "tibia" and hole_name == 'hole5':
+                elif bone == "tibia" and hole_name == 'hole2':
                     curr_theta = np.pi +np.pi/12-np.pi/2
 #                    curr_theta = np.pi/6-np.pi/4-np.pi/2
                 mesh = o3d.geometry.TriangleMesh()
