@@ -1,0 +1,152 @@
+diff --git a/src/perception/parasight/parasight/host.py b/src/perception/parasight/parasight/host.py
+index 6cfaa65..0d09a5b 100644
+--- a/src/perception/parasight/parasight/host.py
++++ b/src/perception/parasight/parasight/host.py
+@@ -34,6 +34,7 @@ from surgical_robot_planner.srv import RobotCommand
+ 
+ from ament_index_python.packages import get_package_share_directory
+ from scipy.spatial.transform import Rotation as R
++from scipy.spatial import cKDTree
+ 
+ from visualization_msgs.msg import Marker
+ 
+@@ -196,6 +197,21 @@ class ParaSightHost(Node):
+         self.colors = {'femur': [1, 0, 0], 'tibia': [0, 0, 1]}
+         self.plan_path = package_dir + "/resource/plan_boneparte.yaml"
+         self.plan = "plan1"
++        
++        # Normal estimation parameters
++        self.declare_parameter('normal_estimation_radius', 0.01)  # 1cm default radius
++        self.normal_radius = self.get_parameter('normal_estimation_radius').get_parameter_value().double_value
++        
++        # Pre-compute normals for source point clouds (do this once at initialization)
++        for bone_name, source_cloud in self.sources.items():
++            source_cloud.estimate_normals(
++                search_param=o3d.geometry.KDTreeSearchParamHybrid(
++                    radius=self.normal_radius, 
++                    max_nn=30
++                )
++            )
++            # Orient normals consistently (pointing outward)
++            source_cloud.orient_normals_consistent_tangent_plane(k=15)
+ 
+         # Interfaces
+         self.regpipe = RegistrationPipeline()
+@@ -733,8 +749,13 @@ class ParaSightHost(Node):
+                 continue
+ 
+             transform = transforms[bone]
++            source_cloud = self.sources[bone]
++            
+             for hole_name, hole in holes.items():
+                 p1, p2, p3 = hole
++                
++                # Determine drill point: use p1 if p3 is None (new format), otherwise p3 (backward compatibility)
++                drill_point = p1 if p3 is None else p3
+ 
+                 curr_theta = 0
+                 if bone == 'femur' and hole_name == 'hole1':
+@@ -746,12 +767,46 @@ class ParaSightHost(Node):
+                 elif bone == "tibia" and hole_name == 'hole2':
+                     curr_theta = np.pi +np.pi/12-np.pi/2
+ #                    curr_theta = np.pi/6-np.pi/4-np.pi/2
+-                mesh = o3d.geometry.TriangleMesh()
+-                mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
+-                mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
+-                mesh.compute_vertex_normals()
+-                normal = np.asarray(mesh.vertex_normals)[0]
+-                actual_normal = -normal
++                
++                # Compute normal using Open3D's normal estimation from source point cloud
++                # Find nearest point in source cloud to drill_point
++                points = np.asarray(source_cloud.points)
++                normals = np.asarray(source_cloud.normals)
++                
++                # Find nearest point using KDTree
++                tree = cKDTree(points)
++                distances, indices = tree.query(drill_point, k=min(10, len(points)))
++                
++                # Average normals from nearest points (weighted by inverse distance)
++                # Handle both scalar (k=1) and array (k>1) return types from query
++                try:
++                    if np.isscalar(indices):
++                        # Single neighbor (k=1 returns scalar)
++                        normal = normals[indices]
++                    else:
++                        # Multiple neighbors (k>1 returns array)
++                        weights = 1.0 / (distances + 1e-6)  # Add small epsilon to avoid division by zero
++                        weights = weights / np.sum(weights)  # Normalize weights
++                        normal = np.average(normals[indices], axis=0, weights=weights)
++                    
++                    normal = normal / np.linalg.norm(normal)  # Normalize
++                    self.get_logger().debug(f"Using Open3D normal estimation for {bone} {hole_name} at drill point {drill_point}")
++                except (IndexError, ValueError) as e:
++                    # Fallback: if p2 and p3 are available, use triangle method (backward compatibility)
++                    if p2 is not None and p3 is not None:
++                        self.get_logger().warn(f"Open3D normal estimation failed for {bone} {hole_name}, falling back to triangle method (p1, p2, p3)")
++                        mesh = o3d.geometry.TriangleMesh()
++                        mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
++                        mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
++                        mesh.compute_vertex_normals()
++                        normal = np.asarray(mesh.vertex_normals)[0]
++                        normal = normal / np.linalg.norm(normal)
++                    else:
++                        # Last resort: default to z-axis
++                        normal = np.array([0, 0, 1])
++                        self.get_logger().warn(f"Could not compute normal for {bone} {hole_name} (Open3D failed and p2/p3 not available), using default z-axis")
++                
++                actual_normal = -normal  # Flip to point inward (drill direction)
+                 z_axis = np.array([0, 0, 1])
+                 rotation_axis = np.cross(z_axis, actual_normal)
+                 rotation_axis /= np.linalg.norm(rotation_axis)
+@@ -760,7 +815,7 @@ class ParaSightHost(Node):
+ 
+                 T = np.eye(4)
+                 T[:3, :3] = Rot
+-                T[:3, 3] = p3
++                T[:3, 3] = drill_point  # Use drill_point (p1 or p3)
+ 
+                 default_plan = T
+                 default_plan_rotated = np.copy(default_plan)
+diff --git a/src/perception/parasight/parasight/utils.py b/src/perception/parasight/parasight/utils.py
+index 1245c00..f065535 100644
+--- a/src/perception/parasight/parasight/utils.py
++++ b/src/perception/parasight/parasight/utils.py
+@@ -109,8 +109,9 @@ def load_plan_points(plan_path, plan_name):
+                     elif point_name == "p3":
+                         p3 = point
+ 
+-                # Only add to `holes` if p1, p2, and p3 are all defined
+-                if p1 is not None and p2 is not None and p3 is not None:
++                # Add hole if at least p1 is defined (p2, p3 optional for backward compatibility)
++                if p1 is not None:
++                    # Store as tuple: (p1, p2, p3) where p2 and p3 may be None
+                     holes[hole_name] = [p1, p2, p3]
+ 
+             # Only add to `parts` if the part has valid holes
+diff --git a/src/perception/parasight/resource/plan_boneparte.yaml b/src/perception/parasight/resource/plan_boneparte.yaml
+index ff9f2d4..6d95fde 100644
+--- a/src/perception/parasight/resource/plan_boneparte.yaml
++++ b/src/perception/parasight/resource/plan_boneparte.yaml
+@@ -10,21 +10,13 @@ plan1:
+   femur:
+     hole1:
+       p1: [21.33, -41.42, 14.42]
+-      p2: [21.49, -39.92, 17.51]
+-      p3: [19.85, -40.59, 15.99]
+     hole2:
+       p1: [-26.59, -39.63, 12.56]
+-      p2: [-29.3, -39.63, 12.56]
+-      p3: [-27.94, -40.81, 10.44]
+   tibia:
+     hole1:
+       p1: [-23.742, -35.28082, 21.70092]
+-      p2: [-22.54676, -34.50692, 22.08593]
+-      p3: [-23.45157, -34.17525, 22.06926]
+     hole2:
+       p1: [20.60691, -25.10947, 21.04682]
+-      p2: [20.15951, -25.88337, 21.1341]
+-      p3: [20.87736, -26.21505, 21.0327]
+ 
+ 
+ 
