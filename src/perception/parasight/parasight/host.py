@@ -722,12 +722,49 @@ class ParaSightHost(Node):
         self.get_logger().info(f'Published combined point cloud with {len(combined_cloud.points)} points')
 
     def compute_plan(self, transforms, theta=-np.pi/2):
-        """Compute surgical drill points by transforming plan points with registration transforms - FULLY IMPLEMENTED."""
+        """Compute surgical drill points by transforming plan points with registration transforms.
+        
+        Uses femur hole1 as the reference orientation and aligns all other holes to match it.
+        """
         drill_pose_array = PoseArray()
 
         parts = load_plan_points(self.plan_path, self.plan)
         self.get_logger().info(f"Updated parts plan to: {parts}")
         
+        # Helper function to compute base orientation from triangle points
+        def compute_base_orientation(p1, p2, p3):
+            mesh = o3d.geometry.TriangleMesh()
+            mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
+            mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
+            mesh.compute_vertex_normals()
+            normal = np.asarray(mesh.vertex_normals)[0]
+            actual_normal = -normal
+            z_axis = np.array([0, 0, 1])
+            rotation_axis = np.cross(z_axis, actual_normal)
+            rotation_axis /= np.linalg.norm(rotation_axis)
+            angle = np.arccos(np.dot(z_axis, actual_normal) / (np.linalg.norm(z_axis) * np.linalg.norm(actual_normal)))
+            Rot = o3d.geometry.get_rotation_matrix_from_axis_angle(rotation_axis * angle)
+            
+            T = np.eye(4)
+            T[:3, :3] = Rot
+            T[:3, 3] = p3
+            return T
+        
+        # Compute femur hole1's reference orientation first
+        reference_rotation = None
+        reference_position = None
+        
+        if 'femur' in self.bones and 'femur' in parts and 'hole1' in parts['femur']:
+            p1, p2, p3 = parts['femur']['hole1']
+            T_base = compute_base_orientation(p1, p2, p3)
+            T_rotated = np.copy(T_base)
+            T_rotated[:3, :3] = np.matmul(T_rotated[:3, :3], R.from_euler('z', -np.pi/2).as_matrix())
+            T_final = np.matmul(transforms['femur'], T_rotated)
+            reference_rotation = T_final[:3, :3]
+            reference_position = T_final[:3, 3]
+            self.get_logger().info("Computed reference orientation from femur hole1")
+        
+        # Process all holes
         for bone, holes in parts.items():
             if bone not in self.bones:
                 continue
@@ -736,50 +773,36 @@ class ParaSightHost(Node):
             for hole_name, hole in holes.items():
                 p1, p2, p3 = hole
 
-                curr_theta = 0
-                if bone == 'femur' and hole_name == 'hole1':
-                    curr_theta = -np.pi/2
-                elif bone == "femur" and hole_name == 'hole2':
-                    curr_theta = -np.pi/2
-                elif bone == "tibia" and hole_name == 'hole1':
-                    curr_theta = -np.pi/4-np.pi/2
-                elif bone == "tibia" and hole_name == 'hole2':
-                    curr_theta = np.pi +np.pi/12-np.pi/2
-#                    curr_theta = np.pi/6-np.pi/4-np.pi/2
-                mesh = o3d.geometry.TriangleMesh()
-                mesh.vertices = o3d.utility.Vector3dVector([p1, p2, p3])
-                mesh.triangles = o3d.utility.Vector3iVector([[0, 1, 2]])
-                mesh.compute_vertex_normals()
-                normal = np.asarray(mesh.vertex_normals)[0]
-                actual_normal = -normal
-                z_axis = np.array([0, 0, 1])
-                rotation_axis = np.cross(z_axis, actual_normal)
-                rotation_axis /= np.linalg.norm(rotation_axis)
-                angle = np.arccos(np.dot(z_axis, actual_normal) / (np.linalg.norm(z_axis) * np.linalg.norm(actual_normal)))
-                Rot = o3d.geometry.get_rotation_matrix_from_axis_angle(rotation_axis * angle)
+                # Use reference for femur hole1, otherwise compute and align
+                if bone == 'femur' and hole_name == 'hole1' and reference_rotation is not None:
+                    T_final = np.eye(4)
+                    T_final[:3, :3] = reference_rotation
+                    T_final[:3, 3] = reference_position
+                else:
+                    T_base = compute_base_orientation(p1, p2, p3)
+                    T_current = np.matmul(transform, T_base)
+                    
+                    if reference_rotation is not None:
+                        # Align to reference orientation
+                        current_rotation = T_current[:3, :3]
+                        relative_rotation = reference_rotation @ current_rotation.T
+                        aligned_rotation = relative_rotation @ current_rotation
+                        
+                        T_final = np.eye(4)
+                        T_final[:3, :3] = aligned_rotation
+                        T_final[:3, 3] = T_current[:3, 3]
+                        self.get_logger().info(f"Aligned {bone} {hole_name} to reference orientation")
+                    else:
+                        T_final = T_current
 
-                T = np.eye(4)
-                T[:3, :3] = Rot
-                T[:3, 3] = p3
-
-                default_plan = T
-                default_plan_rotated = np.copy(default_plan)
-                default_plan_rotated[:3, :3] = np.matmul(default_plan_rotated[:3, :3], R.from_euler('z', curr_theta).as_matrix())
-
-                T = np.matmul(transform, default_plan_rotated)
-
-                # Convert R to a quaternion
-                Rot = T[:3, :3]
-                r = R.from_matrix(Rot)
-                quat = r.as_quat()  # Returns (x, y, z, w)
-
-                p = T[:3, 3]
+                # Convert to quaternion and create pose
+                r = R.from_matrix(T_final[:3, :3])
+                quat = r.as_quat()
 
                 pose = Pose()
-                pose.position.x = p[0]
-                pose.position.y = p[1]
-                pose.position.z = p[2]
-
+                pose.position.x = T_final[0, 3]
+                pose.position.y = T_final[1, 3]
+                pose.position.z = T_final[2, 3]
                 pose.orientation.x = quat[0]
                 pose.orientation.y = quat[1]
                 pose.orientation.z = quat[2]
