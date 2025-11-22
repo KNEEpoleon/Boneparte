@@ -428,7 +428,8 @@ class UnifiedTcpServerNode(Node):
             return
         
         if self.last_rgb_image is None:
-            self.get_logger().error("No image available for annotation")
+            self.get_logger().error("No image available for annotation - camera topic not publishing yet")
+            self.get_logger().error("Make sure /camera/color/image_rect_raw is publishing")
             return
         
         # Check if image was already sent for this annotation cycle
