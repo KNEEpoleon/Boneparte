@@ -233,13 +233,6 @@ Visualization Manager:
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 0.1
-    - Class: rviz_default_plugins/PointCloud2
-      Enabled: true
-      Name: PointCloud
-      Topic: /pointcloud_base
-      Queue Size: 10
-      Style: Points
-      Size (m): 0.01
   Enabled: true
   Global Options:
     Background Color: 21; 21; 26
