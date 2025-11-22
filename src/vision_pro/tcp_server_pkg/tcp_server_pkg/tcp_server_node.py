@@ -81,6 +81,7 @@ class UnifiedTcpServerNode(Node):
         
         self.bridge = CvBridge()
         self.last_rgb_image = None
+        self.rgb_image_sent = False  # Track if RGB image was already sent for current annotation
         self.pending_segmented_image = None
         self.segmented_image_sent = False  # Track if segmented image was already sent
         
@@ -430,6 +431,11 @@ class UnifiedTcpServerNode(Node):
             self.get_logger().error("No image available for annotation")
             return
         
+        # Check if image was already sent for this annotation cycle
+        if self.rgb_image_sent:
+            self.get_logger().debug('RGB image already sent for this annotation cycle, skipping')
+            return
+        
         try:
             # Convert image to JPEG and encode as base64
             self.get_logger().info('Converting image to JPEG and base64...')
@@ -448,6 +454,7 @@ class UnifiedTcpServerNode(Node):
                 self.get_logger().info('Sending image data to AVP...')
                 self.images_client_sock.sendall(image_message.encode('utf-8'))
                 self.get_logger().info('Sent image to AVP for annotation')
+                self.rgb_image_sent = True  # Mark as sent
             finally:
                 # Restore original blocking state
                 if self.images_client_sock is not None:
@@ -573,6 +580,8 @@ class UnifiedTcpServerNode(Node):
 
     def handle_annotate_command(self):
         """Handle annotate command - send image to AVP on images channel"""
+        # Reset the RGB image sent flag for new annotation cycle
+        self.rgb_image_sent = False
         self.send_image_to_avp()
 
     def handle_annotation_response(self, message: str):
