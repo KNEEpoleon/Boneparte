@@ -109,9 +109,14 @@ def load_plan_points(plan_path, plan_name):
                     elif point_name == "p3":
                         p3 = point
 
-                # Only add to `holes` if p1, p2, and p3 are all defined
-                if p1 is not None and p2 is not None and p3 is not None:
-                    holes[hole_name] = [p1, p2, p3]
+                if part_name == 'femur' and hole_name == 'hole1':
+                    if p1 is not None and p2 is not None and p3 is not None:
+                        holes[hole_name] = [p1, p2, p3]
+                else:
+                    # Other holes only need p1 (drilling point)
+                    if p1 is not None:
+                        # Store as [p1, p2, p3] where p2 and p3 may be None
+                        holes[hole_name] = [p1, p2, p3]
 
             # Only add to `parts` if the part has valid holes
             if holes:

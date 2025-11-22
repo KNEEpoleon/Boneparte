@@ -747,7 +747,7 @@ class ParaSightHost(Node):
             
             T = np.eye(4)
             T[:3, :3] = Rot
-            T[:3, 3] = p3
+            T[:3, 3] = p1  # p1 is the drilling point
             return T
         
         # Compute femur hole1's reference orientation first
@@ -773,27 +773,29 @@ class ParaSightHost(Node):
             for hole_name, hole in holes.items():
                 p1, p2, p3 = hole
 
-                # Use reference for femur hole1, otherwise compute and align
+                # Use reference for femur hole1
                 if bone == 'femur' and hole_name == 'hole1' and reference_rotation is not None:
                     T_final = np.eye(4)
                     T_final[:3, :3] = reference_rotation
                     T_final[:3, 3] = reference_position
                 else:
-                    T_base = compute_base_orientation(p1, p2, p3)
-                    T_current = np.matmul(transform, T_base)
+                    # For other holes: only need p1 (drilling point), use reference orientation directly
+                    if reference_rotation is None:
+                        self.get_logger().error(f"Cannot compute pose for {bone} {hole_name}: reference orientation not available")
+                        continue
                     
-                    if reference_rotation is not None:
-                        # Align to reference orientation
-                        current_rotation = T_current[:3, :3]
-                        relative_rotation = reference_rotation @ current_rotation.T
-                        aligned_rotation = relative_rotation @ current_rotation
-                        
-                        T_final = np.eye(4)
-                        T_final[:3, :3] = aligned_rotation
-                        T_final[:3, 3] = T_current[:3, 3]
-                        self.get_logger().info(f"Aligned {bone} {hole_name} to reference orientation")
-                    else:
-                        T_final = T_current
+                    if p1 is None:
+                        self.get_logger().error(f"Cannot compute pose for {bone} {hole_name}: p1 (drilling point) is missing")
+                        continue
+                    
+                    # Transform p1 to camera frame using bone transform
+                    p1_homogeneous = np.array([p1[0], p1[1], p1[2], 1.0])
+                    p1_transformed = np.matmul(transform, p1_homogeneous)
+                    
+                    T_final = np.eye(4)
+                    T_final[:3, :3] = reference_rotation
+                    T_final[:3, 3] = p1_transformed[:3]
+                    self.get_logger().info(f"Using reference orientation for {bone} {hole_name} at drilling point p1")
 
                 # Convert to quaternion and create pose
                 r = R.from_matrix(T_final[:3, :3])

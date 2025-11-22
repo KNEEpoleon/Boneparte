@@ -1,10 +1,10 @@
 # Surgical Plan Configuration
 # ---------------------------
-# Each plan is defined by three points in 3D space.
-# The hole is drilled at P3. 
-# The orientation is determined by the normal vector of the plane defined by P1, P2, P3.
-# ALL DIMENSIONS ARE IN MM
+# Note(Daksh):
+# For femur hole1: Requires P1, P2, P3 to compute reference orientation (normal vector of plane).
+# For all other holes: Only requires P1 (drilling point), orientation uses reference from femur hole1.
 
+# ALL DIMENSIONS ARE IN MM
 
 plan1:
   femur:
@@ -14,65 +14,10 @@ plan1:
       p3: [19.85, -40.59, 15.99]
     hole2:
       p1: [-26.59, -39.63, 12.56]
-      p2: [-29.3, -39.63, 12.56]
-      p3: [-27.94, -40.81, 10.44]
   tibia:
     hole1:
       p1: [-23.742, -35.28082, 21.70092]
-      p2: [-22.54676, -34.50692, 22.08593]
-      p3: [-23.45157, -34.17525, 22.06926]
     hole2:
       p1: [20.60691, -25.10947, 21.04682]
-      p2: [20.15951, -25.88337, 21.1341]
-      p3: [20.87736, -26.21505, 21.0327]
 
 
-
-# Version New SVD Plan backup
-
-# plan1:
-#   femur:
-#     hole1: # we want the lower one - everything is in mm.
-#       p1: [3.29040, 21.06405, 22.41792]
-#       p2: [0.46016, 20.21150, 21.65537]
-#       p3: [1.49632, 23.57007, 22.03367]
-#     hole2: # candidate point
-#       p1: [-1.71, -27.7, 18.46]
-#       p2: [-4.38, -27.38, 18.23]
-#       p3: [-2.96, -25.91, 19.36]
-#   tibia:
-#     hole1:
-#       p1: [-12.750096,-29.86348, 22.72489]
-#       p2: [-13.03138, -31.52185, 22.54779]
-#       p3: [-11.85613, -31.19018, 22.55033]
-#     hole2:
-#       p1: [13.64891, -30.74793, 21.09059]
-#       p2: [12.83759, -30.52681, 21.13295]
-#       p3: [13.00457, -31.41128, 20.86857]
-
-# Version Test (Designated Bone Names)
-# ---------------------------
-
-# plan1:
-#   femur:
-#     hole1: # we want the lower one - everything is in mm.
-#       p1: [3.29040, 21.06405, 22.41792]
-#       p2: [0.46016, 20.21150, 21.65537]
-#       p3: [1.49632, 23.57007, 22.03367]
-#     hole2: # femur top left
-#       p1: [16.451, -17.209, 32.38]
-#       p2: [19.71, -15.65, 32.39]
-#       p3: [21.19, -18.71, 32.36]
-#     hole3:
-#       p1: [-19.29, -19.8, 26.8]
-#       p2: [-17.87, -22.319, 25.92]
-#       p3: [-21.03, -21.03, 26.42]
-#   tibia:
-#     hole1:
-#       p1: [-12.750096,-29.86348, 22.72489]
-#       p2: [-13.03138, -31.52185, 22.54779]
-#       p3: [-11.85613, -31.19018, 22.55033]
-#     hole2:
-#       p1: [13.64891, -30.74793, 21.09059]
-#       p2: [12.83759, -30.52681, 21.13295]
-#       p3: [13.00457, -31.41128, 20.86857]
