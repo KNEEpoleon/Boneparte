@@ -82,6 +82,7 @@ class UnifiedTcpServerNode(Node):
         self.bridge = CvBridge()
         self.last_rgb_image = None
         self.pending_segmented_image = None
+        self.segmented_image_sent = False  # Track if segmented image was already sent
         
         # FSM state
         self.current_fsm_state = "unknown"
@@ -90,6 +91,7 @@ class UnifiedTcpServerNode(Node):
         # Drill poses
         self.latest_drill_poses = None
         self.drill_poses_lock = threading.Lock()
+        self.last_drill_pose_count = 0  # Track drill pose count changes
         
         # Annotation response handling
         self.annotation_response = None
@@ -175,8 +177,10 @@ class UnifiedTcpServerNode(Node):
             segmented_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
             self.pending_segmented_image = segmented_image
             self.get_logger().info('Received segmented image from ParaSight')
-            # Send immediately to AVP
-            self.send_segmented_image_to_avp()
+            # Send immediately to AVP (only if not already sent)
+            if not self.segmented_image_sent:
+                self.send_segmented_image_to_avp()
+                self.segmented_image_sent = True  # Mark as sent
         except Exception as e:
             self.get_logger().error(f'Failed to process segmented image: {e}')
     
@@ -309,11 +313,11 @@ class UnifiedTcpServerNode(Node):
                     message = self.format_poses_message(self.latest_drill_poses)
                     self.poses_client_sock.sendall(message.encode('utf-8'))
                     
-                    # Log occasionally (not every frame to avoid spam)
-                    if self.get_clock().now().nanoseconds % 1000000000 < 100000000:  # ~once per second
-                        self.get_logger().info(
-                            f'Sent {len(self.latest_drill_poses.poses)} drill poses to AVP'
-                        )
+                    # Only log when drill pose count changes
+                    current_count = len(self.latest_drill_poses.poses)
+                    if current_count != self.last_drill_pose_count:
+                        self.get_logger().info(f'Sent {current_count} drill poses to AVP')
+                        self.last_drill_pose_count = current_count
                 
                 except (BrokenPipeError, ConnectionResetError, OSError) as e:
                     self.get_logger().warn(f'Drill poses client disconnected: {e}')
@@ -632,6 +636,11 @@ class UnifiedTcpServerNode(Node):
     def handle_accept_segmentation(self):
         """Handle accept command from AVP - proceed with drill pose computation"""
         self.get_logger().info('Segmentation accepted by AVP, calling approve service')
+        
+        # Reset flag for next segmentation
+        self.segmented_image_sent = False
+        self.pending_segmented_image = None
+        
         if not self.approve_seg_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().error('Service /approve_segmentation not available')
             return
@@ -643,6 +652,10 @@ class UnifiedTcpServerNode(Node):
     def handle_reject_segmentation(self):
         """Handle reject command from AVP - reset FSM to await_surgeon_input for new annotations"""
         self.get_logger().info('Segmentation rejected by AVP')
+        
+        # Reset flag for next segmentation
+        self.segmented_image_sent = False
+        self.pending_segmented_image = None
         
         # Call reject service first to clean up ParaSight state
         if not self.reject_seg_client.wait_for_service(timeout_sec=1.0):
