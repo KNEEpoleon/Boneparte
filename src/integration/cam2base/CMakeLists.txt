@@ -40,6 +40,7 @@ install(PROGRAMS
   src/pointcloud_base_publisher.py
   src/aruco_drill_pose_publisher.py
   src/aruco_calibration_node.py
+  src/aruco_detection_node.py
   DESTINATION lib/cam2base
 )
 
