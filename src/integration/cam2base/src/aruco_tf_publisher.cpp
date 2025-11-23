@@ -27,13 +27,15 @@ private:
     transform.header.frame_id = "lbr_link_0";
     transform.child_frame_id = "aruco_marker";
 
-    // transform.transform.translation.x = 0.563;   // 56.3 cm
-    // transform.transform.translation.y = 0.460;   // 46.0 cm
-    // transform.transform.translation.z = -0.088;  // -8.8 cm
+    // NOTE: These were found by running the aruco_detection_node.py script
+    transform.transform.translation.x = -0.085039;
+    transform.transform.translation.y = 0.467601;
+    transform.transform.translation.z = 0.611487;
 
-    transform.transform.translation.x = -0.085;   
-    transform.transform.translation.y = 0.466;
-    transform.transform.translation.z = 0.603;  
+    // NOTE: These were found by hand measuring
+    // transform.transform.translation.x = -0.085;   
+    // transform.transform.translation.y = 0.466;
+    // transform.transform.translation.z = 0.603;  
 
     tf2::Quaternion q;
     q.setX(-0.707107);
