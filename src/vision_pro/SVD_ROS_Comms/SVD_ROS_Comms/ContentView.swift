@@ -1,501 +1,70 @@
 //
 //  ContentView.swift
-//  BONEparte Surgical Suite
+//  SVD_ROS_Comms
 //
-//  Main Control Panel - Redesigned with modern surgical aesthetic
+//  Unified app with tabbed interface: Control Panel + Drill Site Overlay
 //
 
 import SwiftUI
-import Network
-#if canImport(UIKit)
-import UIKit
-#endif
-
-// MARK: - Minimal Dark Background
-struct GlassmorphismBackground: View {
-    var body: some View {
-        ZStack {
-            // Deep charcoal base
-            Color.backgroundPrimary
-            
-            // Subtle gradient for depth (black to dark gray)
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.3),
-                    Color(red: 0.15, green: 0.15, blue: 0.16).opacity(0.2)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
-        .ignoresSafeArea()
-    }
-}
 
 struct ContentView: View {
-    @StateObject private var tcpClient = TCPClient(host: "192.168.0.193", port: 5000)
-    @State private var selectedDrillSite: String? = nil
-    @State private var showEmergencyConfirm = false
-    @State private var drillCommandHistory: [DrillCommand] = []
-    @State private var lastConnectionState: Bool = false
-    @State private var storedOriginalImage: Data? = nil
+    @Environment(AppModel.self) private var appModel
     
-    // Command mapping
-    private let commandMap: [String: String] = [
-        "Proceed Mission": "proceed_mission",
-        "Reset Mission": "reset_mission",
-        "Annotate": "annotate",
-        "robot_away": "robot_away",
-        "robot_home": "robot_home",
-        "Femur 1": "drill_femur_1",
-        "Femur 2": "drill_femur_2",
-        "Femur 3": "drill_femur_3",
-        "Tibia 1": "drill_tibia_1",
-        "Tibia 2": "drill_tibia_2"
-    ]
-    
-    // Connection status
-    private var isConnected: Bool {
-        tcpClient.statusColor == .green
-    }
+    // Three TCP clients for three ports
+    @StateObject private var controlClient = TCPClient(host: "192.168.0.193", port: 5000)
+    @StateObject private var poseClient = DrillPosesTCPClient(host: "192.168.0.193", port: 5001)
+    @StateObject private var imageClient = ImageTCPClient(host: "192.168.0.193", port: 5002)
     
     var body: some View {
-        HStack(alignment: .top, spacing: Spacing.xl) {
-            leftColumn
-                .frame(width: 420, alignment: .topLeading)
-            rightColumn
-                .frame(width: 540, alignment: .topLeading)
-        }
-        .padding(Spacing.xl)
-        .background(GlassmorphismBackground())
-        .alert("Emergency Stop", isPresented: $showEmergencyConfirm) {
-            Button("Cancel", role: .cancel) { }
-            Button("STOP ALL", role: .destructive) {
-                sendCommand("KILLALL")
-            }
-        } message: {
-            Text("This will immediately stop all robotic operations. Continue?")
-        }
-        .sheet(item: Binding(
-            get: { tcpClient.receivedImage.map { ImageData(data: $0) } },
-            set: { _ in tcpClient.receivedImage = nil }
-        )) { imageData in
-            ImageView(imageData: imageData.data) { annotations in
-                // Store original image before sending annotations
-                storedOriginalImage = imageData.data
-                tcpClient.sendAnnotations(annotations)
-            }
-        }
-        .sheet(item: Binding(
-            get: { tcpClient.receivedSegmentedImage.map { ImageData(data: $0) } },
-            set: { _ in tcpClient.receivedSegmentedImage = nil }
-        )) { imageData in
-            SegmentationView(imageData: imageData.data) {
-                // Accept callback
-                tcpClient.sendAccept()
-                storedOriginalImage = nil
-            } onReject: {
-                // Reject callback - send reject and reopen annotation window
-                tcpClient.sendReject()
-                // Reopen annotation window with stored original image
-                if let originalImage = storedOriginalImage {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        tcpClient.receivedImage = originalImage
-                    }
-                }
-            }
-        }
-        .onChange(of: isConnected) { oldValue, newValue in
-            // Clear history when transitioning from disconnected to connected
-            if !lastConnectionState && newValue {
-                drillCommandHistory.removeAll()
-            }
-            lastConnectionState = newValue
-        }
-    }
-    
-    private var leftColumn: some View {
-        VStack(alignment: .leading, spacing: Spacing.lg) {
-            headerSection
-            connectionStatusCard
-            workflowControlPanel
-        }
-    }
-    
-    private var rightColumn: some View {
-        VStack(alignment: .leading, spacing: Spacing.lg) {
-            emergencySection
-            drillSiteSelection
-        }
-    }
-    
-    // MARK: - Header Section
-    
-    private var headerSection: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text("BONEparte")
-                    .font(.displayLarge)
-                    .foregroundColor(Color(red: 1.0, green: 0.60, blue: 0.20))
-                
-                Text("Surgical Control Suite")
-                    .font(.bodyMedium)
-                    .foregroundColor(.textSecondary)
-            }
-            
-            Spacer()
-            
-            // Status Indicator
-            HStack(spacing: Spacing.sm) {
-                Circle()
-                    .fill(isConnected ? Color.statusActive : Color.statusDanger)
-                    .frame(width: 12, height: 12)
-                    .shadow(color: isConnected ? Color.statusActive : Color.statusDanger,
-                           radius: 4)
-                
-                Text(isConnected ? "ONLINE" : "OFFLINE")
-                    .font(.labelMedium)
-                    .foregroundColor(isConnected ? .statusActive : .statusDanger)
-            }
-            .padding(.horizontal, Spacing.md)
-            .padding(.vertical, Spacing.sm)
-            .background(
-                Capsule()
-                    .fill(Color.surfaceElevated)
+        TabView {
+            // Tab 1: Control Panel (existing SVD_ROS_Comms UI)
+            ControlPanelView(
+                controlClient: controlClient,
+                imageClient: imageClient,
+                poseClient: poseClient
             )
-        }
-    }
-    
-    // MARK: - Connection Status Card
-    
-    private var connectionStatusCard: some View {
-        StatusCard(
-            title: "Network Connection",
-            status: isConnected ? .active : .danger,
-            statusText: isConnected ? "Connected" : "Disconnected"
-        ) {
-            VStack(spacing: Spacing.md) {
-                // Server Info
-                DataRow(
-                    label: "ROS Server",
-                    value: "192.168.0.193:5000",
-                    isMonospaced: true
-                )
-                
-                DataRow(
-                    label: "Status",
-                    value: tcpClient.statusMessage,
-                    valueColor: tcpClient.statusColor
-                )
-                
-                Divider()
-                
-                // Connection Buttons
-                HStack(spacing: Spacing.md) {
-                    if isConnected {
-                        Button {
-                            tcpClient.disconnect()
-                            tcpClient.statusMessage = "Disconnected manually"
-                            tcpClient.statusColor = .red
-                        } label: {
-                            HStack {
-                                Image(systemName: "wifi.slash")
-                                Text("Disconnect")
-                            }
-                        }
-                        .secondaryButton(fullWidth: true)
-                    } else {
-                        Button {
-                            tcpClient.connect()
-                        } label: {
-                            HStack {
-                                Image(systemName: "wifi")
-                                Text("Connect to ROS")
-                            }
-                        }
-                        .primaryButton(fullWidth: true)
-                    }
-                }
+            .environment(appModel)
+            .tabItem {
+                Label("Control Panel", systemImage: "slider.horizontal.3")
             }
-        }
-    }
-    
-    // MARK: - Workflow Control Panel
-    
-    private var workflowControlPanel: some View {
-        VStack(spacing: Spacing.md) {
-            SectionHeader(
-                "Control Panel",
-                subtitle: "Core surgical workflow",
-                icon: "slider.horizontal.3"
+            
+            // Tab 2: Drill Sites Visualization (ArucoTransform UI)
+            DrillSiteVisualizationView(
+                poseClient: poseClient
             )
-            
-            StandardCard {
-                Button {
-                    sendCommand("Proceed Mission")
-                } label: {
-                    Label("Proceed Mission", systemImage: "play.circle.fill")
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
+            .environment(appModel)
+            .tabItem {
+                Label("Overlay", systemImage: "cube.transparent")
             }
-            
-            StandardCard {
-                Button {
-                    sendCommand("Reset Mission")
-                } label: {
-                    Label("Reset Mission", systemImage: "arrow.counterclockwise.circle.fill")
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
-            }
-            
-            StandardCard {
-                Button {
-                    sendCommand("Annotate")
-                } label: {
-                    Label("Annotate", systemImage: "pencil.tip.crop.circle")
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
-            }
-            
-            StandardCard {
-                Button {
-                    sendCommand("robot_away")
-                } label: {
-                    Label("Send Robot Away", systemImage: "paperplane.fill")
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
-            }
-            
-            StandardCard {
-                Button {
-                    sendCommand("robot_home")
-                } label: {
-                    Label("Bring Robot Home", systemImage: "house.fill") 
-                }
-                .primaryButton(fullWidth: true)
-                .disabled(!isConnected)
-            }
+        }
+        .onAppear {
+            setupClients()
         }
     }
     
-    // MARK: - Drill Site Selection
-    
-    private var drillSiteSelection: some View {
-        VStack(spacing: Spacing.md) {
-            SectionHeader(
-                "Drill Site Selection",
-                subtitle: "Select target drill location",
-                icon: "target"
-            )
-            
-            StandardCard(title: "Target Sites") {
-                VStack(spacing: Spacing.lg) {
-                    // Femur sites
-                    VStack(alignment: .leading, spacing: Spacing.sm) {
-                        HStack {
-                            Image(systemName: "circle.fill")
-                                .foregroundColor(.femurColor)
-                                .font(.system(size: 10))
-                            Text("Femur")
-                                .font(.labelLarge)
-                                .foregroundColor(.textPrimary)
-                        }
-                        
-                        HStack(spacing: Spacing.sm) {
-                            ForEach(1...3, id: \.self) { index in
-                                Button {
-                                    selectDrillSite("Femur \(index)")
-                                } label: {
-                                    drillSiteButton(
-                                        number: index,
-                                        color: .femurColor,
-                                        isSelected: selectedDrillSite == "Femur \(index)"
-                                    )
-                                }
-                                .disabled(!isConnected)
-                            }
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    // Tibia sites
-                    VStack(alignment: .leading, spacing: Spacing.sm) {
-                        HStack {
-                            Image(systemName: "circle.fill")
-                                .foregroundColor(.tibiaColor)
-                                .font(.system(size: 10))
-                            Text("Tibia")
-                                .font(.labelLarge)
-                                .foregroundColor(.textPrimary)
-                        }
-                        
-                        HStack(spacing: Spacing.sm) {
-                            ForEach(1...2, id: \.self) { index in
-                                Button {
-                                    selectDrillSite("Tibia \(index)")
-                                } label: {
-                                    drillSiteButton(
-                                        number: index,
-                                        color: .tibiaColor,
-                                        isSelected: selectedDrillSite == "Tibia \(index)"
-                                    )
-                                }
-                                .disabled(!isConnected)
-                            }
-                        }
-                    }
-                    
-                    // Selected site info
-                    if let selected = selectedDrillSite {
-                        Divider()
-                        
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.statusActive)
-                            Text("Selected: \(selected)")
-                                .font(.labelMedium)
-                                .foregroundColor(.textPrimary)
-                            
-                            Spacer()
-                            
-                            Button("Clear") {
-                                selectedDrillSite = nil
-                            }
-                            .font(.labelSmall)
-                            .foregroundColor(.surgicalBlue)
-                        }
-                    }
-                    
-                    // Drill command history
-                    if !drillCommandHistory.isEmpty {
-                        Divider()
-                        
-                        VStack(alignment: .leading, spacing: Spacing.sm) {
-                            HStack {
-                                Text("Drill History")
-                                    .font(.labelLarge)
-                                    .foregroundColor(.textPrimary)
-                                
-                                Spacer()
-                                
-                                Button("Clear All") {
-                                    drillCommandHistory.removeAll()
-                                }
-                                .font(.labelSmall)
-                                .foregroundColor(.statusDanger)
-                            }
-                            
-                            ScrollView {
-                                VStack(spacing: Spacing.xs) {
-                                    ForEach(drillCommandHistory) { command in
-                                        HStack {
-                                            Circle()
-                                                .fill(command.siteName.contains("Femur") ? Color.femurColor : Color.tibiaColor)
-                                                .frame(width: 8, height: 8)
-                                            
-                                            Text(command.siteName)
-                                                .font(.caption)
-                                                .foregroundColor(.textPrimary)
-                                            
-                                            Spacer()
-                                            
-                                            Text(command.timestamp, style: .time)
-                                                .font(.caption2)
-                                                .foregroundColor(.textSecondary)
-                                        }
-                                        .padding(.vertical, 4)
-                                    }
-                                }
-                            }
-                            .frame(maxHeight: 150)
-                        }
-                    }
+    private func setupClients() {
+        // Setup FSM state callback for control client
+        controlClient.onFsmStateReceived = { [appModel] newState in
+            print("📍 ContentView: FSM state callback received: '\(newState)'")
+            Task { @MainActor in
+                // Update last state before changing current
+                if appModel.fsmState != newState && !appModel.fsmState.isEmpty && appModel.fsmState != "unknown" {
+                    appModel.lastFsmState = appModel.fsmState
                 }
+                appModel.fsmState = newState
+                print("📍 ContentView: Updated appModel.fsmState to: '\(appModel.fsmState)'")
             }
         }
-    }
-    
-    // MARK: - Emergency Section
-    
-    private var emergencySection: some View {
-        VStack(spacing: Spacing.md) {
-            Button {
-                showEmergencyConfirm = true
-            } label: {
-                HStack(spacing: Spacing.md) {
-                    Image(systemName: "hand.raised.fill")
-                        .font(.system(size: Spacing.iconLarge))
-                    Text("EMERGENCY STOP")
-                        .font(.buttonLarge)
-                }
-            }
-            .emergencyButton()
-            .disabled(!isConnected)
-            
-            Text("Immediately halts all robotic motion")
-                .font(.caption)
-                .foregroundColor(.textSecondary)
-        }
-    }
-    
-    // MARK: - Helper Views
-    
-    private func drillSiteButton(number: Int, color: Color, isSelected: Bool) -> some View {
-        VStack(spacing: Spacing.xs) {
-            ZStack {
-                Circle()
-                    .fill(isSelected ? color : Color.surfaceElevated)
-                    .frame(width: 50, height: 50)
-                
-                Circle()
-                    .stroke(color, lineWidth: isSelected ? 3 : 2)
-                    .frame(width: 50, height: 50)
-                
-                Text("\(number)")
-                    .font(.headlineMedium)
-                    .fontWeight(.bold)
-                    .foregroundColor(isSelected ? .white : color)
-            }
-        }
-        .scaleEffect(isSelected ? 1.1 : 1.0)
-        .animation(.spring(response: 0.3), value: isSelected)
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func sendCommand(_ label: String) {
-        guard let command = commandMap[label] else { return }
-        tcpClient.send("\(command)\n")
-    }
-    
-    private func selectDrillSite(_ site: String) {
-        selectedDrillSite = site
-        sendCommand(site)
         
-        // Add to history
-        let command = DrillCommand(siteName: site, timestamp: Date())
-        drillCommandHistory.append(command)
+        // Setup drill poses callback
+        poseClient.onDrillPosesReceived = { [appModel] drillSites in
+            Task { @MainActor in
+                appModel.drillSites = drillSites
+            }
+        }
     }
 }
 
 #Preview {
     ContentView()
-}
-
-// Helper struct to make Data Identifiable for sheet presentation
-struct ImageData: Identifiable {
-    let id = UUID()
-    let data: Data
-}
-
-// Drill command tracking
-struct DrillCommand: Identifiable {
-    let id = UUID()
-    let siteName: String
-    let timestamp: Date
 }

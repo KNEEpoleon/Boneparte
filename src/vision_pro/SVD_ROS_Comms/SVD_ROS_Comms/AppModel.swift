@@ -9,7 +9,8 @@ import SwiftUI
 
 /// Maintains app-wide state
 @MainActor
-class AppModel: ObservableObject {
+@Observable
+class AppModel {
     let immersiveSpaceID = "ImmersiveSpace"
     enum ImmersiveSpaceState {
         case closed
@@ -27,7 +28,28 @@ class AppModel: ObservableObject {
         case sendingAnnotations
         case complete
     }
-    @Published var annotationState = AnnotationState.idle
-    @Published var currentImageData: Data?
-    @Published var currentAnnotations: [AnnotationPoint] = []
+    var annotationState = AnnotationState.idle
+    var currentImageData: Data?
+    var currentAnnotations: [AnnotationPoint] = []
+    
+    // NEW: Drill site visualization state (from ArucoTransform)
+    var isTransformEnabled = false
+    var arucoTransformEstablished = false
+    var drillSites: [DrillSite] = []
+    
+    // NEW: FSM state from ROS
+    var fsmState: String = "unknown"
+    var lastFsmState: String = "unknown"  // For "Last State" display
+}
+
+// DrillSite struct (from ArucoTransform)
+struct DrillSite: Identifiable {
+    let id = UUID()
+    let position: SIMD3<Float>
+    let orientation: simd_quatf
+    
+    init(position: SIMD3<Float>, orientation: simd_quatf) {
+        self.position = position
+        self.orientation = orientation
+    }
 }

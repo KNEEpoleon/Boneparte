@@ -1,42 +1,42 @@
 //
-//  TCPClient.swift
+//  ImageTCPClient.swift
 //  SVD_ROS_Comms
 //
-//  TCP client for control commands and FSM state updates (Port 5000)
+//  TCP client for sending/receiving images and annotations (Port 5002)
 //
 
 import Foundation
 import Network
 import SwiftUI
 
-class TCPClient: ObservableObject {
+class ImageTCPClient: ObservableObject {
     private var connection: NWConnection?
-    private let queue = DispatchQueue(label: "TCP Client Queue")
-
+    private let queue = DispatchQueue(label: "ImageTCPClient")
+    
     @Published var statusMessage: String = "Waiting for connection..."
     @Published var statusColor: Color = .gray
     @Published var isConnected: Bool = false
-
+    @Published var receivedImage: Data?
+    @Published var receivedSegmentedImage: Data?
+    @Published var imageTransmissionStatus: String = ""
+    
     private var host: String
     private var port: UInt16
     private var receivedDataBuffer: String = ""
     
-    // Callback for FSM state updates
-    var onFsmStateReceived: ((String) -> Void)?
-
     init(host: String, port: UInt16) {
         self.host = host
         self.port = port
     }
-
+    
     func connect() {
         connection = NWConnection(host: NWEndpoint.Host(host), port: NWEndpoint.Port(rawValue: port)!, using: .tcp)
-
+        
         connection?.stateUpdateHandler = { [weak self] newState in
             DispatchQueue.main.async {
                 switch newState {
                 case .ready:
-                    self?.statusMessage = "Connected to server"
+                    self?.statusMessage = "Connected (Images)"
                     self?.statusColor = .green
                     self?.isConnected = true
                 case .failed(let error):
@@ -57,11 +57,29 @@ class TCPClient: ObservableObject {
                 }
             }
         }
-
+        
         connection?.start(queue: queue)
         receive()
     }
-
+    
+    func disconnect() {
+        connection?.cancel()
+        connection = nil
+        DispatchQueue.main.async {
+            self.statusMessage = "Disconnected"
+            self.statusColor = .red
+            self.isConnected = false
+        }
+    }
+    
+    private func attemptReconnect() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            guard let self = self, !self.isConnected else { return }
+            print("Attempting to reconnect (Images)...")
+            self.connect()
+        }
+    }
+    
     func send(_ message: String) {
         guard let connection = connection, connection.state == .ready else {
             DispatchQueue.main.async {
@@ -70,7 +88,7 @@ class TCPClient: ObservableObject {
             }
             return
         }
-
+        
         let data = Data(message.utf8)
         connection.send(content: data, completion: .contentProcessed({ [weak self] error in
             DispatchQueue.main.async {
@@ -78,22 +96,22 @@ class TCPClient: ObservableObject {
                     self?.statusMessage = "Send error: \(error.localizedDescription)"
                     self?.statusColor = .red
                 } else {
-                    self?.statusMessage = "Sent: \(message.trimmingCharacters(in: .whitespacesAndNewlines))"
+                    self?.statusMessage = "Sent: \(message.prefix(50))..."
                     self?.statusColor = .green
                 }
             }
         }))
     }
-
+    
     private func receive() {
-        connection?.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] data, _, isComplete, error in
+        connection?.receive(minimumIncompleteLength: 1, maximumLength: 1024 * 1024 * 10) { [weak self] data, _, isComplete, error in
             if let data = data, !data.isEmpty {
                 let newData = String(decoding: data, as: UTF8.self)
                 self?.receivedDataBuffer.append(newData)
                 self?.processBufferedData()
             }
             if let error = error {
-                print("TCP Receive error: \(error.localizedDescription)")
+                print("TCP Receive error (Images): \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self?.statusMessage = "Receive error: \(error.localizedDescription)"
                     self?.statusColor = .red
@@ -102,7 +120,7 @@ class TCPClient: ObservableObject {
                 }
             }
             if isComplete {
-                print("Connection closed by server")
+                print("Connection closed by server (Images)")
                 DispatchQueue.main.async {
                     self?.statusMessage = "Connection closed by server"
                     self?.statusColor = .red
@@ -122,47 +140,65 @@ class TCPClient: ObservableObject {
             let distance = receivedDataBuffer.distance(from: receivedDataBuffer.startIndex, to: newlineIndex) + 1
             receivedDataBuffer.removeFirst(distance)
             
-            // Parse FSM state updates
-            if message.hasPrefix("STATE:") {
-                handleFsmState(message)
-            } else {
-                // Handle other responses (acknowledgments, etc.)
-                print("Control channel received: \(message)")
+            if message.hasPrefix("IMAGE:") {
+                handleImageData(message, isSegmented: false)
+            } else if message.hasPrefix("SEGMENTED_IMAGE:") {
+                handleImageData(message, isSegmented: true)
             }
         }
     }
     
-    private func handleFsmState(_ response: String) {
-        let state = String(response.dropFirst(6))  // Remove "STATE:" prefix
+    private func handleImageData(_ response: String, isSegmented: Bool) {
+        let prefixLength = isSegmented ? 16 : 6 // "SEGMENTED_IMAGE:" (16 chars) or "IMAGE:" (6 chars)
+        let imageDataString = String(response.dropFirst(prefixLength))
         
-        DispatchQueue.main.async { [weak self] in
-            self?.onFsmStateReceived?(state)
+        if let imageData = Data(base64Encoded: imageDataString, options: .ignoreUnknownCharacters) {
+            DispatchQueue.main.async {
+                if isSegmented {
+                    self.receivedSegmentedImage = imageData
+                } else {
+                    self.receivedImage = imageData
+                }
+                self.imageTransmissionStatus = "Image received successfully (\(imageData.count) bytes)"
+            }
         }
-        
-        print("FSM State received: \(state)")
     }
     
-    private func attemptReconnect() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            guard let self = self, !self.isConnected else { return }
-            print("Attempting to reconnect (Control)...")
-            self.connect()
+    func sendAnnotations(_ annotations: [AnnotationPoint]) {
+        guard let connection = connection, connection.state == .ready else {
+            DispatchQueue.main.async {
+                self.statusMessage = "Connection not ready for annotation transmission"
+                self.statusColor = .red
+            }
+            return
         }
-    }
-
-    func disconnect() {
-        connection?.cancel()
-        connection = nil
-        DispatchQueue.main.async {
-            self.statusMessage = "Disconnected"
-            self.statusColor = .red
-            self.isConnected = false
+        
+        do {
+            let annotationData = try JSONEncoder().encode(annotations)
+            let annotationString = String(data: annotationData, encoding: .utf8) ?? ""
+            let message = "ANNOTATIONS:\(annotationString)\n"
+            
+            print("Sending \(annotations.count) annotations")
+            
+            let data = Data(message.utf8)
+            connection.send(content: data, completion: .contentProcessed({ [weak self] error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self?.statusMessage = "Annotation send error: \(error.localizedDescription)"
+                        self?.statusColor = .red
+                    } else {
+                        self?.statusMessage = "Annotations sent successfully"
+                        self?.statusColor = .green
+                        self?.receivedImage = nil
+                    }
+                }
+            }))
+        } catch {
+            DispatchQueue.main.async {
+                self.statusMessage = "Failed to encode annotations: \(error.localizedDescription)"
+                self.statusColor = .red
+            }
         }
     }
 }
 
-// Annotation data structure
-struct AnnotationPoint: Codable {
-    let x: Double // Normalized x coordinate (0.0 to 1.0)
-    let y: Double // Normalized y coordinate (0.0 to 1.0)
-}
