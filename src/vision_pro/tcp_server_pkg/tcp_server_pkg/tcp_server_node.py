@@ -578,6 +578,7 @@ class UnifiedTcpServerNode(Node):
             except:
                 self.get_logger().warn(f"Invalid pose index in command: {command}")
         elif command.startswith("clear_"):
+            self.get_logger().info(f'🗑️  Clear command received: "{command}"')
             _, bone, hole = command.split('_')
             try:
                 if bone == "femur":
@@ -592,8 +593,8 @@ class UnifiedTcpServerNode(Node):
                         self.call_clear_obstacle_service(3)
                     elif hole == "2":
                         self.call_clear_obstacle_service(4)
-            except:
-                self.get_logger().warn(f"Invalid pose index in clear command: {command}")
+            except Exception as e:
+                self.get_logger().warn(f"Invalid pose index in clear command: {command}, error: {e}")
         else:
             self.get_logger().warn(f'Unknown command: "{command}"')
 
