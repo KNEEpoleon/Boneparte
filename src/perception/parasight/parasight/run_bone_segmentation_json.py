@@ -12,7 +12,7 @@ from PIL import Image
 from torchvision import transforms
 from scipy.ndimage import zoom
 from sklearn.decomposition import PCA
-from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.cluster import KMeans
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -145,7 +145,7 @@ def save_cluster_stats_json(output_path, data_to_save):
 
 def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/kneepolean/sreeharsha/dinov3", 
                            output_dir=None, device=None, save_cluster_stats=True):
-    """Extract DINOv3 features from bone image using meanshift clustering.
+    """Extract DINOv3 features from bone image using k-means clustering.
     
     Args:
         image_path: Path to input image
@@ -178,13 +178,21 @@ def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/
     
     # Load and preprocess image
     image = Image.open(image_path).convert("RGB")
-    image_resized = resize_to_divisible(image, patch_size=16, max_size=768)
+    
+    # Center crop to 848x480
+    crop_width, crop_height = 848, 480
+    img_width, img_height = image.size
+    left = (img_width - crop_width) // 2
+    top = (img_height - crop_height) // 2
+    right = left + crop_width
+    bottom = top + crop_height
+    image = image.crop((left, top, right, bottom))
     
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
     ])
-    image_tensor = transform(image_resized).unsqueeze(0).to(device)
+    image_tensor = transform(image).unsqueeze(0).to(device)
     
     # Extract features
     start_time = time.time()
@@ -202,30 +210,32 @@ def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/
     
     # Calculate dimensions
     # PIL .size returns (width, height), we need (height, width) for numpy
-    w_pixels, h_pixels = image_resized.size
+    w_pixels, h_pixels = image.size
     patch_h = h_pixels // 16
     patch_w = w_pixels // 16
     
-    # Compute PCA features
-    pca = PCA(n_components=3, whiten=True)
-    features_pca = pca.fit_transform(features_cpu.numpy())
-    features_pca_spatial = features_pca.reshape(patch_h, patch_w, 3)
+    # Compute 3D PCA features for visualization
+    pca_3d = PCA(n_components=3, whiten=True)
+    features_pca_3d = pca_3d.fit_transform(features_cpu.numpy())
+    features_pca_spatial = features_pca_3d.reshape(patch_h, patch_w, 3)
     
-    # Normalize PCA features
+    # Normalize PCA features for visualization
     for i in range(3):
         channel = features_pca_spatial[:, :, i]
         features_pca_spatial[:, :, i] = (channel - channel.min()) / (channel.max() - channel.min())
     
-    # Run meanshift clustering
-    cluster_start = time.time()
-    bandwidth = estimate_bandwidth(features_pca, quantile=0.2, n_samples=200)
-    clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
-    labels = clusterer.fit_predict(features_pca)
-    cluster_time = time.time() - cluster_start
-    n_clusters_found = len(np.unique(labels[labels >= 0]))
-    print(f"MEANSHIFT: {cluster_time*1000:.2f} ms ({n_clusters_found} clusters)")
+    # Compute 8D PCA features for clustering
+    pca_8d = PCA(n_components=8, whiten=True)
+    features_pca_8d = pca_8d.fit_transform(features_cpu.numpy())
     
-    cluster_labels_spatial = labels.reshape(patch_h, patch_w)
+    # Run k-means clustering on 8D PCA features
+    cluster_start = time.time()
+    clusterer_kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+    labels_kmeans = clusterer_kmeans.fit_predict(features_pca_8d)
+    cluster_time = time.time() - cluster_start
+    print(f"K-MEANS: {cluster_time*1000:.2f} ms (5 clusters)")
+    
+    cluster_labels_spatial = labels_kmeans.reshape(patch_h, patch_w)
     
     # Save outputs if output_dir specified
     if output_dir is not None:
@@ -234,34 +244,34 @@ def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/
         # output_path = os.path.join(output_dir, model_name, output_name)
         output_path = os.path.join(output_dir, output_name)
         
-        # Upsample for visualizations
+        # Upsample from patch space to pixel space for visualizations
         zoom_h = h_pixels / patch_h
         zoom_w = w_pixels / patch_w
         features_pca_upsampled = zoom(features_pca_spatial, (zoom_h, zoom_w, 1), order=3)
-        image_resized_array = np.array(image_resized)
+        image_array = np.array(image)
         cluster_labels_upsampled = zoom(cluster_labels_spatial.astype(float), (zoom_h, zoom_w), order=0)
         
-        # Save PCA visualization
-        plt.figure(figsize=(10, 8))
-        plt.imshow(features_pca_upsampled)
-        plt.axis('off')
-        plt.savefig(os.path.join(output_path, f"{output_name}_pca_vis.png"), dpi=300, bbox_inches='tight')
-        plt.close()
+        # Normalize PCA features for saving (0-255 uint8)
+        features_pca_uint8 = (features_pca_upsampled * 255).astype(np.uint8)
         
-        # Save cluster visualization
-        plt.figure(figsize=(10, 8))
-        plt.imshow(cluster_labels_upsampled, cmap='tab10', interpolation='nearest')
-        plt.axis('off')
-        plt.savefig(os.path.join(output_path, f"image_clusters.png"), dpi=300, bbox_inches='tight')
-        plt.close()
+        # Save PCA visualization using PIL for exact pixel dimensions
+        Image.fromarray(features_pca_uint8).save(os.path.join(output_path, f"{output_name}_pca_vis.png"))
         
-        # Save cluster overlay on RGB image
-        plt.figure(figsize=(10, 8))
-        plt.imshow(image_resized_array)
-        plt.imshow(cluster_labels_upsampled, cmap='tab10', alpha=0.5, interpolation='nearest')
-        plt.axis('off')
-        plt.savefig(os.path.join(output_path, f"image_clusters_overlay.png"), dpi=300, bbox_inches='tight')
-        plt.close()
+        # Create colormap for cluster labels
+        cmap = plt.get_cmap('tab10')
+        
+        # Normalize cluster labels to 0-1 range for colormap
+        def apply_colormap(labels):
+            normalized = (labels - labels.min()) / (labels.max() - labels.min() + 1e-8)
+            colored = cmap(normalized)[:, :, :3]  # Remove alpha channel
+            return (colored * 255).astype(np.uint8)
+        
+        # Save k-means cluster visualizations
+        cluster_kmeans_colored = apply_colormap(cluster_labels_upsampled)
+        Image.fromarray(cluster_kmeans_colored).save(os.path.join(output_path, f"image_clusters_kmeans.png"))
+        
+        overlay_kmeans = (image_array * 0.5 + cluster_kmeans_colored * 0.5).astype(np.uint8)
+        Image.fromarray(overlay_kmeans).save(os.path.join(output_path, f"image_clusters_overlay_kmeans.png"))
         
         # Extract cluster statistics
         cluster_data = extract_cluster_statistics(
@@ -272,7 +282,7 @@ def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/
             patch_w,
             h_pixels,
             w_pixels,
-            'meanshift'
+            'kmeans'
         )
         
         # Save cluster statistics as JSON
@@ -289,7 +299,7 @@ def extract_dinov3_features(image_path, checkpoint_path, dinov3_location="/home/
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract DINOv3 features from bone images using meanshift clustering")
+    parser = argparse.ArgumentParser(description="Extract DINOv3 features from bone images using k-means clustering")
     parser.add_argument("--dinov3-location", type=str, 
                        default="/home/kneepolean/sreeharsha/dinov3")
     parser.add_argument("--checkpoint-path", type=str, default="/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth")

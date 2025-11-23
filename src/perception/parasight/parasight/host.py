@@ -206,7 +206,8 @@ class ParaSightHost(Node):
         checkpoint_path = "/ros_ws/src/perception/dinov3/checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
         self.auto_reposition_dir = "/ros_ws/src/perception/auto_reposition/"
         dinov3_path = "/ros_ws/src/perception/dinov3"
-        codebook_path = "/ros_ws/src/perception/auto_reposition/fvd_bone_codebook.json"
+        codebook_path = "/ros_ws/src/perception/auto_reposition/fvd_bone_codebookv2.json"
+        # codebook_path = "/ros_ws/src/perception/auto_reposition/fvd_bone_codebook.json"
 
         self.bone_extractor = DINOBoneExtractor(checkpoint_path=checkpoint_path, dinov3_path=dinov3_path, codebook_path=codebook_path, auto_reposition_dir=self.auto_reposition_dir)
         # Initialize state machine after everything is set up
