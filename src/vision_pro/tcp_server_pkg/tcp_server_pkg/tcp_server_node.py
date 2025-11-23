@@ -11,7 +11,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Empty, String
 from std_srvs.srv import Empty as EmptySrv
-from surgical_robot_planner.srv import SelectPose, RobotCommand
+from surgical_robot_planner.srv import SelectPose, RobotCommand, ClearObstacle
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseArray
 from cv_bridge import CvBridge
@@ -47,6 +47,7 @@ class UnifiedTcpServerNode(Node):
         self.robot_command_client = self.create_client(RobotCommand, '/robot_command')
         self.approve_seg_client = self.create_client(EmptySrv, '/approve_segmentation')
         self.reject_seg_client = self.create_client(EmptySrv, '/reject_segmentation')
+        self.clear_obstacle_client = self.create_client(ClearObstacle, '/clear_obstacle')
 
         # Data subscriptions
         self.image_subscription = self.create_subscription(
@@ -576,6 +577,23 @@ class UnifiedTcpServerNode(Node):
                         self.call_select_pose_service(4)
             except:
                 self.get_logger().warn(f"Invalid pose index in command: {command}")
+        elif command.startswith("clear_"):
+            _, bone, hole = command.split('_')
+            try:
+                if bone == "femur":
+                    if hole == "1":
+                        self.call_clear_obstacle_service(0)
+                    elif hole == "2":
+                        self.call_clear_obstacle_service(1)
+                    elif hole == "3":
+                        self.call_clear_obstacle_service(2)
+                elif bone == "tibia":
+                    if hole == "1":
+                        self.call_clear_obstacle_service(3)
+                    elif hole == "2":
+                        self.call_clear_obstacle_service(4)
+            except:
+                self.get_logger().warn(f"Invalid pose index in clear command: {command}")
         else:
             self.get_logger().warn(f'Unknown command: "{command}"')
 
@@ -763,6 +781,30 @@ class UnifiedTcpServerNode(Node):
                 self.get_logger().error(f'Robot command failed: {response.message}')
         except Exception as e:
             self.get_logger().error(f'Robot command service call failed: {e}')
+
+    def call_clear_obstacle_service(self, pose_index: int):
+        """Call the clear obstacle service to remove a pin obstacle from planning stack"""
+        if not self.clear_obstacle_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error('Service /clear_obstacle not available')
+            return
+
+        request = ClearObstacle.Request()
+        request.pose_index = pose_index
+
+        future = self.clear_obstacle_client.call_async(request)
+        future.add_done_callback(self.handle_clear_obstacle_response)
+        self.get_logger().info(f"Clearing obstacle at pose_index: {pose_index}")
+
+    def handle_clear_obstacle_response(self, future):
+        """Handle response from clear obstacle service"""
+        try:
+            response = future.result()
+            if response.success:
+                self.get_logger().info(f'Clear obstacle succeeded: {response.message}')
+            else:
+                self.get_logger().error(f'Clear obstacle failed: {response.message}')
+        except Exception as e:
+            self.get_logger().error(f'Clear obstacle service call failed: {e}')
 
     # ============================================================================
     # CLEANUP
