@@ -58,7 +58,7 @@ struct ControlPanelView: View {
         .alert("Emergency Stop", isPresented: $showEmergencyConfirm) {
             Button("Cancel", role: .cancel) { }
             Button("STOP ALL", role: .destructive) {
-                sendCommand("KILLALL")
+                controlClient.send("KILLALL\n")
             }
         } message: {
             Text("This will immediately stop all robotic operations. Continue?")
