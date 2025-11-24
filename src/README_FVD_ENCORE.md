@@ -14,7 +14,7 @@ ros2 launch launch_subsystems planning_hardware.launch.py
 **Launch the planning-perception nodes**
 > Launches the transforms package and the parasight package
 ```bash
-ros2 launch launch_subsystems planning_perception.launch.py
+ros2 launch launch_subsystems planning_perception.launch.py # name changed for tab completion
 ```  
 
 **Launch the second AVP node**
