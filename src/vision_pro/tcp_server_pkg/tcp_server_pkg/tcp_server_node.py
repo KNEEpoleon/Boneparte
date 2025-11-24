@@ -63,14 +63,7 @@ class UnifiedTcpServerNode(Node):
             self.segmented_image_callback,
             10)
         
-        # NEW: FSM state subscription
-        self.fsm_state_subscription = self.create_subscription(
-            String,
-            '/fsm_state',
-            self.fsm_state_callback,
-            10)
-        
-        # NEW: Drill poses subscription (from avp_tcp_server.py)
+        # Drill poses subscription (from avp_tcp_server.py)
         self.drill_poses_subscription = self.create_subscription(
             PoseArray,
             '/aruco_drill_poses',
@@ -86,10 +79,6 @@ class UnifiedTcpServerNode(Node):
         self.rgb_image_sent = False  # Track if RGB image was already sent for current annotation
         self.pending_segmented_image = None
         self.segmented_image_sent = False  # Track if segmented image was already sent
-        
-        # FSM state
-        self.current_fsm_state = "unknown"
-        self.fsm_state_lock = threading.Lock()
         
         # Drill poses
         self.latest_drill_poses = None
@@ -187,17 +176,6 @@ class UnifiedTcpServerNode(Node):
         except Exception as e:
             self.get_logger().error(f'Failed to process segmented image: {e}')
     
-    def fsm_state_callback(self, msg):
-        """Store and broadcast FSM state changes"""
-        with self.fsm_state_lock:
-            old_state = self.current_fsm_state
-            self.current_fsm_state = msg.data
-            
-            if old_state != self.current_fsm_state:
-                self.get_logger().info(f'FSM State changed: {old_state} → {self.current_fsm_state}')
-                # Immediately push to AVP on control channel
-                self.send_fsm_state_to_avp()
-    
     def drill_poses_callback(self, msg):
         """Store latest drill poses"""
         with self.drill_poses_lock:
@@ -222,9 +200,6 @@ class UnifiedTcpServerNode(Node):
             self.control_client_addr = addr
             self.control_client_sock.setblocking(False)
             self.get_logger().info(f'Control client connected from {addr}')
-            
-            # Send current FSM state immediately upon connection
-            self.send_fsm_state_to_avp()
             return
         
         # Check for annotation timeout
@@ -263,21 +238,6 @@ class UnifiedTcpServerNode(Node):
             except (BrokenPipeError, ConnectionResetError, OSError) as e:
                 self.get_logger().warn(f'Control client disconnected while sending ack: {e}')
                 self.disconnect_control_client()
-    
-    def send_fsm_state_to_avp(self):
-        """Push current FSM state to AVP on control channel"""
-        if self.control_client_sock is None:
-            return
-        
-        with self.fsm_state_lock:
-            state_message = f"STATE:{self.current_fsm_state}\n"
-        
-        try:
-            self.control_client_sock.sendall(state_message.encode('utf-8'))
-            self.get_logger().debug(f'Sent FSM state to AVP: {self.current_fsm_state}')
-        except (BrokenPipeError, ConnectionResetError, OSError) as e:
-            self.get_logger().warn(f'Failed to send FSM state: {e}')
-            self.disconnect_control_client()
     
     def disconnect_control_client(self):
         """Disconnect control channel client"""

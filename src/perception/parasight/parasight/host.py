@@ -180,7 +180,6 @@ class ParaSightHost(Node):
         self.pose_array_publisher = self.create_publisher(PoseArray, '/drill_pose_camera_frame', 10)
         self.bone_centroid_publisher = self.create_publisher(PoseArray, '/bone_centroid_camera_frame', 10)
         self.manipulator_command_publisher = self.create_publisher(String, '/manipulator_command', 10)
-        self.fsm_state_publisher = self.create_publisher(String, '/fsm_state', 10)
         # self.reposition_vector_publisher = self.create_publisher(Vector3, '/error_recovery_direction', 10)
         # self.marker_publisher = self.create_publisher(Marker, '/fitness_marker', 10)
 
@@ -221,10 +220,6 @@ class ParaSightHost(Node):
     def after_state_change(self):
         """Called automatically after every state transition."""
         self.get_logger().info(f'═══ State changed to: {self.state} ═══')
-        # Publish FSM state to topic for AVP and other nodes
-        state_msg = String()
-        state_msg.data = self.state
-        self.fsm_state_publisher.publish(state_msg)
 
     # ============================================================================
     # STATE ENTRY/EXIT CALLBACKS
@@ -455,11 +450,7 @@ class ParaSightHost(Node):
             return False
 
     def publish_state(self):
-        """Publish current FSM state to /fsm_state topic."""
         self.get_logger().info(f'Current state: {self.state}')
-        state_msg = String()
-        state_msg.data = self.state
-        self.fsm_state_publisher.publish(state_msg)
 
     def ui_trigger_callback(self, msg):
         """Handle UI trigger - triggers annotation workflow from await_surgeon_input state.
