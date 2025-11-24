@@ -173,7 +173,15 @@ public:
       
       if (execution_result == moveit::core::MoveItErrorCode::SUCCESS) {
         // Plan and execute return to pre-drill position
-        return_to_pre_drill_position(above_pose);
+        bool retraction_success = return_to_pre_drill_position(above_pose);
+        
+        if (!retraction_success) {
+          // If the robot fails to move to above_pose, abort the operation
+          RCLCPP_ERROR(this->get_logger(), "ABORTING: Drill retraction failed. Robot halted for safety.");
+          return;
+        }
+        
+        // Proceed if retraction was successful
         // Notify obstacle manager that a pin was drilled
         auto pin_drilled_msg = surgical_robot_planner::msg::PinDrilled();
         pin_drilled_msg.pose = target_pose;
@@ -183,15 +191,17 @@ public:
         return_to_home_pose();
       } else {
         RCLCPP_ERROR(this->get_logger(), "Drilling motion execution failed with error code: %d", execution_result.val);
-        return_to_home_pose();
+        RCLCPP_ERROR(this->get_logger(), "SAFETY HALT: Drilling execution failed. Robot stopped. Manual intervention required.");
+        return;
       }
     } else {
       RCLCPP_ERROR(this->get_logger(), "Drilling motion planning failed with error code: %d", drilling_plan.val);
-      return_to_home_pose();
+      RCLCPP_ERROR(this->get_logger(), "Aborting drilling operation. Robot remains at pre-drill position.");
+      return;
     }
   }
 
-  void return_to_pre_drill_position(const geometry_msgs::msg::Pose& above_pose) {
+  bool return_to_pre_drill_position(const geometry_msgs::msg::Pose& above_pose) {
     RCLCPP_INFO(this->get_logger(), "Planning return to pre-drill position...");
     
     move_group_interface_->setStartStateToCurrentState();
@@ -208,10 +218,16 @@ public:
       auto execution_result = move_group_interface_->execute(retract_plan);
       
       if (execution_result != moveit::core::MoveItErrorCode::SUCCESS) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to execute return to pre-drill position with error code: %d", execution_result.val);
+        RCLCPP_ERROR(this->get_logger(), "CRITICAL: Failed to execute return to pre-drill position with error code: %d", execution_result.val);
+        RCLCPP_ERROR(this->get_logger(), "SAFETY HALT: Robot stopped at current position. Manual intervention required.");
+        return false;
       }
+      RCLCPP_INFO(this->get_logger(), "Successfully returned to pre-drill position.");
+      return true;
     } else {
-      RCLCPP_ERROR(this->get_logger(), "Failed to plan return to pre-drill position with error code: %d", plan_result.val);
+      RCLCPP_ERROR(this->get_logger(), "CRITICAL: Failed to plan return to pre-drill position with error code: %d", plan_result.val);
+      RCLCPP_ERROR(this->get_logger(), "SAFETY HALT: Cannot safely retract drill. Robot stopped at current position. Manual intervention required.");
+      return false;
     }
   }
 
