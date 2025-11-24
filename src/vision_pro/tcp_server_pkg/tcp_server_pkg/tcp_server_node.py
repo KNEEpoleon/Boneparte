@@ -15,13 +15,13 @@ from surgical_robot_planner.srv import SelectPose, RobotCommand, ClearObstacle
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseArray
 from cv_bridge import CvBridge
+from controller_manager_msgs.srv import SwitchController
 import socket
 import base64
 import cv2
 import json
 import threading
 import time
-import subprocess
 
 
 class UnifiedTcpServerNode(Node):
@@ -48,6 +48,7 @@ class UnifiedTcpServerNode(Node):
         self.approve_seg_client = self.create_client(EmptySrv, '/approve_segmentation')
         self.reject_seg_client = self.create_client(EmptySrv, '/reject_segmentation')
         self.clear_obstacle_client = self.create_client(ClearObstacle, '/clear_obstacle')
+        self.switch_controller_client = self.create_client(SwitchController, '/lbr/controller_manager/switch_controller')
 
         # Data subscriptions
         self.image_subscription = self.create_subscription(
@@ -717,22 +718,39 @@ class UnifiedTcpServerNode(Node):
         self.get_logger().info('Published to /reset_mission - FSM transitioning to bring_manipulator')
 
     def handle_emergency_stop(self):
-        """Handle emergency stop command - kill all Docker containers and processes"""
-        self.get_logger().error('EMERGENCY STOP ACTIVATED - Killing all containers and processes')
+        """Handle emergency stop command - stop robot controllers via ros2_control"""
+        self.get_logger().error('EMERGENCY STOP ACTIVATED - Stopping controllers')
         
         try:
-            # Kill all running Docker containers
-            subprocess.run(['docker', 'kill', '$(docker ps -q)'], shell=True, check=False)
-            self.get_logger().info('Killed all running Docker containers')
+            # Create service request to stop joint_trajectory_controller
+            request = SwitchController.Request()
+            request.stop_controllers = ['joint_trajectory_controller']
+            request.strictness = 1  # BEST_EFFORT
+            request.start_controllers = []
+            request.start_asap = False
+            request.timeout = 0.0
             
-            # Kill any remaining ROS2 processes
-            subprocess.run(['pkill', '-f', 'ros2'], check=False)
-            subprocess.run(['pkill', '-f', 'rclpy'], check=False)
+            # Call service asynchronously (fire-and-forget)
+            future = self.switch_controller_client.call_async(request)
             
-            self.get_logger().info('Emergency stop completed - all processes terminated')
+            self.get_logger().info('Emergency stop command sent to controller_manager')
+            
+            # Optional: Add callback to log result (non-blocking)
+            future.add_done_callback(self._estop_response_callback)
             
         except Exception as e:
             self.get_logger().error(f'Error during emergency stop: {e}')
+    
+    def _estop_response_callback(self, future):
+        """Callback to log emergency stop service response"""
+        try:
+            response = future.result()
+            if response.ok:
+                self.get_logger().info('Emergency stop successful - controllers stopped')
+            else:
+                self.get_logger().error('Emergency stop service call failed')
+        except Exception as e:
+            self.get_logger().error(f'Emergency stop service exception: {e}')
 
     # ============================================================================
     # SERVICE CALLS
