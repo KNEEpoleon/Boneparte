@@ -14,8 +14,8 @@ from std_srvs.srv import Empty as EmptySrv
 from surgical_robot_planner.srv import SelectPose, RobotCommand, ClearObstacle
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseArray
-from cv_bridge import CvBridge
 from controller_manager_msgs.srv import SwitchController
+from cv_bridge import CvBridge
 import socket
 import base64
 import cv2
@@ -182,7 +182,7 @@ class UnifiedTcpServerNode(Node):
             self.get_logger().info('Received segmented image from ParaSight')
             # Send immediately to AVP (only if not already sent)
             if not self.segmented_image_sent:
-            self.send_segmented_image_to_avp()
+                self.send_segmented_image_to_avp()
                 self.segmented_image_sent = True  # Mark as sent
         except Exception as e:
             self.get_logger().error(f'Failed to process segmented image: {e}')
@@ -284,8 +284,8 @@ class UnifiedTcpServerNode(Node):
         try:
             if self.control_client_sock:
                 self.control_client_sock.close()
-            except:
-                pass
+        except:
+            pass
         self.control_client_sock = None
         self.control_client_addr = None
         self.get_logger().info('Control channel waiting for new connection...')
@@ -334,7 +334,7 @@ class UnifiedTcpServerNode(Node):
                     # Client disconnected gracefully
                     self.get_logger().info('Drill poses client disconnected')
                     self.disconnect_poses_client()
-        else:
+                else:
                     # Echo acknowledgment (optional)
                     message = data.decode('utf-8').strip()
                     self.get_logger().debug(f'Received from drill poses client: {message}')
@@ -407,21 +407,21 @@ class UnifiedTcpServerNode(Node):
             return
         
         # Process annotation response
-            message = data.decode('utf-8').strip()
-            if message:
+        message = data.decode('utf-8').strip()
+        if message:
             self.get_logger().info(f'Received from images channel: "{message}"')
-                
-                # Check if this is an annotation response
-                if message.startswith("ANNOTATIONS:"):
-                    self.get_logger().info('Processing AVP annotation response...')
-                    self.handle_annotation_response(message)
+            
+            # Check if this is an annotation response
+            if message.startswith("ANNOTATIONS:"):
+                self.get_logger().info('Processing AVP annotation response...')
+                self.handle_annotation_response(message)
 
-                # Send acknowledgment
-                try:
-                    self.images_client_sock.sendall(b'acknowledged\n')
-                except (BrokenPipeError, ConnectionResetError, OSError) as e:
-                    self.get_logger().warn(f'Images client disconnected while sending ack: {e}')
-                    self.disconnect_images_client()
+            # Send acknowledgment
+            try:
+                self.images_client_sock.sendall(b'acknowledged\n')
+            except (BrokenPipeError, ConnectionResetError, OSError) as e:
+                self.get_logger().warn(f'Images client disconnected while sending ack: {e}')
+                self.disconnect_images_client()
 
     def send_image_to_avp(self):
         """Send RGB image to AVP for annotation on Port 5002"""
@@ -719,38 +719,24 @@ class UnifiedTcpServerNode(Node):
 
     def handle_emergency_stop(self):
         """Handle emergency stop command - stop robot controllers via ros2_control"""
-        self.get_logger().error('EMERGENCY STOP ACTIVATED - Stopping controllers')
+        self.get_logger().error('EMERGENCY STOP ACTIVATED - Stopping robot controllers')
         
         try:
             # Create service request to stop joint_trajectory_controller
             request = SwitchController.Request()
             request.stop_controllers = ['joint_trajectory_controller']
-            request.strictness = 1  # BEST_EFFORT
             request.start_controllers = []
+            request.strictness = 1  # BEST_EFFORT
             request.start_asap = False
-            request.timeout = 0.0
+            request.timeout = rclpy.duration.Duration(seconds=0.0).to_msg()
             
             # Call service asynchronously (fire-and-forget)
             future = self.switch_controller_client.call_async(request)
             
-            self.get_logger().info('Emergency stop command sent to controller_manager')
-            
-            # Optional: Add callback to log result (non-blocking)
-            future.add_done_callback(self._estop_response_callback)
+            self.get_logger().info('Emergency stop command sent - controller deactivation requested')
             
         except Exception as e:
             self.get_logger().error(f'Error during emergency stop: {e}')
-    
-    def _estop_response_callback(self, future):
-        """Callback to log emergency stop service response"""
-        try:
-            response = future.result()
-            if response.ok:
-                self.get_logger().info('Emergency stop successful - controllers stopped')
-            else:
-                self.get_logger().error('Emergency stop service call failed')
-        except Exception as e:
-            self.get_logger().error(f'Emergency stop service exception: {e}')
 
     # ============================================================================
     # SERVICE CALLS
