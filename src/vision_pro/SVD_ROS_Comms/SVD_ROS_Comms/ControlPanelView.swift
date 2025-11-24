@@ -42,9 +42,6 @@ struct ControlPanelView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // TOP BANNER: Connection Status
-            connectionBanner
-            
             // Main content
             HStack(alignment: .top, spacing: Spacing.xl) {
                 leftColumn
@@ -53,7 +50,10 @@ struct ControlPanelView: View {
                     .frame(width: 540, alignment: .topLeading)
             }
             .padding(Spacing.xl)
+            
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(GlassmorphismBackground())
         .alert("Emergency Stop", isPresented: $showEmergencyConfirm) {
             Button("Cancel", role: .cancel) { }
@@ -141,64 +141,68 @@ struct ControlPanelView: View {
     // MARK: - Connection Banner (Top)
     
     private var connectionBanner: some View {
-        HStack(spacing: Spacing.md) {
-            // BONEparte branding (LEFT)
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            // First line: BONEparte branding
+            HStack(spacing: Spacing.xs) {
                 Text("BONEparte")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(Color(red: 1.0, green: 0.60, blue: 0.20))
                 
                 Text("Surgical Control Suite")
-                    .font(.system(size: 10))
+                    .font(.system(size: 14))
                     .foregroundColor(.gray)
             }
             
-            Spacer()
-            
-            // Status indicator (RIGHT)
+            // Second line: Status, server info, and connect button
             HStack(spacing: Spacing.sm) {
-                Circle()
-                    .fill(isConnected ? Color.statusActive : Color.statusDanger)
-                    .frame(width: 12, height: 12)
-                    .shadow(color: isConnected ? Color.statusActive : Color.statusDanger,
-                           radius: 4)
-                
-                Text(isConnected ? "ONLINE" : "OFFLINE")
-                    .font(.labelMedium)
-                    .foregroundColor(isConnected ? .statusActive : .statusDanger)
-                    .fontWeight(.bold)
-            }
-            
-            Text("ROS Server: 192.168.0.193")
-                .font(.caption)
-                .foregroundColor(.textSecondary)
-            
-            // Connect/Disconnect button
-            Button(action: {
-                if isConnected {
-                    controlClient.disconnect()
-                    poseClient.disconnect()
-                    imageClient.disconnect()
-                } else {
-                    controlClient.connect()
-                    poseClient.connect()
-                    imageClient.connect()
+                // Status indicator
+                HStack(spacing: Spacing.xs) {
+                    Circle()
+                        .fill(isConnected ? Color.statusActive : Color.statusDanger)
+                        .frame(width: 10, height: 10)
+                        .shadow(color: isConnected ? Color.statusActive : Color.statusDanger,
+                               radius: 3)
+                    
+                    Text(isConnected ? "ONLINE" : "OFFLINE")
+                        .font(.caption)
+                        .foregroundColor(isConnected ? .statusActive : .statusDanger)
+                        .fontWeight(.semibold)
                 }
-            }) {
-                Text(isConnected ? "Disconnect" : "Connect")
-                    .font(.labelSmall)
-                    .foregroundColor(isConnected ? .statusDanger : .statusActive)
+                
+                Text("ROS Server: 192.168.0.193")
+                    .font(.caption)
+                    .foregroundColor(.textSecondary)
+                
+                Spacer()
+                
+                // Connect/Disconnect button
+                Button(action: {
+                    if isConnected {
+                        controlClient.disconnect()
+                        poseClient.disconnect()
+                        imageClient.disconnect()
+                    } else {
+                        controlClient.connect()
+                        poseClient.connect()
+                        imageClient.connect()
+                    }
+                }) {
+                    Text(isConnected ? "Disconnect" : "Connect")
+                        .font(.caption)
+                        .foregroundColor(isConnected ? .statusDanger : .statusActive)
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.bordered)
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.md)
         .background(Color.surfaceElevated)
+        .cornerRadius(Spacing.cornerMedium)
     }
     
     private var leftColumn: some View {
         VStack(alignment: .leading, spacing: Spacing.lg) {
-            fsmStatusCard
+            connectionBanner
             workflowControlPanel
         }
     }
@@ -208,39 +212,6 @@ struct ControlPanelView: View {
             emergencySection
             clearSiteSection
             drillSiteSelection
-        }
-    }
-    
-    // MARK: - FSM Status Card (replaces connection status card)
-    
-    private var fsmStatusCard: some View {
-        StatusCard(
-            title: "System State",
-            status: .active,
-            statusText: appModel.fsmState
-        ) {
-            VStack(spacing: Spacing.md) {
-                // Current State
-                DataRow(
-                    label: "Current State",
-                    value: appModel.fsmState.isEmpty ? "unknown" : appModel.fsmState,
-                    isMonospaced: true
-                )
-                
-                // Last State
-                DataRow(
-                    label: "Last State",
-                    value: appModel.lastFsmState.isEmpty ? "unknown" : appModel.lastFsmState,
-                    isMonospaced: true
-                )
-                
-                Divider()
-                
-                // Connection info (smaller)
-                Text("Control: Port 5000 | Poses: Port 5001 | Images: Port 5002")
-                    .font(.caption2)
-                    .foregroundColor(.textSecondary)
-            }
         }
     }
     

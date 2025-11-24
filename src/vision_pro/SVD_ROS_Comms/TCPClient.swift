@@ -2,7 +2,7 @@
 //  TCPClient.swift
 //  SVD_ROS_Comms
 //
-//  TCP client for control commands and FSM state updates (Port 5000)
+//  TCP client for control commands (Port 5000)
 //
 
 import Foundation
@@ -20,9 +20,6 @@ class TCPClient: ObservableObject {
     private var host: String
     private var port: UInt16
     private var receivedDataBuffer: String = ""
-    
-    // Callback for FSM state updates
-    var onFsmStateReceived: ((String) -> Void)?
 
     init(host: String, port: UInt16) {
         self.host = host
@@ -122,24 +119,9 @@ class TCPClient: ObservableObject {
             let distance = receivedDataBuffer.distance(from: receivedDataBuffer.startIndex, to: newlineIndex) + 1
             receivedDataBuffer.removeFirst(distance)
             
-            // Parse FSM state updates
-            if message.hasPrefix("STATE:") {
-                handleFsmState(message)
-            } else {
-                // Handle other responses (acknowledgments, etc.)
-                print("Control channel received: \(message)")
-            }
+            // Handle responses (acknowledgments, etc.)
+            print("Control channel received: \(message)")
         }
-    }
-    
-    private func handleFsmState(_ response: String) {
-        let state = String(response.dropFirst(6))  // Remove "STATE:" prefix
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.onFsmStateReceived?(state)
-        }
-        
-        print("FSM State received: \(state)")
     }
     
     private func attemptReconnect() {

@@ -39,10 +39,6 @@ class AppModel {
     
     // NEW: Persistent world anchor manager (moved from ImmersiveView @State to persist across sessions)
     var worldAnchorManager = WorldAnchorManager()
-    
-    // NEW: FSM state from ROS
-    var fsmState: String = "unknown"
-    var lastFsmState: String = "unknown"  // For "Last State" display
 }
 
 // DrillSite struct (from ArucoTransform)

@@ -10,25 +10,24 @@ import RealityKit
 
 struct DrillSiteVisualizationView: View {
     @ObservedObject var poseClient: DrillPosesTCPClient
+    @ObservedObject var controlClient: TCPClient
+    @ObservedObject var imageClient: ImageTCPClient
     @Environment(AppModel.self) private var appModel
     @Environment(\.openImmersiveSpace) var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
     // Connection status
     private var isConnected: Bool {
-        poseClient.isConnected
+        controlClient.isConnected && poseClient.isConnected && imageClient.isConnected
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // TOP BANNER: Branding and Connection Status
-            connectionBanner
-            
             // Main content
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
-                    // Connection status card
-                    connectionStatusCard
+                    // Connection banner (moved from top)
+                    connectionBanner
                     
                     // Visualization controls
                     visualizationControlCard
@@ -50,89 +49,66 @@ struct DrillSiteVisualizationView: View {
         }
     }
     
-    // MARK: - Connection Banner (Top)
+    // MARK: - Connection Banner
     
     private var connectionBanner: some View {
-        HStack(spacing: Spacing.md) {
-            // BONEparte branding (LEFT)
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            // First line: BONEparte branding
+            HStack(spacing: Spacing.xs) {
                 Text("BONEparte")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(Color(red: 1.0, green: 0.60, blue: 0.20))
                 
-                Text("Drill Site Overlay")
-                    .font(.system(size: 10))
+                Text("Surgical Control Suite")
+                    .font(.system(size: 14))
                     .foregroundColor(.gray)
             }
             
-            Spacer()
-            
-            // Status indicator (RIGHT)
+            // Second line: Status, server info, and connect button
             HStack(spacing: Spacing.sm) {
-                Circle()
-                    .fill(isConnected ? Color.statusActive : Color.statusDanger)
-                    .frame(width: 12, height: 12)
-                    .shadow(color: isConnected ? Color.statusActive : Color.statusDanger,
-                           radius: 4)
-                
-                Text(isConnected ? "ONLINE" : "OFFLINE")
-                    .font(.labelMedium)
-                    .foregroundColor(isConnected ? .statusActive : .statusDanger)
-                    .fontWeight(.bold)
-            }
-            
-            Text("Poses: 192.168.0.193:5001")
-                .font(.caption)
-                .foregroundColor(.textSecondary)
-            
-            // Connect/Disconnect button
-            Button(action: {
-                if isConnected {
-                    poseClient.disconnect()
-                    appModel.drillSites = []
-                } else {
-                    poseClient.connect()
+                // Status indicator
+                HStack(spacing: Spacing.xs) {
+                    Circle()
+                        .fill(isConnected ? Color.statusActive : Color.statusDanger)
+                        .frame(width: 10, height: 10)
+                        .shadow(color: isConnected ? Color.statusActive : Color.statusDanger,
+                               radius: 3)
+                    
+                    Text(isConnected ? "ONLINE" : "OFFLINE")
+                        .font(.caption)
+                        .foregroundColor(isConnected ? .statusActive : .statusDanger)
+                        .fontWeight(.semibold)
                 }
-            }) {
-                Text(isConnected ? "Disconnect" : "Connect")
-                    .font(.labelSmall)
-                    .foregroundColor(isConnected ? .statusDanger : .statusActive)
+                
+                Text("ROS Server: 192.168.0.193")
+                    .font(.caption)
+                    .foregroundColor(.textSecondary)
+                
+                Spacer()
+                
+                // Connect/Disconnect button
+                Button(action: {
+                    if isConnected {
+                        controlClient.disconnect()
+                        poseClient.disconnect()
+                        imageClient.disconnect()
+                    } else {
+                        controlClient.connect()
+                        poseClient.connect()
+                        imageClient.connect()
+                    }
+                }) {
+                    Text(isConnected ? "Disconnect" : "Connect")
+                        .font(.caption)
+                        .foregroundColor(isConnected ? .statusDanger : .statusActive)
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.bordered)
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.md)
         .background(Color.surfaceElevated)
-    }
-    
-    // MARK: - Connection Status Card
-    
-    private var connectionStatusCard: some View {
-        StatusCard(
-            title: "Connection Status",
-            status: isConnected ? .active : .danger,
-            statusText: poseClient.statusMessage
-        ) {
-            VStack(spacing: Spacing.md) {
-                DataRow(
-                    label: "Server",
-                    value: "192.168.0.193:5001",
-                    isMonospaced: true
-                )
-                
-                DataRow(
-                    label: "Drill Poses Received",
-                    value: "\(appModel.drillSites.count)",
-                    valueColor: appModel.drillSites.count > 0 ? .statusActive : .textSecondary
-                )
-                
-                DataRow(
-                    label: "Connection State",
-                    value: isConnected ? "Connected" : "Disconnected",
-                    valueColor: isConnected ? .statusActive : .statusDanger
-                )
-            }
-        }
+        .cornerRadius(Spacing.cornerMedium)
     }
     
     // MARK: - Visualization Control Card

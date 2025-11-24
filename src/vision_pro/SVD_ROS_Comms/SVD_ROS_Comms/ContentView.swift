@@ -30,7 +30,9 @@ struct ContentView: View {
             
             // Tab 2: Drill Sites Visualization (ArucoTransform UI)
             DrillSiteVisualizationView(
-                poseClient: poseClient
+                poseClient: poseClient,
+                controlClient: controlClient,
+                imageClient: imageClient
             )
             .environment(appModel)
             .tabItem {
@@ -43,19 +45,7 @@ struct ContentView: View {
     }
     
     private func setupClients() {
-        // Setup FSM state callback for control client
-        controlClient.onFsmStateReceived = { [appModel] newState in
-            print("📍 ContentView: FSM state callback received: '\(newState)'")
-            Task { @MainActor in
-                // Update last state before changing current
-                if appModel.fsmState != newState && !appModel.fsmState.isEmpty && appModel.fsmState != "unknown" {
-                    appModel.lastFsmState = appModel.fsmState
-                }
-                appModel.fsmState = newState
-                print("📍 ContentView: Updated appModel.fsmState to: '\(appModel.fsmState)'")
-        }
-    }
-    
+        // Setup client connections
         // Setup drill poses callback
         poseClient.onDrillPosesReceived = { [appModel] drillSites in
             Task { @MainActor in
