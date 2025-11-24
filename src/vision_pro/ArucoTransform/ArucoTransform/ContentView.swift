@@ -123,7 +123,7 @@ struct ContentView: View {
                                 .font(.caption)
                         }
                         
-                        Text("Point your Vision Pro at the 15cm ArUco marker")
+                        Text("Point your Vision Pro at the 17cm ArUco marker")
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }

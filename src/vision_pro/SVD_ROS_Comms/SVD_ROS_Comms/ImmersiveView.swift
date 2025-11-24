@@ -17,7 +17,7 @@ struct ImmersiveView: View {
     @State private var worldTracking = WorldTrackingProvider()
     @State private var imageTracking: ImageTrackingProvider?
     
-    @State private var worldAnchorManager = WorldAnchorManager()
+    // worldAnchorManager is now in AppModel to persist across immersive space sessions
     @State private var drillSiteRenderer = DrillSiteRenderer()
     
     var body: some View {
@@ -44,7 +44,7 @@ struct ImmersiveView: View {
             Task { @MainActor in
                 drillSiteRenderer.updateDrillSites(
                     appModel.drillSites,
-                    arucoTransform: worldAnchorManager.arucoToWorldTransform
+                    arucoTransform: appModel.worldAnchorManager.arucoToWorldTransform
                 )
             }
         }
@@ -58,12 +58,9 @@ struct ImmersiveView: View {
                         Text("Looking for ArUco Marker")
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("Point your Vision Pro at the 15cm ArUco marker (ID=0)")
+                        Text("Point your Vision Pro at the 17cm ArUco marker (ID=0)")
                             .font(.body)
                             .foregroundStyle(.secondary)
-                        Text("The marker should be mounted on the robot base")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
                     }
                     .padding(25)
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
@@ -134,6 +131,12 @@ struct ImmersiveView: View {
     }
     
     private func detectArucoMarker() async {
+        // Only detect once if not already detected (to reuse existing transform)
+        guard !appModel.arucoTransformEstablished else {
+            print("ArUco transform already established, skipping detection")
+            return
+        }
+        
         guard let imageTracking = imageTracking else {
             print("Image tracking provider not available")
             return
@@ -161,9 +164,9 @@ struct ImmersiveView: View {
                 // anchor.originFromAnchorTransform gives us ArUco marker → World transform
                 let arucoToWorld = anchor.originFromAnchorTransform
                 
-                // Store the transform
+                // Store the transform in the persistent AppModel worldAnchorManager
                 await MainActor.run {
-                    worldAnchorManager.setArucoTransform(arucoToWorld)
+                    appModel.worldAnchorManager.setArucoTransform(arucoToWorld)
                     appModel.arucoTransformEstablished = true
                 }
                 
@@ -197,7 +200,7 @@ struct ImmersiveView: View {
             try? await Task.sleep(for: .seconds(1))
             logCount += 1
             
-            let transform = worldAnchorManager.arucoToWorldTransform ?? initialTransform
+            let transform = appModel.worldAnchorManager.arucoToWorldTransform
             let pos = transform.columns.3
             
             print("[\(logCount)s] ArUco → AVP Transform:")

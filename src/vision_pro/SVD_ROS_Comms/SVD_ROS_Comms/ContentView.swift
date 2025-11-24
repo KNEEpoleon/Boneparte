@@ -53,9 +53,9 @@ struct ContentView: View {
                 }
                 appModel.fsmState = newState
                 print("📍 ContentView: Updated appModel.fsmState to: '\(appModel.fsmState)'")
-            }
         }
-        
+    }
+    
         // Setup drill poses callback
         poseClient.onDrillPosesReceived = { [appModel] drillSites in
             Task { @MainActor in

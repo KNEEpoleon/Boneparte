@@ -57,7 +57,7 @@ struct ImmersiveView: View {
                         Text("Looking for ArUco Marker")
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("Point your Vision Pro at the 15cm ArUco marker (ID=0)")
+                        Text("Point your Vision Pro at the 17cm ArUco marker (ID=0)")
                             .font(.body)
                             .foregroundStyle(.secondary)
                         Text("The marker should be mounted on the robot base")

@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct SVD_ROS_CommsApp: App {
     @State private var appModel = AppModel()
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()

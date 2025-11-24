@@ -32,7 +32,7 @@ class UnifiedTcpServerNode(Node):
         # ============================================================================
         # ROS PUBLISHERS & SUBSCRIBERS
         # ============================================================================
-        
+
         # FSM command publishers
         self.annotate_pub = self.create_publisher(Empty, '/annotate', 10)
         self.proceed_mission_pub = self.create_publisher(Empty, '/proceed_mission', 10)
@@ -94,13 +94,13 @@ class UnifiedTcpServerNode(Node):
         self.latest_drill_poses = None
         self.drill_poses_lock = threading.Lock()
         self.last_drill_pose_count = 0  # Track drill pose count changes
-        
+
         # Annotation response handling
         self.annotation_response = None
         self.annotation_lock = threading.Lock()
         self.waiting_for_annotation = False
         self.annotation_start_time = None
-
+        
         # ============================================================================
         # PORT 5000: CONTROL CHANNEL (Commands + FSM State)
         # ============================================================================
@@ -116,7 +116,7 @@ class UnifiedTcpServerNode(Node):
         self.control_client_addr = None
         
         self.get_logger().info('Control channel listening on port 5000')
-
+        
         # ============================================================================
         # PORT 5001: DRILL POSES CHANNEL
         # ============================================================================
@@ -130,7 +130,7 @@ class UnifiedTcpServerNode(Node):
         
         self.poses_client_sock = None
         self.poses_client_addr = None
-        
+
         self.get_logger().info('Drill poses channel listening on port 5001')
 
         # ============================================================================
@@ -143,10 +143,10 @@ class UnifiedTcpServerNode(Node):
         self.images_server_sock.bind(('0.0.0.0', 5002))
         self.images_server_sock.listen(1)
         self.images_server_sock.setblocking(False)
-        
+
         self.images_client_sock = None
         self.images_client_addr = None
-        
+
         self.get_logger().info('Images channel listening on port 5002')
 
         # ============================================================================
@@ -181,7 +181,7 @@ class UnifiedTcpServerNode(Node):
             self.get_logger().info('Received segmented image from ParaSight')
             # Send immediately to AVP (only if not already sent)
             if not self.segmented_image_sent:
-                self.send_segmented_image_to_avp()
+            self.send_segmented_image_to_avp()
                 self.segmented_image_sent = True  # Mark as sent
         except Exception as e:
             self.get_logger().error(f'Failed to process segmented image: {e}')
@@ -283,8 +283,8 @@ class UnifiedTcpServerNode(Node):
         try:
             if self.control_client_sock:
                 self.control_client_sock.close()
-        except:
-            pass
+            except:
+                pass
         self.control_client_sock = None
         self.control_client_addr = None
         self.get_logger().info('Control channel waiting for new connection...')
@@ -333,7 +333,7 @@ class UnifiedTcpServerNode(Node):
                     # Client disconnected gracefully
                     self.get_logger().info('Drill poses client disconnected')
                     self.disconnect_poses_client()
-                else:
+        else:
                     # Echo acknowledgment (optional)
                     message = data.decode('utf-8').strip()
                     self.get_logger().debug(f'Received from drill poses client: {message}')
@@ -406,22 +406,22 @@ class UnifiedTcpServerNode(Node):
             return
         
         # Process annotation response
-        message = data.decode('utf-8').strip()
-        if message:
+            message = data.decode('utf-8').strip()
+            if message:
             self.get_logger().info(f'Received from images channel: "{message}"')
-            
-            # Check if this is an annotation response
-            if message.startswith("ANNOTATIONS:"):
-                self.get_logger().info('Processing AVP annotation response...')
-                self.handle_annotation_response(message)
                 
+                # Check if this is an annotation response
+                if message.startswith("ANNOTATIONS:"):
+                    self.get_logger().info('Processing AVP annotation response...')
+                    self.handle_annotation_response(message)
+
                 # Send acknowledgment
                 try:
                     self.images_client_sock.sendall(b'acknowledged\n')
                 except (BrokenPipeError, ConnectionResetError, OSError) as e:
                     self.get_logger().warn(f'Images client disconnected while sending ack: {e}')
                     self.disconnect_images_client()
-    
+
     def send_image_to_avp(self):
         """Send RGB image to AVP for annotation on Port 5002"""
         if self.images_client_sock is None:
@@ -482,10 +482,10 @@ class UnifiedTcpServerNode(Node):
             self.get_logger().error('No images client connection available')
             return
         
-        if self.pending_segmented_image is None:
-            self.get_logger().error('No pending segmented image to send')
-            return
-        
+            if self.pending_segmented_image is None:
+                self.get_logger().error('No pending segmented image to send')
+                return
+            
         try:
             segmented_image = self.pending_segmented_image
             
@@ -661,7 +661,7 @@ class UnifiedTcpServerNode(Node):
             
         except Exception as e:
             self.get_logger().error(f'Failed to process annotations: {e}')
-
+    
     def handle_accept_segmentation(self):
         """Handle accept command from AVP - proceed with drill pose computation"""
         self.get_logger().info('Segmentation accepted by AVP, calling approve service')
