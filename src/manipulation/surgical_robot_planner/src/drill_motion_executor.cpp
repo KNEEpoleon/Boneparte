@@ -196,8 +196,7 @@ public:
       }
     } else {
       RCLCPP_ERROR(this->get_logger(), "Drilling motion planning failed with error code: %d", drilling_plan.val);
-      RCLCPP_ERROR(this->get_logger(), "Aborting drilling operation. Robot remains at pre-drill position.");
-      return;
+      return_to_home_pose();
     }
   }
 
