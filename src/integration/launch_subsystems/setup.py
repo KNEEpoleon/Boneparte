@@ -1,6 +1,4 @@
 from setuptools import find_packages, setup
-import os
-from glob import glob
 
 package_name = 'launch_subsystems'
 
@@ -12,7 +10,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
+        ('share/' + package_name + '/launch', ['launch/planning_hardware.launch.py']),
+        ('share/' + package_name + '/launch', ['launch/planning_perception.launch.py']),
     ],
     install_requires=['setuptools', 'rclpy', 'std_msgs', 'pyserial'], #
     zip_safe=True,

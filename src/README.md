@@ -8,13 +8,13 @@ ros2 launch lbr_bringup hardware.launch.py model:=med7
 **Launch the planning-hardware nodes**
 > Launches RVIZ, Planner, Arduino Serial and AVP TCP connection:
 ```bash
-ros2 launch launch_subsystems launch_planning_hardware.py
+ros2 launch launch_subsystems planning_hardware.launch.py
 ```  
 
 **Launch the planning-perception nodes**
 > Launches the transforms package and the parasight package
 ```bash
-ros2 launch launch_subsystems launch_planning_perception.py
+ros2 launch launch_subsystems planning_perception.launch.py
 ```  
 ___
 

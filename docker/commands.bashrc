@@ -4,10 +4,6 @@
 # Source ROS2 Humble setup file
 source /opt/ros/humble/setup.bash
 
-# Enable colored ROS2 logging output
-export RCUTILS_COLORIZED_OUTPUT=1
-export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity}] [{name}]: {message}"
-
 # Alias to build the workspace and source the new setup file
 alias bone_install='colcon build && source install/setup.bash'
 alias rossrc='source install/setup.bash'

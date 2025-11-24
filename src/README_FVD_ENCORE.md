@@ -1,4 +1,4 @@
-## COMMANDS TO RUN FOR FVD:
+## COMMANDS TO RUN FOR FVD Encore:
 
 **LBR bringup hardware**
 ```bash
@@ -8,13 +8,13 @@ ros2 launch lbr_bringup hardware.launch.py model:=med7
 **Launch the planning-hardware nodes**
 > Launches RVIZ, Planner, Arduino Serial and AVP TCP connection:
 ```bash
-ros2 launch launch_subsystems launch_planning_hardware.py
-```  
+ros2 launch launch_subsystems planning_hardware.launch.py
+```
 
 **Launch the planning-perception nodes**
 > Launches the transforms package and the parasight package
 ```bash
-ros2 launch launch_subsystems launch_planning_perception.py
+ros2 launch launch_subsystems planning_perception.launch.py
 ```  
 
 **Launch the second AVP node**
@@ -55,7 +55,7 @@ ros2 topic pub --once /trigger_host_ui std_msgs/msg/Empty '{}'
 ```
 
 > send the service to drill to index 0:
-Change index to any of {0,1,2} for drill sites on the Femur and {3,4} for drill sites on the Tibia.
+Change index to any of {0,1} for drill sites on the Femur and {2,3} for drill sites on the Tibia.
 ```bash
 ros2 service call /select_pose surgical_robot_planner/srv/SelectPose "{index: 0}"
 ```

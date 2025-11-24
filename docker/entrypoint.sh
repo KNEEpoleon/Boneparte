@@ -4,11 +4,6 @@
 source /opt/ros/humble/setup.bash
 source ~/.bashrc
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-
-# Enable colored ROS2 logging output
-export RCUTILS_COLORIZED_OUTPUT=1
-export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity}] [{name}]: {message}"
-
 echo "entrypoint"
 echo ${PWD}
 # Check if the workspace is built
