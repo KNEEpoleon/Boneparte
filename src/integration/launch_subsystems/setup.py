@@ -10,8 +10,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/launch_planning_hardware.py']),
-        ('share/' + package_name + '/launch', ['launch/launch_planning_perception.py']),
+        ('share/' + package_name + '/launch', ['launch/planning_hardware.launch.py']),
+        ('share/' + package_name + '/launch', ['launch/planning_perception.launch.py']),
     ],
     install_requires=['setuptools', 'rclpy', 'std_msgs', 'pyserial'], #
     zip_safe=True,

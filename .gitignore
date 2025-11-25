@@ -8,6 +8,8 @@ src/perception/dinov3/checkpoints/
 src/perception/dinov3/*.pkl
 src/perception/auto_reposition/
 src/perception/do_not_commit_auto_reposition/
+src/perception/new_home_dataset/
+src/perception/new_home_datasetv2/
 *.pyc
 **/__pycache__/
 .ipynb_checkpoints/
@@ -25,3 +27,4 @@ DerivedData/
 *.hmap
 *.ipa
 *.xcworkspace/xcuserdata/
+*.pdf

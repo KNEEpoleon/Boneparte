@@ -6,7 +6,9 @@
 #include "shape_msgs/msg/solid_primitive.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "surgical_robot_planner/msg/pin_drilled.hpp"
+#include "surgical_robot_planner/srv/clear_obstacle.hpp"
 #include <vector>
+#include <algorithm>
 
 class ObstacleManagerNode : public rclcpp::Node {
 private:
@@ -16,6 +18,9 @@ private:
   // Subscriptions
   rclcpp::Subscription<surgical_robot_planner::msg::PinDrilled>::SharedPtr pin_drilled_subscription_;
   rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr pose_array_subscription_;
+  
+  // Services
+  rclcpp::Service<surgical_robot_planner::srv::ClearObstacle>::SharedPtr clear_obstacle_service_;
   
   // State
   std::vector<geometry_msgs::msg::Pose> stored_poses_;
@@ -43,6 +48,11 @@ private:
     pose_array_subscription_ = this->create_subscription<geometry_msgs::msg::PoseArray>(
         "/surgical_drill_pose", 10,
         std::bind(&ObstacleManagerNode::pose_array_callback, this, std::placeholders::_1));
+    
+    // Create service for clearing obstacles
+    clear_obstacle_service_ = this->create_service<surgical_robot_planner::srv::ClearObstacle>(
+        "/clear_obstacle",
+        std::bind(&ObstacleManagerNode::clear_obstacle_callback, this, std::placeholders::_1, std::placeholders::_2));
     
     RCLCPP_INFO(this->get_logger(), "ObstacleManager initialized for robot: %s", robot_name_.c_str());
   }
@@ -150,6 +160,60 @@ private:
                  pin_id.c_str(), new_pose.position.x, new_pose.position.y, new_pose.position.z);
     } catch (const std::exception& e) {
       RCLCPP_ERROR(this->get_logger(), "Failed to move pin %s: %s", pin_id.c_str(), e.what());
+    }
+  }
+  
+  void clear_obstacle_callback(
+      const std::shared_ptr<surgical_robot_planner::srv::ClearObstacle::Request> request,
+      std::shared_ptr<surgical_robot_planner::srv::ClearObstacle::Response> response) {
+    
+    int pose_index = request->pose_index;
+    
+    RCLCPP_INFO(this->get_logger(), "Received request to clear obstacle at pose_index: %d", pose_index);
+    
+    // Find all pins drilled at this pose_index
+    std::vector<size_t> indices_to_remove;
+    for (size_t i = 0; i < drilled_pin_indices_.size(); i++) {
+      if (drilled_pin_indices_[i] == pose_index) {
+        indices_to_remove.push_back(i);
+      }
+    }
+    
+    if (indices_to_remove.empty()) {
+      response->success = false;
+      response->message = "No obstacle found at pose_index " + std::to_string(pose_index);
+      RCLCPP_WARN(this->get_logger(), "%s", response->message.c_str());
+      return;
+    }
+    
+    // Remove obstacles from planning scene
+    std::vector<std::string> object_ids;
+    for (size_t i : indices_to_remove) {
+      const std::string& pin_id = drilled_pin_ids_[i];
+      object_ids.push_back(pin_id);
+      
+      RCLCPP_INFO(this->get_logger(), "Removing obstacle: %s (pose_index: %d)", 
+                  pin_id.c_str(), pose_index);
+    }
+    
+    try {
+      planning_scene_interface_->removeCollisionObjects(object_ids);
+      
+      // Remove from tracking vectors (iterate backwards to maintain indices)
+      for (auto it = indices_to_remove.rbegin(); it != indices_to_remove.rend(); ++it) {
+        drilled_pin_ids_.erase(drilled_pin_ids_.begin() + *it);
+        drilled_pin_indices_.erase(drilled_pin_indices_.begin() + *it);
+      }
+      
+      response->success = true;
+      response->message = "Cleared " + std::to_string(indices_to_remove.size()) + 
+                          " obstacle(s) at pose_index " + std::to_string(pose_index);
+      RCLCPP_INFO(this->get_logger(), "%s", response->message.c_str());
+      
+    } catch (const std::exception& e) {
+      response->success = false;
+      response->message = "Failed to remove obstacles: " + std::string(e.what());
+      RCLCPP_ERROR(this->get_logger(), "%s", response->message.c_str());
     }
   }
 };

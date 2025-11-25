@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "aruco_marker_id0_15cm.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "width" : 0.17000000000000001
+  }
+}

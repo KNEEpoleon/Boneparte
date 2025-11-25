@@ -9,7 +9,7 @@ from PIL import Image
 from torchvision import transforms
 from scipy.ndimage import zoom
 from sklearn.decomposition import PCA
-from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.cluster import KMeans
 import matplotlib
 matplotlib.use('Agg')
 import warnings
@@ -81,11 +81,11 @@ class DINOBoneExtractor():
         
         # Track overall timing
         start_time = time.time()
-        dino_pca_features, dino_features, image_resized, h_patch, w_patch, h_pixels, w_pixels = self.get_dino_features(image_path)
-        cluster_data = self._get_dino_clusters(dino_pca_features, h_patch, w_patch)
+        dino_pca_features, dino_features, image_resized, h_patch, w_patch, h_pixels, w_pixels, features_pca_8d = self.get_dino_features(image_path)
+        cluster_data = self._get_dino_clusters(features_pca_8d, h_patch, w_patch)
 
         cluster_statistics = self._extract_cluster_statistics(
-            cluster_data['meanshift'], 
+            cluster_data['kmeans'], 
             dino_features, 
             dino_pca_features, 
             h_patch, w_patch, h_pixels, w_pixels
@@ -98,7 +98,7 @@ class DINOBoneExtractor():
 
         if self.save_visualizations:    
             self._save_dino_features(dino_pca_features, "DINO_PCA_Features")
-            self._save_dino_clusters(cluster_data['meanshift'], image_resized, "DINO_Clusters", h_pixels, w_pixels, h_patch, w_patch)
+            self._save_dino_clusters(cluster_data['kmeans'], image_resized, "DINO_Clusters", h_pixels, w_pixels, h_patch, w_patch)
         
         if self.save_cluster_stats:
             self._save_cluster_stats_json(cluster_statistics)
@@ -151,35 +151,36 @@ class DINOBoneExtractor():
         h_patch = h_pixels // 16
         w_patch = w_pixels // 16
         
-        # Compute PCA features
-        pca = PCA(n_components=3, whiten=True)
-        features_pca_spatial = pca.fit_transform(features_cpu.numpy()).reshape(h_patch, w_patch, 3)
+        # Compute 3D PCA features for visualization
+        pca_3d = PCA(n_components=3, whiten=True)
+        features_pca_3d = pca_3d.fit_transform(features_cpu.numpy())
+        features_pca_spatial = features_pca_3d.reshape(h_patch, w_patch, 3)
         
-        # Normalize PCA features
+        # Normalize PCA features for visualization
         for i in range(3):
             channel = features_pca_spatial[:, :, i]
             features_pca_spatial[:, :, i] = (channel - channel.min()) / (channel.max() - channel.min())
+        
+        # Compute 8D PCA features for clustering
+        pca_8d = PCA(n_components=8, whiten=True)
+        features_pca_8d = pca_8d.fit_transform(features_cpu.numpy())
  
-        return features_pca_spatial, features_cpu.numpy(), image_resized, h_patch, w_patch, h_pixels, w_pixels
+        return features_pca_spatial, features_cpu.numpy(), image_resized, h_patch, w_patch, h_pixels, w_pixels, features_pca_8d
 
-    def _get_dino_clusters(self, features_pca, h_patch, w_patch):
-        # Running Meanshift
+    def _get_dino_clusters(self, features_pca_8d, h_patch, w_patch):
+        # Running K-means on 8D PCA features
         cluster_results = {}
         cluster_start = time.time()
         
-        # Reshape from (h_patch, w_patch, 3) to (n_patches, 3) for sklearn
-        features_pca_flat = features_pca.reshape(-1, 3)
-        
-        bandwidth = estimate_bandwidth(features_pca_flat, quantile=0.2, n_samples=200)
-        clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
-        labels = clusterer.fit_predict(features_pca_flat)
+        # K-means clustering on 8D features
+        clusterer = KMeans(n_clusters=5, random_state=42, n_init=10)
+        labels = clusterer.fit_predict(features_pca_8d)
         
         cluster_time = time.time() - cluster_start
-        n_clusters_found = len(np.unique(labels[labels >= 0]))
-        print(f"MeanShift clustering: {cluster_time*1000:.1f} ms ({n_clusters_found} clusters)")
+        print(f"K-MEANS clustering: {cluster_time*1000:.1f} ms (5 clusters)")
         
         # Reshape labels back to spatial dimensions
-        cluster_results['meanshift'] = labels.reshape(h_patch, w_patch)
+        cluster_results['kmeans'] = labels.reshape(h_patch, w_patch)
 
         return cluster_results
 

@@ -6,6 +6,16 @@
 	<string></string>
 	<key>CFBundleExecutable</key>
 	<string></string>
+	<key>NSCameraUsageDescription</key>
+	<string>SVD_ROS_Comms needs camera access to detect ArUco markers for spatial localization.</string>
+	<key>NSWorldSensingUsageDescription</key>
+	<string>SVD_ROS_Comms needs world sensing to track your position and display drill sites in AR.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>SVD_ROS_Comms needs local network access to connect to the ROS server for receiving drill site data.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_ros._tcp</string>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
