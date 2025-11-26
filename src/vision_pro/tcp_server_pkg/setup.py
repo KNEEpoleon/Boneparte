@@ -10,6 +10,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/launch', ['launch/avp_server_launch.py']),
         ('share/' + package_name, ['tcp_server_pkg/tcp_server_node.py']),
         ('share/' + package_name, ['tcp_server_pkg/measure_latency.py']),
     ],
@@ -23,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'tcp_server_node = tcp_server_pkg.tcp_server_node:main',
+            'avp_tcp_server = tcp_server_pkg.avp_tcp_server:main',
         ],
     },
 )

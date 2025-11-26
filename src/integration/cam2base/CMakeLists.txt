@@ -22,6 +22,14 @@ ament_target_dependencies(hand2eye_tf_publisher
     geometry_msgs    
 )
 
+add_executable(aruco_tf_publisher src/aruco_tf_publisher.cpp)
+ament_target_dependencies(aruco_tf_publisher
+    rclcpp
+    tf2
+    tf2_ros
+    geometry_msgs    
+)
+
 # Make the Python script executable and install it
 install(PROGRAMS
   src/drill_pose_publisher.py
@@ -30,6 +38,8 @@ install(PROGRAMS
 
 install(PROGRAMS
   src/pointcloud_base_publisher.py
+  src/aruco_drill_pose_publisher.py
+  src/aruco_calibration_node.py
   DESTINATION lib/cam2base
 )
 
@@ -42,7 +52,7 @@ install(DIRECTORY launch/
   DESTINATION share/cam2base/launch
 )
 
-install(TARGETS hand2eye_tf_publisher
+install(TARGETS hand2eye_tf_publisher aruco_tf_publisher
     DESTINATION lib/cam2base)
 
 ament_package()
